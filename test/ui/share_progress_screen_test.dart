@@ -179,7 +179,7 @@ void main() {
     expect(size.height, 1920);
   });
 
-  screenTest('partage le format bloc en 1080 × 1080', (tester) async {
+  screenTest('partage le format bloc en 1080 × 900', (tester) async {
     await pumpScreen(tester, _item());
 
     await tester.tap(find.text('Bloc'));
@@ -187,7 +187,7 @@ void main() {
     await tapShare(tester);
 
     expect(sharing.fileName, 'biblivre-progression-bloc.png');
-    expect(_pngSize(sharing.bytes!), (width: 1080, height: 1080));
+    expect(_pngSize(sharing.bytes!), (width: 1080, height: 900));
   });
 
   screenTest('revient au grand format à la demande', (tester) async {

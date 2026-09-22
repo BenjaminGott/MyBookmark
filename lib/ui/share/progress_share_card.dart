@@ -14,8 +14,8 @@ enum ShareCardFormat {
   /// Pleine hauteur, pour une story ou un post : 1080 × 1920.
   large(360, 640, 'Grand', '1080 × 1920'),
 
-  /// Bloc carré, pensé pour être posé à côté d'autre chose : 1080 × 1080.
-  compact(360, 360, 'Bloc', '1080 × 1080');
+  /// Bloc bas, pensé pour être posé à côté d'autre chose : 1080 × 900.
+  compact(360, 300, 'Bloc', '1080 × 900');
 
   const ShareCardFormat(this.width, this.height, this.label, this.pixels);
 
@@ -168,7 +168,7 @@ class _CompactLayout extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 if (cover != null) ...<Widget>[
-                  _Cover(cover: cover!, width: 100, height: 150),
+                  _Cover(cover: cover!, width: 96, height: 144),
                   const SizedBox(width: 18),
                 ],
                 Expanded(
@@ -492,35 +492,49 @@ class _ProgressBar extends StatelessWidget {
               // Le rail reste discret : c'est la portion lue qui porte le
               // regard.
               DecoratedBox(
+                key: const Key('progress-track'),
                 decoration: BoxDecoration(
                   color: palette.foreground.withValues(alpha: 0.16),
                   borderRadius: radius,
                 ),
                 child: const SizedBox.expand(),
               ),
-              SizedBox(
+              // `Positioned` avec haut et bas fixés : sans cela, dans une
+              // `Stack` aux contraintes lâches, un `DecoratedBox` sans enfant
+              // se retrouve haut de zéro et la portion lue ne peint rien —
+              // c'est exactement ce qui rendait la barre invisible.
+              Positioned(
+                left: 0,
+                top: 0,
+                bottom: 0,
                 width: filled,
                 child: DecoratedBox(
+                  key: const Key('progress-fill'),
                   decoration: BoxDecoration(
                     color: palette.accent,
                     borderRadius: radius,
                   ),
                 ),
               ),
-              Positioned.fill(
+              // Le chiffre est borné à la portion lue quand il y tient : aligné
+              // sur la barre entière, il se retrouverait sur le rail vide, dans
+              // la couleur prévue pour le remplissage — donc illisible.
+              Positioned(
+                left: inside ? 0 : filled + 10,
+                top: 0,
+                bottom: 0,
+                width: inside ? filled : null,
+                right: inside ? null : 0,
                 child: Padding(
-                  padding: EdgeInsets.only(
-                    left: inside ? 0 : filled + 10,
-                    right: inside ? height * 0.5 : 0,
-                  ),
+                  padding: EdgeInsets.only(right: inside ? height * 0.45 : 0),
                   child: Align(
                     alignment:
                         inside ? Alignment.centerRight : Alignment.centerLeft,
                     child: Text(
                       '$percent %',
+                      key: const Key('progress-label'),
                       style: TextStyle(
-                        color:
-                            inside ? palette.onAccent : palette.foreground,
+                        color: inside ? palette.onAccent : palette.foreground,
                         fontSize: height * 0.52,
                         fontWeight: FontWeight.w600,
                         height: 1,

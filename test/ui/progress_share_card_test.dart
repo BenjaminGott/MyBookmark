@@ -265,6 +265,40 @@ void main() {
       expect(find.textContaining('biblivre'), findsNothing);
     });
 
+    testWidgets('dessine réellement la portion lue', (tester) async {
+      await pumpCard(tester, _item(currentPage: 329, pageCount: 658));
+
+      // Le défaut précédent ne venait pas de la couleur mais de la mise en
+      // page : dans une `Stack` aux contraintes lâches, le remplissage se
+      // retrouvait haut de zéro et ne peignait rien. On mesure donc sa taille,
+      // pas seulement sa teinte.
+      final fill = tester.getSize(find.byKey(const Key('progress-fill')));
+      expect(fill.height, greaterThan(20));
+
+      // La carte fait 360 de large, moins 28 de marge de chaque côté ; à 50 %,
+      // le remplissage doit couvrir la moitié de cette largeur.
+      final bar = tester.getSize(find.byKey(const Key('progress-track')));
+      expect(fill.width, closeTo(bar.width / 2, 1));
+      expect(fill.height, bar.height);
+    });
+
+    testWidgets('ne dessine rien quand la lecture commence à peine',
+        (tester) async {
+      await pumpCard(tester, _item(currentPage: 0, pageCount: 658));
+
+      expect(tester.getSize(find.byKey(const Key('progress-fill'))).width, 0);
+      expect(find.text('0 %'), findsOne);
+    });
+
+    testWidgets('remplit toute la barre à 100 %', (tester) async {
+      await pumpCard(tester, _item(currentPage: 658, pageCount: 658));
+
+      final fill = tester.getSize(find.byKey(const Key('progress-fill')));
+      final bar = tester.getSize(find.byKey(const Key('progress-track')));
+      expect(fill.width, bar.width);
+      expect(find.text('100 %'), findsOne);
+    });
+
     testWidgets('écrit le pourcentage dans la barre', (tester) async {
       await pumpCard(tester, _item(currentPage: 500, pageCount: 658));
 
@@ -272,6 +306,13 @@ void main() {
       // pour être lue sur elle.
       final label = tester.widget<Text>(find.text('76 %'));
       expect(label.style!.color, ProgressCardPalette.fallback().onAccent);
+
+      // Et il est réellement au-dessus du remplissage, pas sur le rail vide :
+      // c'est là qu'il se perdait auparavant.
+      final fill = tester.getRect(find.byKey(const Key('progress-fill')));
+      final text = tester.getRect(find.byKey(const Key('progress-label')));
+      expect(text.left, greaterThanOrEqualTo(fill.left));
+      expect(text.right, lessThanOrEqualTo(fill.right));
     });
 
     testWidgets('sort le pourcentage de la barre quand elle est trop courte',
@@ -282,14 +323,23 @@ void main() {
       // côté, sur le rail, dans la couleur du texte courant.
       final label = tester.widget<Text>(find.text('1 %'));
       expect(label.style!.color, ProgressCardPalette.fallback().foreground);
+
+      final fill = tester.getRect(find.byKey(const Key('progress-fill')));
+      final text = tester.getRect(find.byKey(const Key('progress-label')));
+      expect(text.left, greaterThan(fill.right));
     });
 
-    testWidgets('le format bloc mesure 360 × 360', (tester) async {
+    testWidgets('le format bloc est bas et large', (tester) async {
       await pumpCard(tester, _item(), format: ShareCardFormat.compact);
 
       expect(
         tester.getSize(find.byKey(captureKey)),
         Size(ShareCardFormat.compact.width, ShareCardFormat.compact.height),
+      );
+      // Le bloc doit rester nettement plus bas que le grand format.
+      expect(
+        ShareCardFormat.compact.height,
+        lessThan(ShareCardFormat.large.height / 2),
       );
     });
 
@@ -315,7 +365,7 @@ void main() {
       expect(find.textContaining('%'), findsNothing);
     });
 
-    testWidgets('le format bloc se capture en 1080 × 1080', (tester) async {
+    testWidgets('le format bloc se capture en 1080 × 900', (tester) async {
       await pumpCard(tester, _item(), format: ShareCardFormat.compact);
 
       final boundary =
@@ -329,7 +379,7 @@ void main() {
         return _pngSize(data!.buffer.asUint8List());
       });
 
-      expect(size, (width: 1080, height: 1080));
+      expect(size, (width: 1080, height: 900));
     });
 
     testWidgets('propose deux noms de fichier distincts', (tester) async {
