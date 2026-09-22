@@ -12,26 +12,47 @@ class PreferencesService {
   static const String _themeKey = 'theme_mode';
   static const String _goalPrefix = 'reading_goal_';
 
-  final SharedPreferences _preferences;
+  /// Nul quand les préférences n'ont pas pu être chargées.
+  final SharedPreferences? _preferences;
 
   static Future<PreferencesService> load() async {
     return PreferencesService(await SharedPreferences.getInstance());
   }
 
-  AppThemeMode get themeMode =>
-      AppThemeMode.fromWire(_preferences.getString(_themeKey));
+  /// Charge les préférences, ou repart sur les valeurs par défaut.
+  ///
+  /// Un réglage d'apparence ne vaut pas un écran noir au lancement : si le
+  /// stockage du téléphone refuse de répondre, l'application démarre quand même
+  /// avec le thème système, et les écritures suivantes seront simplement sans
+  /// effet.
+  static Future<PreferencesService> loadOrDefaults() async {
+    try {
+      return await load();
+    } on Object {
+      return PreferencesService(null);
+    }
+  }
 
-  Future<void> setThemeMode(AppThemeMode mode) =>
-      _preferences.setString(_themeKey, mode.wireName);
+  AppThemeMode get themeMode =>
+      AppThemeMode.fromWire(_preferences?.getString(_themeKey));
+
+  Future<void> setThemeMode(AppThemeMode mode) async {
+    await _preferences?.setString(_themeKey, mode.wireName);
+  }
 
   /// Objectif de lecture d'une année, prévu pour le défi annuel à venir.
-  int? readingGoal(int year) => _preferences.getInt('$_goalPrefix$year');
+  int? readingGoal(int year) => _preferences?.getInt('$_goalPrefix$year');
 
-  Future<void> setReadingGoal(int year, int? books) {
+  Future<void> setReadingGoal(int year, int? books) async {
+    final preferences = _preferences;
+    if (preferences == null) {
+      return;
+    }
     final key = '$_goalPrefix$year';
     if (books == null || books <= 0) {
-      return _preferences.remove(key);
+      await preferences.remove(key);
+      return;
     }
-    return _preferences.setInt(key, books);
+    await preferences.setInt(key, books);
   }
 }

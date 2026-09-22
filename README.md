@@ -81,7 +81,17 @@ Android récent, prendre `app-arm64-v8a-release.apk` (~21 Mo).
 
 `flutter build apk --release` seul produit un APK universel de ~60 Mo qui
 contient les trois architectures ; c'est pratique si l'on ne sait pas quel
-téléphone recevra le fichier.
+téléphone recevra le fichier. Pour un seul appareil connu :
+
+```bash
+flutter build apk --release --target-platform android-arm64
+```
+
+**Attention en changeant de commande** : `--split-per-abi` décale le code de
+version (+1000 pour armeabi-v7a, +2000 pour arm64-v8a, +4000 pour x86_64). Un
+APK issu de `--split-per-abi` porte donc le code 2001 là où les autres portent
+1, et réinstaller par-dessus échoue avec `INSTALL_FAILED_VERSION_DOWNGRADE`. Il
+faut alors désinstaller d'abord, ou s'en tenir à une seule des deux commandes.
 
 ## Installer sur un téléphone
 

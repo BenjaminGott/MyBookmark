@@ -7,16 +7,21 @@ import 'data/prefs/preferences_service.dart';
 import 'ui/providers/settings_providers.dart';
 
 Future<void> main() async {
+  // Obligatoire avant tout appel de plateforme : `shared_preferences` passe par
+  // un canal qui n'existe pas encore sans cette ligne, et l'exception se
+  // produirait avant le premier écran — l'application n'afficherait que du noir.
+  WidgetsFlutterBinding.ensureInitialized();
+
   // Charge les noms de mois et de jours en français avant le premier écran.
   await initializeDateFormatting('fr_FR');
 
-  // Le thème est lu avant le premier rendu : pas de passage du clair au sombre
-  // sous les yeux de l'utilisateur au lancement.
-  final preferences = await PreferencesService.load();
-
   runApp(
     ProviderScope(
-      overrides: [preferencesServiceProvider.overrideWithValue(preferences)],
+      overrides: [
+        preferencesServiceProvider.overrideWithValue(
+          await PreferencesService.loadOrDefaults(),
+        ),
+      ],
       child: const BiblivreApp(),
     ),
   );
