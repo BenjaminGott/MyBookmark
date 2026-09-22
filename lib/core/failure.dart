@@ -52,3 +52,17 @@ class MalformedResponseException extends AppException {
 class RequestCancelledException extends AppException {
   const RequestCancelledException([super.message = 'Requête annulée.']);
 }
+
+/// Le livre est déjà en bibliothèque : sa clé Open Library y est déjà.
+class DuplicateBookException extends AppException {
+  const DuplicateBookException([
+    super.message = 'Ce livre est déjà dans votre bibliothèque.',
+  ]);
+}
+
+/// L'écriture en base a échoué : contrainte violée, disque plein…
+class StorageException extends AppException {
+  const StorageException([
+    super.message = 'Enregistrement impossible. Vérifiez la saisie.',
+  ]);
+}

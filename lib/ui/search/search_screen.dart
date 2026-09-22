@@ -3,7 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../domain/models/book_search_result.dart';
 import '../../domain/repositories/search_repository.dart';
+import '../providers/book_actions_controller.dart';
+import '../providers/book_providers.dart';
+import '../shelf_labels.dart';
 import '../widgets/book_cover.dart';
+import '../widgets/shelf_picker.dart';
 import '../widgets/status_views.dart';
 import 'search_controller.dart';
 import 'search_state.dart';
@@ -105,22 +109,34 @@ class _Results extends ConsumerWidget {
       return const SizedBox.shrink();
     }
 
+    // Une erreur de lecture de la base ne doit pas cacher les résultats : sans
+    // cette liste, on considère simplement qu'aucun livre n'est déjà connu.
+    final known = ref.watch(knownOlKeysProvider).value ?? const <String>{};
+
     return ListView.separated(
       itemCount: state.results.length,
       separatorBuilder: (context, index) => const Divider(height: 1),
-      itemBuilder: (context, index) =>
-          _ResultTile(result: state.results[index]),
+      itemBuilder: (context, index) {
+        final result = state.results[index];
+        return _ResultTile(
+          result: result,
+          alreadyAdded: known.contains(result.olKey),
+        );
+      },
     );
   }
 }
 
-class _ResultTile extends StatelessWidget {
-  const _ResultTile({required this.result});
+class _ResultTile extends ConsumerWidget {
+  const _ResultTile({required this.result, required this.alreadyAdded});
 
   final BookSearchResult result;
+  final bool alreadyAdded;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final busy = ref.watch(bookActionsProvider);
+
     return ListTile(
       leading: BookCover(url: result.coverUrl()),
       title: Text(result.title, maxLines: 2, overflow: TextOverflow.ellipsis),
@@ -129,7 +145,42 @@ class _ResultTile extends StatelessWidget {
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       ),
-      onTap: () {},
+      trailing: alreadyAdded
+          ? Icon(
+              Icons.library_add_check,
+              semanticLabel: 'Déjà dans votre bibliothèque',
+              color: Theme.of(context).colorScheme.primary,
+            )
+          : const Icon(Icons.add),
+      enabled: !busy && !alreadyAdded,
+      onTap: () => _add(context, ref),
+    );
+  }
+
+  Future<void> _add(BuildContext context, WidgetRef ref) async {
+    final shelf = await showShelfPicker(context, bookTitle: result.title);
+    if (shelf == null || !context.mounted) {
+      return;
+    }
+
+    final outcome = await ref
+        .read(bookActionsProvider.notifier)
+        .addFromSearch(result, shelf);
+    if (!context.mounted) {
+      return;
+    }
+
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.hideCurrentSnackBar();
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(
+          switch (outcome) {
+            ActionSuccess() => shelf.addedMessage,
+            ActionFailure(message: final message) => message,
+          },
+        ),
+      ),
     );
   }
 

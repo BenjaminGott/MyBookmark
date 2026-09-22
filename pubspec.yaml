@@ -20,6 +20,9 @@ dependencies:
   # sqlite3_flutter_libs n'est plus nécessaire, il est marqué EOL sur pub.dev)
   drift: ^2.35.0
   drift_flutter: ^0.3.1
+  # Référencé directement pour attraper SqliteException et traduire les
+  # violations de contrainte en messages français.
+  sqlite3: ^3.5.2
 
   # Réseau (Open Library, sans clé d'API)
   http: ^1.6.0
