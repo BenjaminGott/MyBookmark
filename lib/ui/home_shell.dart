@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'book_detail/book_detail_screen.dart';
 import 'library/library_screen.dart';
 import 'search/search_screen.dart';
 
@@ -16,6 +17,14 @@ class _HomeShellState extends State<HomeShell> {
 
   void _goToSearch() => setState(() => _index = 1);
 
+  void _openBook(int bookId) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (context) => BookDetailScreen(bookId: bookId),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,7 +33,7 @@ class _HomeShellState extends State<HomeShell> {
       body: IndexedStack(
         index: _index,
         children: <Widget>[
-          LibraryScreen(onOpenSearch: _goToSearch),
+          LibraryScreen(onOpenSearch: _goToSearch, onOpenBook: _openBook),
           const SearchScreen(),
         ],
       ),
