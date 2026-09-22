@@ -120,10 +120,6 @@ class _ShareProgressScreenState extends ConsumerState<ShareProgressScreen> {
   @override
   Widget build(BuildContext context) {
     final palette = _palette;
-    // La carte plein écran suit les proportions de l'appareil : une story en
-    // 16:9 laisserait des bandes sur un téléphone allongé.
-    final size = MediaQuery.sizeOf(context);
-    final cardHeight = _format.heightForAspect(size.height / size.width);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Partager ma progression')),
@@ -140,7 +136,6 @@ class _ShareProgressScreenState extends ConsumerState<ShareProgressScreen> {
                       palette: palette,
                       cover: _cover,
                       format: _format,
-                      cardHeight: cardHeight,
                     ),
                   ),
                 ),
@@ -172,7 +167,7 @@ class _ShareProgressScreenState extends ConsumerState<ShareProgressScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  _format.pixelsFor(cardHeight),
+                  _format.pixels,
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
                 SafeArea(
@@ -260,7 +255,6 @@ class _CardPreview extends StatelessWidget {
     required this.palette,
     required this.cover,
     required this.format,
-    required this.cardHeight,
   });
 
   final GlobalKey cardKey;
@@ -268,7 +262,6 @@ class _CardPreview extends StatelessWidget {
   final ProgressCardPalette palette;
   final ImageProvider? cover;
   final ShareCardFormat format;
-  final double cardHeight;
 
   @override
   Widget build(BuildContext context) {
@@ -276,7 +269,7 @@ class _CardPreview extends StatelessWidget {
       builder: (context, constraints) {
         final scale = math.min(
           constraints.maxWidth / format.width,
-          constraints.maxHeight / cardHeight,
+          constraints.maxHeight / format.height,
         );
 
         return Transform.scale(
@@ -286,7 +279,6 @@ class _CardPreview extends StatelessWidget {
             palette: palette,
             cover: cover,
             format: format,
-            height: cardHeight,
             captureKey: cardKey,
           ),
         );

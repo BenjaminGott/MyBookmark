@@ -17,10 +17,10 @@ l'ajout — passé ce point, l'application fonctionne entièrement hors ligne.
 5. Progression : saisie de la page en cours, pourcentage et barre
 6. Saisie manuelle d'un livre, et correction des métadonnées fausses
 7. Export et import JSON de toute la base
-8. Partage de sa progression en carte image, en trois formats — bloc
-   (1080 × 636, par défaut), story 9:16 (1080 × 1920) et plein écran aux
-   proportions de l'appareil (1080 × 2400 en 20:9) — sur un dégradé tiré de la
-   couverture, avec variantes claire, sombre et vive, et composition manuelle
+8. Partage de sa progression en carte image, en deux formats — bloc
+   (1080 × 636, par défaut) et story 9:16 (1080 × 1920) — sur un dégradé tiré
+   de la couverture, avec variantes claire, sombre et vive, et composition
+   manuelle du dégradé
 
 Thèmes clair et sombre, interface intégralement en français.
 

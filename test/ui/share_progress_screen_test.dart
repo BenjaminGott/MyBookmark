@@ -146,7 +146,10 @@ void main() {
     }
   }
 
-  void screenTest(String description, Future<void> Function(WidgetTester) body) {
+  void screenTest(
+    String description,
+    Future<void> Function(WidgetTester) body,
+  ) {
     testWidgets(description, (tester) async {
       await body(tester);
       await tester.pumpWidget(const SizedBox.shrink());
@@ -162,10 +165,6 @@ void main() {
     expect(find.text('page 120 sur 658'), findsOne);
     expect(find.widgetWithText(FilledButton, 'Partager'), findsOne);
   });
-
-  /// La hauteur attendue du format « Grand » sur l'écran de test : 1000 × 1800,
-  /// soit un rapport de 1,8 — au-delà du 16:9, la carte s'allonge d'autant.
-  const expectedScreenHeight = 1944;
 
   /// Sélectionne un format dans le sélecteur.
   Future<void> chooseFormat(WidgetTester tester, String label) async {
@@ -199,24 +198,10 @@ void main() {
     expect(_pngSize(sharing.bytes!), (width: 1080, height: 1920));
   });
 
-  screenTest('partage le plein écran aux proportions de l\'appareil',
-      (tester) async {
-    await pumpScreen(tester, _item());
-
-    await chooseFormat(tester, 'Grand');
-    await tapShare(tester);
-
-    expect(sharing.fileName, 'biblivre-progression-plein-ecran.png');
-    final size = _pngSize(sharing.bytes!);
-    expect(size, (width: 1080, height: expectedScreenHeight));
-    // L'image couvre l'écran : mêmes proportions, aux arrondis près.
-    expect(size.height / size.width, closeTo(1800 / 1000, 0.01));
-  });
-
   screenTest('revient au bloc après avoir changé d\'avis', (tester) async {
     await pumpScreen(tester, _item());
 
-    await chooseFormat(tester, 'Grand');
+    await chooseFormat(tester, 'Moyen');
     await chooseFormat(tester, 'Bloc');
     await tapShare(tester);
 
@@ -338,8 +323,9 @@ void main() {
     expect(_pngSize(sharing.bytes!), (width: 1080, height: 636));
   });
 
-  screenTest('retombe sur la variante sans image si la couverture échoue',
-      (tester) async {
+  screenTest('retombe sur la variante sans image si la couverture échoue', (
+    tester,
+  ) async {
     await pumpScreen(
       tester,
       _item(coverUrl: 'https://covers.openlibrary.org/b/id/1-L.jpg'),

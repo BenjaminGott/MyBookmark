@@ -27,31 +27,11 @@ enum ShareCardFormat {
   /// Le 9:16 qu'Instagram, TikTok et Snapchat acceptent sans recadrer. Il
   /// laisse des bandes sur un téléphone allongé, mais il ne sera jamais rogné
   /// où qu'il finisse.
-  story(360, 640, 'Moyen', 0),
+  story(360, 640, 'Moyen', 0);
 
-  /// Plein écran : la hauteur suit les proportions de l'appareil.
-  ///
-  /// 1080 × 2400 sur un écran 20:9, 1080 × 2340 sur un 19,5:9. L'image couvre
-  /// l'écran bord à bord, au prix d'un recadrage possible sur les plateformes
-  /// qui imposent le 9:16.
-  screen(360, 640, 'Grand', 0, adaptsToScreen: true);
-
-  const ShareCardFormat(
-    this.width,
-    this.height,
-    this.label,
-    this.cornerRadius, {
-    this.adaptsToScreen = false,
-  });
-
-  /// Proportions extrêmes acceptées, du 16:9 au 21:9. Au-delà, une carte
-  /// démesurément haute deviendrait illisible une fois réduite.
-  static const double _minAspect = 16 / 9;
-  static const double _maxAspect = 21 / 9;
+  const ShareCardFormat(this.width, this.height, this.label, this.cornerRadius);
 
   final double width;
-
-  /// Hauteur par défaut, celle d'un écran 16:9.
   final double height;
 
   /// Rayon des coins, en points. Zéro pour un bord franc.
@@ -60,34 +40,21 @@ enum ShareCardFormat {
   /// Le nom montré dans le sélecteur.
   final String label;
 
-  /// Vrai quand la hauteur suit les proportions de l'appareil.
-  final bool adaptsToScreen;
-
-  /// La hauteur à donner à la carte sur un écran de ce rapport hauteur/largeur.
-  double heightForAspect(double aspect) {
-    if (!adaptsToScreen) {
-      return height;
-    }
-    return width * aspect.clamp(_minAspect, _maxAspect);
-  }
-
   /// La taille de l'image produite, annoncée à l'utilisateur.
-  String pixelsFor(double height) =>
+  String get pixels =>
       '${(width * ProgressShareCard.captureRatio).round()} × '
       '${(height * ProgressShareCard.captureRatio).round()}';
 
   String get fileName => switch (this) {
     ShareCardFormat.compact => 'biblivre-progression-bloc.png',
     ShareCardFormat.story => 'biblivre-progression-story.png',
-    ShareCardFormat.screen => 'biblivre-progression-plein-ecran.png',
   };
 }
 
 /// La carte de progression partagée, dessinée à taille fixe.
 ///
-/// Rien dans cette carte ne dépend du thème de l'application. Sa largeur est
-/// toujours la même ; seule la hauteur du grand format suit les proportions de
-/// l'appareil, pour que la story couvre l'écran au lieu d'y laisser des bandes.
+/// Rien dans cette carte ne dépend du thème de l'application ni de la taille de
+/// l'écran : l'image partagée est identique d'un téléphone à l'autre.
 ///
 /// La composition est alignée à gauche et le pourcentage logé dans la barre
 /// elle-même : une mise en page éditoriale, qui ne cherche à ressembler à
@@ -100,7 +67,6 @@ class ProgressShareCard extends StatelessWidget {
     this.format = ShareCardFormat.compact,
     this.cover,
     this.captureKey,
-    this.height,
   });
 
   /// Ratio de capture : 360 × 3 = 1080, 640 × 3 = 1920.
@@ -112,9 +78,6 @@ class ProgressShareCard extends StatelessWidget {
 
   /// La couverture, déjà chargée. Nulle si le livre n'en a pas.
   final ImageProvider? cover;
-
-  /// Hauteur imposée, quand le format suit l'écran. Sinon celle du format.
-  final double? height;
 
   /// La clé de la frontière de capture, posée au plus près de la carte.
   ///
@@ -133,7 +96,7 @@ class ProgressShareCard extends StatelessWidget {
         key: captureKey,
         child: SizedBox(
           width: format.width,
-          height: height ?? format.height,
+          height: format.height,
           child: DecoratedBox(
             key: const Key('card-background'),
             decoration: BoxDecoration(
@@ -152,10 +115,7 @@ class ProgressShareCard extends StatelessWidget {
                 palette: palette,
                 cover: cover,
               ),
-              // Les deux formats hauts partagent la même composition ; seule
-              // leur hauteur diffère.
-              ShareCardFormat.story ||
-              ShareCardFormat.screen => _LargeLayout(
+              ShareCardFormat.story => _LargeLayout(
                 item: item,
                 palette: palette,
                 cover: cover,

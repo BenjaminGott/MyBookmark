@@ -521,27 +521,21 @@ void main() {
       expect(cover.width / cover.height, closeTo(2 / 3, 0.02));
     });
 
-    test('allonge le grand format sur un écran allongé', () {
-      // Un téléphone en 20:9 : la story doit couvrir l'écran, pas s'arrêter
-      // en 16:9 et laisser des bandes.
-      expect(ShareCardFormat.screen.heightForAspect(20 / 9), 800);
-      expect(ShareCardFormat.screen.pixelsFor(800), '1080 × 2400');
-
-      // Un écran 16:9 retrouve la taille de story classique.
-      expect(ShareCardFormat.screen.heightForAspect(16 / 9), 640);
-      expect(ShareCardFormat.screen.pixelsFor(640), '1080 × 1920');
+    test('donne la story au format de référence', () {
+      // Le 9:16 attendu par les plateformes, quel que soit l'appareil.
+      expect(ShareCardFormat.story.pixels, '1080 × 1920');
+      expect(ShareCardFormat.compact.pixels, '1080 × 636');
     });
 
-    test('borne les proportions extrêmes', () {
-      // Ni plus courte qu'une story, ni démesurément haute : au-delà, l'image
-      // deviendrait illisible une fois réduite.
-      expect(ShareCardFormat.screen.heightForAspect(1.2), 640);
-      expect(ShareCardFormat.screen.heightForAspect(3), 840);
-    });
-
-    test('le bloc garde sa taille quel que soit l\'écran', () {
-      expect(ShareCardFormat.compact.heightForAspect(20 / 9), 212);
-      expect(ShareCardFormat.compact.heightForAspect(16 / 9), 212);
+    test('propose deux formats, du plus petit au plus grand', () {
+      expect(ShareCardFormat.values.map((format) => format.label), <String>[
+        'Bloc',
+        'Moyen',
+      ]);
+      expect(
+        ShareCardFormat.compact.height,
+        lessThan(ShareCardFormat.story.height),
+      );
     });
 
     testWidgets('propose deux noms de fichier distincts', (tester) async {
