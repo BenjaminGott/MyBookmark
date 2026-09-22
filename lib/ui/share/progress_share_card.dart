@@ -12,15 +12,29 @@ import 'progress_card_palette.dart';
 /// [ProgressShareCard.captureRatio], elles donnent les pixels annoncés.
 enum ShareCardFormat {
   /// Pleine hauteur, pour une story ou un post : 1080 × 1920.
-  large(360, 640, 'Grand', '1080 × 1920'),
+  ///
+  /// Sans coins arrondis : elle occupe tout l'écran, il n'y a rien derrière.
+  large(360, 640, 'Grand', '1080 × 1920', 0),
 
   /// Bloc bas, pensé pour être posé à côté d'autre chose : 1080 × 900.
-  compact(360, 300, 'Bloc', '1080 × 900');
+  ///
+  /// Coins arrondis et donc transparents : il se pose sur un fond quelconque
+  /// sans trancher dessus par un angle droit.
+  compact(360, 300, 'Bloc', '1080 × 900', 26);
 
-  const ShareCardFormat(this.width, this.height, this.label, this.pixels);
+  const ShareCardFormat(
+    this.width,
+    this.height,
+    this.label,
+    this.pixels,
+    this.cornerRadius,
+  );
 
   final double width;
   final double height;
+
+  /// Rayon des coins, en points. Zéro pour un bord franc.
+  final double cornerRadius;
 
   /// Le nom montré dans le sélecteur.
   final String label;
@@ -81,7 +95,11 @@ class ProgressShareCard extends StatelessWidget {
           width: format.width,
           height: format.height,
           child: DecoratedBox(
+            key: const Key('card-background'),
             decoration: BoxDecoration(
+              // Hors des coins, l'image partagée est transparente : le PNG
+              // conserve son canal alpha à la capture.
+              borderRadius: BorderRadius.circular(format.cornerRadius),
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -161,15 +179,20 @@ class _CompactLayout extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
+          // Seule l'accroche traverse toute la largeur : tout le reste vit à
+          // droite de la couverture.
           _Kicker(item: item, palette: palette),
-          const SizedBox(height: 18),
+          const SizedBox(height: 16),
           Expanded(
             child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
                 if (cover != null) ...<Widget>[
-                  _Cover(cover: cover!, width: 96, height: 144),
-                  const SizedBox(width: 18),
+                  Align(
+                    alignment: Alignment.topLeft,
+                    child: _Cover(cover: cover!, width: 112, height: 168),
+                  ),
+                  const SizedBox(width: 16),
                 ],
                 Expanded(
                   child: Column(
@@ -178,23 +201,28 @@ class _CompactLayout extends StatelessWidget {
                       _Title(
                         item: item,
                         palette: palette,
-                        size: cover == null ? 30 : 21,
+                        size: cover == null ? 30 : 20,
                         maxLines: cover == null ? 4 : 3,
                       ),
                       const Spacer(),
-                      if (item.currentEntry.rating != null)
+                      if (item.currentEntry.rating != null) ...<Widget>[
                         _Stars(
                           rating: item.currentEntry.rating!,
                           palette: palette,
                         ),
+                        const SizedBox(height: 12),
+                      ],
+                      _ProgressBlock(
+                        item: item,
+                        palette: palette,
+                        style: _BarStyle.thick,
+                      ),
                     ],
                   ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 16),
-          _ProgressBlock(item: item, palette: palette, style: _BarStyle.thick),
         ],
       ),
     );

@@ -50,6 +50,21 @@ LibraryItem _item({
 ///
 /// Les 8 premiers octets sont la signature, puis la longueur et le type du
 /// premier bloc ; la taille commence donc à l'octet 16.
+/// Un PNG d'un pixel transparent, de quoi tenir lieu de couverture sans
+/// dépendre du réseau : la mise en page n'a pas besoin que l'image soit
+/// décodée, seulement qu'elle existe.
+final Uint8List _onePixelPng = Uint8List.fromList(<int>[
+  0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, //
+  0x00, 0x00, 0x00, 0x0D, 0x49, 0x48, 0x44, 0x52,
+  0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
+  0x08, 0x06, 0x00, 0x00, 0x00, 0x1F, 0x15, 0xC4,
+  0x89, 0x00, 0x00, 0x00, 0x0A, 0x49, 0x44, 0x41,
+  0x54, 0x78, 0x9C, 0x63, 0x00, 0x01, 0x00, 0x00,
+  0x05, 0x00, 0x01, 0x0D, 0x0A, 0x2D, 0xB4, 0x00,
+  0x00, 0x00, 0x00, 0x49, 0x45, 0x4E, 0x44, 0xAE,
+  0x42, 0x60, 0x82,
+]);
+
 ({int width, int height}) _pngSize(Uint8List bytes) {
   final data = ByteData.sublistView(bytes);
   return (width: data.getUint32(16), height: data.getUint32(20));
@@ -172,6 +187,7 @@ void main() {
       WidgetTester tester,
       LibraryItem item, {
       ShareCardFormat format = ShareCardFormat.large,
+      bool withCover = false,
     }) async {
       tester.view.physicalSize = const Size(400, 700);
       tester.view.devicePixelRatio = 1;
@@ -184,6 +200,7 @@ void main() {
               item: item,
               palette: ProgressCardPalette.fallback(),
               format: format,
+              cover: withCover ? MemoryImage(_onePixelPng) : null,
               captureKey: captureKey,
             ),
           ),
@@ -396,6 +413,59 @@ void main() {
       });
 
       expect(size, (width: 1080, height: 900));
+    });
+
+    testWidgets('arrondit les coins du bloc, pas ceux du grand format',
+        (tester) async {
+      await pumpCard(tester, _item(), format: ShareCardFormat.compact);
+      var decoration = tester
+          .widget<DecoratedBox>(find.byKey(const Key('card-background')))
+          .decoration as BoxDecoration;
+      // Hors des coins, la carte est transparente : elle se pose sur n'importe
+      // quel fond sans y découper un angle droit.
+      expect(decoration.borderRadius, isNotNull);
+      expect(ShareCardFormat.compact.cornerRadius, greaterThan(0));
+
+      await pumpCard(tester, _item());
+      decoration = tester
+          .widget<DecoratedBox>(find.byKey(const Key('card-background')))
+          .decoration as BoxDecoration;
+      expect(
+        decoration.borderRadius,
+        BorderRadius.circular(0),
+        reason: 'le grand format occupe tout l\'écran, il reste franc',
+      );
+    });
+
+    testWidgets('dans le bloc, tout se tient à droite de la couverture',
+        (tester) async {
+      await pumpCard(
+        tester,
+        _item(rating: 4),
+        format: ShareCardFormat.compact,
+        withCover: true,
+      );
+
+      final cover = tester.getRect(find.byType(Image));
+      for (final part in <Finder>[
+        find.text('Dune'),
+        find.text('Frank Herbert'),
+        find.byKey(const Key('progress-track')),
+        find.text('page 120 sur 658'),
+        find.byIcon(Icons.star).first,
+      ]) {
+        expect(
+          tester.getRect(part).left,
+          greaterThanOrEqualTo(cover.right),
+          reason: 'cet élément devrait être à droite de la couverture',
+        );
+      }
+
+      // Sauf l'accroche, qui traverse toute la largeur.
+      expect(
+        tester.getRect(find.text('EN COURS DE LECTURE')).left,
+        lessThan(cover.right),
+      );
     });
 
     testWidgets('propose deux noms de fichier distincts', (tester) async {
