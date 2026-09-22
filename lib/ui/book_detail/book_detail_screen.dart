@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/failure.dart';
 import '../../domain/models/library_item.dart';
 import '../../domain/models/shelf.dart';
+import '../book_form/book_form_screen.dart';
 import '../providers/book_actions_controller.dart';
 import '../providers/book_providers.dart';
 import '../widgets/status_views.dart';
@@ -100,6 +101,10 @@ class _BookMenu extends ConsumerWidget {
       onSelected: (action) => _handle(context, ref, action),
       itemBuilder: (context) => const <PopupMenuEntry<_BookMenuAction>>[
         PopupMenuItem<_BookMenuAction>(
+          value: _BookMenuAction.edit,
+          child: Text('Corriger les informations'),
+        ),
+        PopupMenuItem<_BookMenuAction>(
           value: _BookMenuAction.reread,
           child: Text('Commencer une relecture'),
         ),
@@ -117,6 +122,8 @@ class _BookMenu extends ConsumerWidget {
     _BookMenuAction action,
   ) async {
     switch (action) {
+      case _BookMenuAction.edit:
+        await openBookEditor(context, ref, bookId: item.book.id);
       case _BookMenuAction.reread:
         await _startReread(context, ref);
       case _BookMenuAction.delete:
@@ -187,4 +194,4 @@ class _BookMenu extends ConsumerWidget {
   }
 }
 
-enum _BookMenuAction { reread, delete }
+enum _BookMenuAction { edit, reread, delete }

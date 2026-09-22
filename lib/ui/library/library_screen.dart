@@ -5,6 +5,7 @@ import '../../core/failure.dart';
 import '../../domain/models/library_item.dart';
 import '../../domain/models/library_query.dart';
 import '../../domain/models/shelf.dart';
+import '../book_form/book_form_screen.dart';
 import '../shelf_labels.dart';
 import '../widgets/book_cover.dart';
 import '../widgets/progress_bar.dart';
@@ -31,6 +32,12 @@ class LibraryScreen extends ConsumerWidget {
         title: const Text('Ma bibliothèque'),
         actions: <Widget>[_SortButton(query: query)],
         bottom: _ShelfFilterBar(query: query),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => openManualBookForm(context),
+        icon: const Icon(Icons.edit_outlined),
+        label: const Text('Saisir un livre'),
+        tooltip: 'Ajouter un livre qu\'Open Library ne connaît pas',
       ),
       body: library.when(
         // Un changement de filtre garde la liste à l'écran le temps de la

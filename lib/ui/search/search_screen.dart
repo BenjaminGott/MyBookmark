@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../domain/models/book_search_result.dart';
 import '../../domain/repositories/search_repository.dart';
+import '../book_form/book_form_screen.dart';
 import '../providers/book_actions_controller.dart';
 import '../providers/book_providers.dart';
 import '../shelf_labels.dart';
@@ -96,11 +97,16 @@ class _Results extends ConsumerWidget {
     }
 
     if (state.hasNoResult) {
-      return const EmptyState(
+      return EmptyState(
         icon: Icons.search_off,
         title: 'Aucun résultat',
         message: 'Open Library ne connaît pas ce titre. '
-            'Vérifiez l\'orthographe, ou ajoutez le livre à la main.',
+            'Vérifiez l\'orthographe, ou saisissez le livre vous-même.',
+        action: FilledButton.tonalIcon(
+          onPressed: () => openManualBookForm(context),
+          icon: const Icon(Icons.edit_outlined),
+          label: const Text('Saisir le livre à la main'),
+        ),
       );
     }
 
