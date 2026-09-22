@@ -186,7 +186,7 @@ void main() {
     Future<void> pumpCard(
       WidgetTester tester,
       LibraryItem item, {
-      ShareCardFormat format = ShareCardFormat.large,
+      ShareCardFormat format = ShareCardFormat.story,
       bool withCover = false,
     }) async {
       tester.view.physicalSize = const Size(400, 700);
@@ -270,7 +270,7 @@ void main() {
 
       expect(
         tester.getSize(find.byKey(captureKey)),
-        Size(ShareCardFormat.large.width, ShareCardFormat.large.height),
+        Size(ShareCardFormat.story.width, ShareCardFormat.story.height),
       );
     });
 
@@ -372,7 +372,7 @@ void main() {
       // Le bloc doit rester nettement plus bas que le grand format.
       expect(
         ShareCardFormat.compact.height,
-        lessThan(ShareCardFormat.large.height / 2),
+        lessThan(ShareCardFormat.story.height / 2),
       );
     });
 
@@ -524,19 +524,19 @@ void main() {
     test('allonge le grand format sur un écran allongé', () {
       // Un téléphone en 20:9 : la story doit couvrir l'écran, pas s'arrêter
       // en 16:9 et laisser des bandes.
-      expect(ShareCardFormat.large.heightForAspect(20 / 9), 800);
-      expect(ShareCardFormat.large.pixelsFor(800), '1080 × 2400');
+      expect(ShareCardFormat.screen.heightForAspect(20 / 9), 800);
+      expect(ShareCardFormat.screen.pixelsFor(800), '1080 × 2400');
 
       // Un écran 16:9 retrouve la taille de story classique.
-      expect(ShareCardFormat.large.heightForAspect(16 / 9), 640);
-      expect(ShareCardFormat.large.pixelsFor(640), '1080 × 1920');
+      expect(ShareCardFormat.screen.heightForAspect(16 / 9), 640);
+      expect(ShareCardFormat.screen.pixelsFor(640), '1080 × 1920');
     });
 
     test('borne les proportions extrêmes', () {
       // Ni plus courte qu'une story, ni démesurément haute : au-delà, l'image
       // deviendrait illisible une fois réduite.
-      expect(ShareCardFormat.large.heightForAspect(1.2), 640);
-      expect(ShareCardFormat.large.heightForAspect(3), 840);
+      expect(ShareCardFormat.screen.heightForAspect(1.2), 640);
+      expect(ShareCardFormat.screen.heightForAspect(3), 840);
     });
 
     test('le bloc garde sa taille quel que soit l\'écran', () {
@@ -545,12 +545,11 @@ void main() {
     });
 
     testWidgets('propose deux noms de fichier distincts', (tester) async {
-      expect(
-        ShareCardFormat.large.fileName,
-        isNot(ShareCardFormat.compact.fileName),
-      );
-      expect(ShareCardFormat.large.fileName, endsWith('.png'));
-      expect(ShareCardFormat.compact.fileName, endsWith('.png'));
+      final names = <String>{
+        for (final format in ShareCardFormat.values) format.fileName,
+      };
+      expect(names, hasLength(ShareCardFormat.values.length));
+      expect(names.every((name) => name.endsWith('.png')), isTrue);
     });
 
     testWidgets('se capture en 1080 × 1920', (tester) async {

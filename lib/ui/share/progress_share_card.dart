@@ -11,23 +11,30 @@ import 'progress_card_palette.dart';
 /// Les dimensions sont données en points ; capturées au ratio de
 /// [ProgressShareCard.captureRatio], elles donnent les pixels annoncés.
 enum ShareCardFormat {
-  /// Plein écran, pour une story ou un post.
-  ///
-  /// Sa hauteur suit les proportions de l'appareil : sur un téléphone en 20:9,
-  /// une image en 16:9 laisserait des bandes. 1080 × 1920 n'est donc qu'un
-  /// défaut, celui d'un écran 16:9.
-  ///
-  /// Sans coins arrondis : elle occupe tout l'écran, il n'y a rien derrière.
-  large(360, 640, 'Grand', 0, adaptsToScreen: true),
-
   /// Bloc bas, pensé pour être posé à côté d'autre chose : 1080 × 636.
   ///
-  /// Sa hauteur est celle du bloc de texte, couverture comprise : l'image
-  /// s'arrête exactement sur la ligne des pages.
+  /// C'est le format par défaut : le plus souvent, on veut glisser sa lecture
+  /// dans une story déjà composée, pas en occuper toute la surface.
   ///
-  /// Coins arrondis et donc transparents : il se pose sur un fond quelconque
-  /// sans trancher dessus par un angle droit.
-  compact(360, 212, 'Bloc', 26);
+  /// Sa hauteur est celle du bloc de texte, couverture comprise : l'image
+  /// s'arrête exactement sur la ligne des pages. Coins arrondis et donc
+  /// transparents, pour se poser sur un fond quelconque sans y trancher un
+  /// angle droit.
+  compact(360, 212, 'Bloc', 26),
+
+  /// Story au format de référence : 1080 × 1920.
+  ///
+  /// Le 9:16 qu'Instagram, TikTok et Snapchat acceptent sans recadrer. Il
+  /// laisse des bandes sur un téléphone allongé, mais il ne sera jamais rogné
+  /// où qu'il finisse.
+  story(360, 640, 'Moyen', 0),
+
+  /// Plein écran : la hauteur suit les proportions de l'appareil.
+  ///
+  /// 1080 × 2400 sur un écran 20:9, 1080 × 2340 sur un 19,5:9. L'image couvre
+  /// l'écran bord à bord, au prix d'un recadrage possible sur les plateformes
+  /// qui imposent le 9:16.
+  screen(360, 640, 'Grand', 0, adaptsToScreen: true);
 
   const ShareCardFormat(
     this.width,
@@ -70,8 +77,9 @@ enum ShareCardFormat {
       '${(height * ProgressShareCard.captureRatio).round()}';
 
   String get fileName => switch (this) {
-    ShareCardFormat.large => 'biblivre-progression.png',
     ShareCardFormat.compact => 'biblivre-progression-bloc.png',
+    ShareCardFormat.story => 'biblivre-progression-story.png',
+    ShareCardFormat.screen => 'biblivre-progression-plein-ecran.png',
   };
 }
 
@@ -89,7 +97,7 @@ class ProgressShareCard extends StatelessWidget {
     required this.item,
     required this.palette,
     super.key,
-    this.format = ShareCardFormat.large,
+    this.format = ShareCardFormat.compact,
     this.cover,
     this.captureKey,
     this.height,
@@ -139,12 +147,15 @@ class ProgressShareCard extends StatelessWidget {
               ),
             ),
             child: switch (format) {
-              ShareCardFormat.large => _LargeLayout(
+              ShareCardFormat.compact => _CompactLayout(
                 item: item,
                 palette: palette,
                 cover: cover,
               ),
-              ShareCardFormat.compact => _CompactLayout(
+              // Les deux formats hauts partagent la même composition ; seule
+              // leur hauteur diffère.
+              ShareCardFormat.story ||
+              ShareCardFormat.screen => _LargeLayout(
                 item: item,
                 palette: palette,
                 cover: cover,

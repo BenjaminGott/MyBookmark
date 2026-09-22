@@ -163,51 +163,65 @@ void main() {
     expect(find.widgetWithText(FilledButton, 'Partager'), findsOne);
   });
 
-  /// La hauteur attendue pour l'écran de test : 1000 × 1800, soit un rapport
-  /// de 1,8 — au-delà du 16:9, donc la carte s'allonge d'autant.
-  const expectedLargeHeight = 1944;
+  /// La hauteur attendue du format « Grand » sur l'écran de test : 1000 × 1800,
+  /// soit un rapport de 1,8 — au-delà du 16:9, la carte s'allonge d'autant.
+  const expectedScreenHeight = 1944;
 
-  screenTest('partage une story aux proportions de l\'écran', (tester) async {
+  /// Sélectionne un format dans le sélecteur.
+  Future<void> chooseFormat(WidgetTester tester, String label) async {
+    await tester.tap(find.text(label));
+    await tester.pump();
+  }
+
+  screenTest('partage le bloc par défaut, sans rien choisir', (tester) async {
     await pumpScreen(tester, _item());
 
     await tapShare(tester);
 
     expect(sharing.calls, 1);
-    expect(sharing.fileName, 'biblivre-progression.png');
+    expect(sharing.fileName, 'biblivre-progression-bloc.png');
     expect(sharing.text, 'Dune — Frank Herbert');
 
     final bytes = sharing.bytes!;
     // Signature PNG, puis dimensions lues dans l'en-tête.
     expect(bytes.sublist(1, 4), <int>[0x50, 0x4E, 0x47]);
-    final size = _pngSize(bytes);
-    expect(size.width, 1080);
-    expect(size.height, expectedLargeHeight);
+    expect(_pngSize(bytes), (width: 1080, height: 636));
+  });
+
+  screenTest('partage la story au format de référence', (tester) async {
+    await pumpScreen(tester, _item());
+
+    await chooseFormat(tester, 'Moyen');
+    await tapShare(tester);
+
+    expect(sharing.fileName, 'biblivre-progression-story.png');
+    // Le 9:16 attendu par les plateformes, quel que soit l'appareil.
+    expect(_pngSize(sharing.bytes!), (width: 1080, height: 1920));
+  });
+
+  screenTest('partage le plein écran aux proportions de l\'appareil',
+      (tester) async {
+    await pumpScreen(tester, _item());
+
+    await chooseFormat(tester, 'Grand');
+    await tapShare(tester);
+
+    expect(sharing.fileName, 'biblivre-progression-plein-ecran.png');
+    final size = _pngSize(sharing.bytes!);
+    expect(size, (width: 1080, height: expectedScreenHeight));
     // L'image couvre l'écran : mêmes proportions, aux arrondis près.
     expect(size.height / size.width, closeTo(1800 / 1000, 0.01));
   });
 
-  screenTest('partage le format bloc en 1080 × 636', (tester) async {
+  screenTest('revient au bloc après avoir changé d\'avis', (tester) async {
     await pumpScreen(tester, _item());
 
-    await tester.tap(find.text('Bloc'));
-    await tester.pump();
+    await chooseFormat(tester, 'Grand');
+    await chooseFormat(tester, 'Bloc');
     await tapShare(tester);
 
     expect(sharing.fileName, 'biblivre-progression-bloc.png');
     expect(_pngSize(sharing.bytes!), (width: 1080, height: 636));
-  });
-
-  screenTest('revient au grand format à la demande', (tester) async {
-    await pumpScreen(tester, _item());
-
-    await tester.tap(find.text('Bloc'));
-    await tester.pump();
-    await tester.tap(find.text('Grand'));
-    await tester.pump();
-    await tapShare(tester);
-
-    expect(sharing.fileName, 'biblivre-progression.png');
-    expect(_pngSize(sharing.bytes!), (width: 1080, height: expectedLargeHeight));
   });
 
   ProgressCardPalette cardPalette(WidgetTester tester) =>
@@ -235,7 +249,7 @@ void main() {
     await tapShare(tester);
 
     expect(sharing.calls, 1);
-    expect(_pngSize(sharing.bytes!), (width: 1080, height: expectedLargeHeight));
+    expect(_pngSize(sharing.bytes!), (width: 1080, height: 636));
   });
 
   screenTest('ouvre l\'éditeur de couleurs et sait renoncer', (tester) async {
@@ -321,7 +335,7 @@ void main() {
     expect(card.palette.foreground, Colors.white);
 
     await tapShare(tester);
-    expect(_pngSize(sharing.bytes!), (width: 1080, height: expectedLargeHeight));
+    expect(_pngSize(sharing.bytes!), (width: 1080, height: 636));
   });
 
   screenTest('retombe sur la variante sans image si la couverture échoue',
@@ -332,13 +346,17 @@ void main() {
       cover: Uint8List.fromList(<int>[0, 1, 2, 3]),
     );
 
-    // Des octets qui ne sont pas une image : la carte se rabat sur son
-    // substitut au lieu d'échouer.
-    expect(find.byIcon(Icons.menu_book_outlined), findsOne);
+    // Des octets qui ne sont pas une image : le bloc se compose sans elle,
+    // le texte prenant toute la largeur.
     expect(find.byType(Image), findsNothing);
 
     await tapShare(tester);
-    expect(_pngSize(sharing.bytes!), (width: 1080, height: expectedLargeHeight));
+    expect(_pngSize(sharing.bytes!), (width: 1080, height: 636));
+
+    // Les formats hauts, eux, montrent le substitut typographique.
+    await chooseFormat(tester, 'Moyen');
+    expect(find.byIcon(Icons.menu_book_outlined), findsOne);
+    expect(find.byType(Image), findsNothing);
   });
 
   screenTest('partage aussi un livre sans nombre de pages', (tester) async {

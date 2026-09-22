@@ -43,7 +43,8 @@ class _ShareProgressScreenState extends ConsumerState<ShareProgressScreen> {
   ProgressCardPalette? _custom;
 
   ImageProvider? _cover;
-  ShareCardFormat _format = ShareCardFormat.large;
+  /// Le bloc est proposé d'abord : c'est le format le plus souvent utile.
+  ShareCardFormat _format = ShareCardFormat.compact;
   bool _sharing = false;
 
   /// Le fond réellement appliqué à la carte.
