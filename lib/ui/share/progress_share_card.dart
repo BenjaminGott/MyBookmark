@@ -16,14 +16,14 @@ enum ShareCardFormat {
   /// Sans coins arrondis : elle occupe tout l'écran, il n'y a rien derrière.
   large(360, 640, 'Grand', '1080 × 1920', 0),
 
-  /// Bloc bas, pensé pour être posé à côté d'autre chose : 1080 × 750.
+  /// Bloc bas, pensé pour être posé à côté d'autre chose : 1080 × 630.
   ///
-  /// Sa hauteur est celle de la couverture : tout le reste tient au-dessus
-  /// d'elle en hauteur, il n'y a pas de place à gagner ailleurs.
+  /// Sa hauteur est celle du bloc de texte, couverture comprise : l'image
+  /// s'arrête exactement sur la ligne des pages.
   ///
   /// Coins arrondis et donc transparents : il se pose sur un fond quelconque
   /// sans trancher dessus par un angle droit.
-  compact(360, 250, 'Bloc', '1080 × 750', 26);
+  compact(360, 212, 'Bloc', '1080 × 636', 26);
 
   const ShareCardFormat(
     this.width,
@@ -46,9 +46,9 @@ enum ShareCardFormat {
   final String pixels;
 
   String get fileName => switch (this) {
-        ShareCardFormat.large => 'biblivre-progression.png',
-        ShareCardFormat.compact => 'biblivre-progression-bloc.png',
-      };
+    ShareCardFormat.large => 'biblivre-progression.png',
+    ShareCardFormat.compact => 'biblivre-progression-bloc.png',
+  };
 }
 
 /// La carte de progression partagée, dessinée à taille fixe.
@@ -110,10 +110,16 @@ class ProgressShareCard extends StatelessWidget {
               ),
             ),
             child: switch (format) {
-              ShareCardFormat.large =>
-                _LargeLayout(item: item, palette: palette, cover: cover),
-              ShareCardFormat.compact =>
-                _CompactLayout(item: item, palette: palette, cover: cover),
+              ShareCardFormat.large => _LargeLayout(
+                item: item,
+                palette: palette,
+                cover: cover,
+              ),
+              ShareCardFormat.compact => _CompactLayout(
+                item: item,
+                palette: palette,
+                cover: cover,
+              ),
             },
           ),
         ),
@@ -163,13 +169,33 @@ class _LargeLayout extends StatelessWidget {
 
 /// Mise en page en bloc : couverture à gauche, texte et barre à droite.
 ///
-/// Format carré et compact, pensé pour être posé à côté d'autre chose.
+/// Les hauteurs y sont fixées plutôt que laissées au contenu. C'est ce qui
+/// permet à la couverture de s'arrêter exactement sur la ligne des pages : sa
+/// hauteur est celle du bloc de texte, qui ne peut donc pas dépendre de la
+/// longueur du titre. Un titre court occupe la même place qu'un titre sur deux
+/// lignes, et toutes les cartes se ressemblent.
 class _CompactLayout extends StatelessWidget {
   const _CompactLayout({
     required this.item,
     required this.palette,
     required this.cover,
   });
+
+  /// Deux lignes de titre à 21 points, interligne 1,12.
+  static const double _titleHeight = 48;
+
+  static const double _authorHeight = 16;
+  static const double _barHeight = 26;
+  static const double _pagesHeight = 16;
+
+  /// La somme exacte du bloc de texte, et donc la hauteur de la couverture.
+  static const double textHeight =
+      _titleHeight + 6 + _authorHeight + 14 + _barHeight + 10 + _pagesHeight;
+
+  /// Proportion d'une couverture de livre : deux tiers de large pour trois de
+  /// haut, le format des images d'Open Library. La couverture n'est donc jamais
+  /// rognée, c'est sa largeur qui suit.
+  static const double coverWidth = textHeight * 2 / 3;
 
   final LibraryItem item;
   final ProgressCardPalette palette;
@@ -180,32 +206,40 @@ class _CompactLayout extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(24),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           // Seule l'accroche traverse toute la largeur : tout le reste vit à
           // droite de la couverture.
           _Kicker(item: item, palette: palette),
           const SizedBox(height: 16),
-          Expanded(
+          SizedBox(
+            height: textHeight,
             child: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 if (cover != null) ...<Widget>[
-                  Align(
-                    alignment: Alignment.topLeft,
-                    child: _Cover(cover: cover!, width: 112, height: 168),
-                  ),
+                  _Cover(cover: cover!, width: coverWidth, height: textHeight),
                   const SizedBox(width: 16),
                 ],
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      _Title(
-                        item: item,
-                        palette: palette,
-                        size: cover == null ? 30 : 20,
-                        maxLines: cover == null ? 4 : 2,
+                      SizedBox(
+                        height: _titleHeight,
+                        child: _Title(
+                          item: item,
+                          palette: palette,
+                          size: cover == null ? 26 : 21,
+                          maxLines: 2,
+                          withAuthor: false,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      SizedBox(
+                        height: _authorHeight,
+                        child: _Author(item: item, palette: palette, size: 13),
                       ),
                       const SizedBox(height: 14),
                       // La progression arrive juste après le titre : c'est
@@ -214,6 +248,9 @@ class _CompactLayout extends StatelessWidget {
                         item: item,
                         palette: palette,
                         style: _BarStyle.thick,
+                        barHeight: _barHeight,
+                        pagesHeight: _pagesHeight,
+                        gap: 10,
                         trailing: item.currentEntry.rating == null
                             ? null
                             : _Stars(
@@ -272,26 +309,26 @@ class _Kicker extends StatelessWidget {
 }
 
 class _Cover extends StatelessWidget {
-  const _Cover({
-    required this.cover,
-    required this.width,
-    required this.height,
-  });
+  const _Cover({required this.cover, this.width, this.height});
 
   final ImageProvider cover;
-  final double width;
-  final double height;
+
+  /// Nuls quand la couverture prend la taille que son parent lui donne.
+  final double? width;
+  final double? height;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(6),
-        boxShadow: const <BoxShadow>[
+        boxShadow: <BoxShadow>[
+          // Ombre proportionnée à l'image : sur le bloc, où la couverture doit
+          // s'arrêter net sur la ligne des pages, une ombre fixe déborderait.
           BoxShadow(
-            color: Color(0x5A000000),
-            blurRadius: 26,
-            offset: Offset(0, 14),
+            color: const Color(0x52000000),
+            blurRadius: (height ?? 200) / 8,
+            offset: Offset(0, (height ?? 200) / 26),
           ),
         ],
       ),
@@ -350,6 +387,7 @@ class _Title extends StatelessWidget {
     required this.palette,
     required this.size,
     this.maxLines = 3,
+    this.withAuthor = true,
   });
 
   final LibraryItem item;
@@ -357,35 +395,67 @@ class _Title extends StatelessWidget {
   final double size;
   final int maxLines;
 
+  /// Le bloc calant ses hauteurs au point près, il place l'auteur lui-même.
+  final bool withAuthor;
+
   @override
   Widget build(BuildContext context) {
+    final title = Text(
+      item.book.title,
+      maxLines: maxLines,
+      overflow: TextOverflow.ellipsis,
+      style: TextStyle(
+        color: palette.foreground,
+        fontSize: size,
+        fontWeight: FontWeight.w700,
+        height: 1.12,
+        letterSpacing: -0.4,
+      ),
+    );
+
+    if (!withAuthor) {
+      // La place de deux lignes est réservée d'avance ; un titre court se cale
+      // en bas de cette réserve, juste au-dessus de l'auteur, plutôt que de
+      // laisser un trou entre les deux.
+      return Align(alignment: Alignment.bottomLeft, child: title);
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Text(
-          item.book.title,
-          maxLines: maxLines,
-          overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-            color: palette.foreground,
-            fontSize: size,
-            fontWeight: FontWeight.w700,
-            height: 1.12,
-            letterSpacing: -0.4,
-          ),
-        ),
+        title,
         const SizedBox(height: 7),
-        Text(
-          item.book.author ?? 'Auteur inconnu',
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-            color: palette.foreground.withValues(alpha: 0.78),
-            fontSize: size < 24 ? 13 : 15,
-            letterSpacing: 0.2,
-          ),
-        ),
+        _Author(item: item, palette: palette, size: size < 24 ? 13 : 15),
       ],
+    );
+  }
+}
+
+class _Author extends StatelessWidget {
+  const _Author({
+    required this.item,
+    required this.palette,
+    required this.size,
+  });
+
+  final LibraryItem item;
+  final ProgressCardPalette palette;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.topLeft,
+      child: Text(
+        item.book.author ?? 'Auteur inconnu',
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: TextStyle(
+          color: palette.foreground.withValues(alpha: 0.78),
+          fontSize: size,
+          letterSpacing: 0.2,
+        ),
+      ),
     );
   }
 }
@@ -434,7 +504,19 @@ class _ProgressBlock extends StatelessWidget {
     required this.palette,
     required this.style,
     this.trailing,
+    this.barHeight = 24,
+    this.pagesHeight,
+    this.gap = 10,
   });
+
+  /// Épaisseur de la barre, pour le style épais.
+  final double barHeight;
+
+  /// Hauteur imposée à la ligne des pages, quand le bloc cale ses hauteurs.
+  final double? pagesHeight;
+
+  /// Espace entre la barre et la ligne des pages.
+  final double gap;
 
   final LibraryItem item;
   final ProgressCardPalette palette;
@@ -497,11 +579,14 @@ class _ProgressBlock extends StatelessWidget {
 
     return switch (style) {
       _BarStyle.thick => Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            _ThickBar(percent: percent, palette: palette, height: 24),
-            const SizedBox(height: 10),
-            Row(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          _ThickBar(percent: percent, palette: palette, height: barHeight),
+          SizedBox(height: gap),
+          SizedBox(
+            height: pagesHeight,
+            child: Row(
               children: <Widget>[
                 Flexible(child: pages),
                 if (trailing != null) ...<Widget>[
@@ -510,42 +595,43 @@ class _ProgressBlock extends StatelessWidget {
                 ],
               ],
             ),
-          ],
-        ),
+          ),
+        ],
+      ),
       _BarStyle.slim => Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            _SlimBar(percent: percent, palette: palette),
-            const SizedBox(height: 14),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: <Widget>[
-                Expanded(child: pages),
-                Text(
-                  '$percent',
-                  key: const Key('progress-label'),
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          _SlimBar(percent: percent, palette: palette),
+          const SizedBox(height: 14),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: <Widget>[
+              Expanded(child: pages),
+              Text(
+                '$percent',
+                key: const Key('progress-label'),
+                style: TextStyle(
+                  color: palette.foreground,
+                  fontSize: 40,
+                  fontWeight: FontWeight.w300,
+                  height: 0.92,
+                  letterSpacing: -1.5,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 3, bottom: 4),
+                child: Text(
+                  '%',
                   style: TextStyle(
-                    color: palette.foreground,
-                    fontSize: 40,
-                    fontWeight: FontWeight.w300,
-                    height: 0.92,
-                    letterSpacing: -1.5,
+                    color: palette.foreground.withValues(alpha: 0.8),
+                    fontSize: 15,
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 3, bottom: 4),
-                  child: Text(
-                    '%',
-                    style: TextStyle(
-                      color: palette.foreground.withValues(alpha: 0.8),
-                      fontSize: 15,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
+              ),
+            ],
+          ),
+        ],
+      ),
     };
   }
 }
@@ -672,8 +758,9 @@ class _ThickBar extends StatelessWidget {
                 child: Padding(
                   padding: EdgeInsets.only(right: inside ? height * 0.45 : 0),
                   child: Align(
-                    alignment:
-                        inside ? Alignment.centerRight : Alignment.centerLeft,
+                    alignment: inside
+                        ? Alignment.centerRight
+                        : Alignment.centerLeft,
                     child: Text(
                       '$percent %',
                       key: const Key('progress-label'),

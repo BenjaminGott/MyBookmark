@@ -398,7 +398,7 @@ void main() {
       expect(find.textContaining('%'), findsNothing);
     });
 
-    testWidgets('le format bloc se capture en 1080 × 750', (tester) async {
+    testWidgets('le format bloc se capture en 1080 × 636', (tester) async {
       await pumpCard(tester, _item(), format: ShareCardFormat.compact);
 
       final boundary =
@@ -412,7 +412,7 @@ void main() {
         return _pngSize(data!.buffer.asUint8List());
       });
 
-      expect(size, (width: 1080, height: 750));
+      expect(size, (width: 1080, height: 636));
     });
 
     testWidgets('arrondit les coins du bloc, pas ceux du grand format',
@@ -491,6 +491,34 @@ void main() {
 
       final stars = tester.getRect(find.byIcon(Icons.star).first);
       expect(stars.center.dy, closeTo(pages.center.dy, 6));
+    });
+
+    testWidgets('arrête la couverture sur la ligne des pages', (tester) async {
+      await pumpCard(
+        tester,
+        _item(),
+        format: ShareCardFormat.compact,
+        withCover: true,
+      );
+
+      final cover = tester.getRect(find.byType(Image));
+      final pages = tester.getRect(find.text('page 120 sur 658'));
+
+      // Les deux bas coïncident : c'est ce qui fait tenir le bloc.
+      expect(cover.bottom, closeTo(pages.bottom, 6));
+    });
+
+    testWidgets('garde la couverture à sa proportion, sans la rogner',
+        (tester) async {
+      await pumpCard(
+        tester,
+        _item(),
+        format: ShareCardFormat.compact,
+        withCover: true,
+      );
+
+      final cover = tester.getRect(find.byType(Image));
+      expect(cover.width / cover.height, closeTo(2 / 3, 0.02));
     });
 
     testWidgets('propose deux noms de fichier distincts', (tester) async {
