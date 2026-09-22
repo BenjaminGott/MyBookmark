@@ -5,6 +5,7 @@ import 'package:biblivre/domain/models/book.dart';
 import 'package:biblivre/domain/models/library_item.dart';
 import 'package:biblivre/domain/models/reading_entry.dart';
 import 'package:biblivre/domain/models/shelf.dart';
+import 'package:biblivre/ui/share/card_backgrounds.dart';
 import 'package:biblivre/ui/share/progress_card_palette.dart';
 import 'package:biblivre/ui/share/progress_share_card.dart';
 import 'package:flutter/material.dart';
@@ -158,9 +159,7 @@ void main() {
 
     test('ne demande pas d\'analyse quand il n\'y a pas de couverture',
         () async {
-      final palette = await ProgressCardPalette.fromCover(null);
-
-      expect(palette.top, ProgressCardPalette.fallback().top);
+      expect((await CoverColors.fromCover(null)).isEmpty, isTrue);
     });
   });
 

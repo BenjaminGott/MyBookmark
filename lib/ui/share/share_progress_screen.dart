@@ -9,6 +9,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/failure.dart';
 import '../../domain/models/library_item.dart';
 import '../providers/share_providers.dart';
+import 'background_picker.dart';
+import 'card_backgrounds.dart';
 import 'progress_card_palette.dart';
 import 'progress_share_card.dart';
 
@@ -30,10 +32,29 @@ class ShareProgressScreen extends ConsumerStatefulWidget {
 class _ShareProgressScreenState extends ConsumerState<ShareProgressScreen> {
   final GlobalKey _cardKey = GlobalKey();
 
-  ProgressCardPalette? _palette;
+  /// Les fonds proposés, le premier étant l'automatique.
+  List<BackgroundOption>? _backgrounds;
+
+  /// Index choisi dans [_backgrounds], ou `null` si c'est le fond personnel.
+  int? _selected = 0;
+
+  /// Le dégradé composé à la main, conservé même quand on repasse sur un
+  /// fond proposé : revenir à son choix ne doit pas le faire refaire.
+  ProgressCardPalette? _custom;
+
   ImageProvider? _cover;
   ShareCardFormat _format = ShareCardFormat.large;
   bool _sharing = false;
+
+  /// Le fond réellement appliqué à la carte.
+  ProgressCardPalette? get _palette {
+    final backgrounds = _backgrounds;
+    if (backgrounds == null) {
+      return null;
+    }
+    final index = _selected;
+    return index == null ? _custom : backgrounds[index].palette;
+  }
 
   @override
   void initState() {
@@ -67,13 +88,31 @@ class _ShareProgressScreenState extends ConsumerState<ShareProgressScreen> {
       cover = failed ? null : candidate;
     }
 
-    final palette = await ProgressCardPalette.fromCover(cover);
+    final backgrounds = CardBackgrounds.forCover(
+      await CoverColors.fromCover(cover),
+    );
     if (!mounted) {
       return;
     }
     setState(() {
       _cover = cover;
-      _palette = palette;
+      _backgrounds = backgrounds;
+    });
+  }
+
+  Future<void> _editCustom() async {
+    final chosen = await showCustomBackgroundEditor(
+      context,
+      initial: _custom ?? _palette,
+    );
+    if (chosen == null || !mounted) {
+      // Annulation : on garde le fond courant, et le fond personnel précédent
+      // reste disponible s'il en existait un.
+      return;
+    }
+    setState(() {
+      _custom = chosen;
+      _selected = null;
     });
   }
 
@@ -99,6 +138,14 @@ class _ShareProgressScreenState extends ConsumerState<ShareProgressScreen> {
                     ),
                   ),
                 ),
+                BackgroundPicker(
+                  options: _backgrounds!,
+                  selectedIndex: _selected,
+                  customPalette: _custom,
+                  onSelected: (index) => setState(() => _selected = index),
+                  onCustom: _editCustom,
+                ),
+                const SizedBox(height: 4),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: SegmentedButton<ShareCardFormat>(

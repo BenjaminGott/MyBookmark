@@ -17,8 +17,9 @@ l'ajout — passé ce point, l'application fonctionne entièrement hors ligne.
 5. Progression : saisie de la page en cours, pourcentage et barre
 6. Saisie manuelle d'un livre, et correction des métadonnées fausses
 7. Export et import JSON de toute la base
-8. Partage de sa progression en carte image 1080 × 1920, dont le dégradé est
-   tiré des couleurs dominantes de la couverture
+8. Partage de sa progression en carte image, au format story (1080 × 1920) ou
+   en bloc (1080 × 900), sur un dégradé tiré de la couverture — avec variantes
+   claire, sombre et vive, et composition manuelle du dégradé
 
 Thèmes clair et sombre, interface intégralement en français.
 

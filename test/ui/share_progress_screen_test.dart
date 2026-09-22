@@ -8,6 +8,7 @@ import 'package:biblivre/domain/models/reading_entry.dart';
 import 'package:biblivre/domain/models/shelf.dart';
 import 'package:biblivre/domain/repositories/image_sharing.dart';
 import 'package:biblivre/ui/providers/share_providers.dart';
+import 'package:biblivre/ui/share/progress_card_palette.dart';
 import 'package:biblivre/ui/share/progress_share_card.dart';
 import 'package:biblivre/ui/share/share_progress_screen.dart';
 import 'package:flutter/material.dart';
@@ -201,6 +202,71 @@ void main() {
 
     expect(sharing.fileName, 'biblivre-progression.png');
     expect(_pngSize(sharing.bytes!), (width: 1080, height: 1920));
+  });
+
+  ProgressCardPalette cardPalette(WidgetTester tester) =>
+      tester.widget<ProgressShareCard>(find.byType(ProgressShareCard)).palette;
+
+  screenTest('applique un fond proposé', (tester) async {
+    await pumpScreen(tester, _item());
+
+    final initial = cardPalette(tester);
+    await tester.tap(find.text('Papier'));
+    await tester.pump();
+
+    final changed = cardPalette(tester);
+    expect(changed.top, isNot(initial.top));
+    expect(changed.family, PaletteFamily.light);
+    // Le texte suit le fond, il n'est jamais laissé tel quel.
+    expect(changed.foreground, isNot(initial.foreground));
+  });
+
+  screenTest('partage bien le fond choisi', (tester) async {
+    await pumpScreen(tester, _item());
+
+    await tester.tap(find.text('Papier'));
+    await tester.pump();
+    await tapShare(tester);
+
+    expect(sharing.calls, 1);
+    expect(_pngSize(sharing.bytes!), (width: 1080, height: 1920));
+  });
+
+  screenTest('ouvre l\'éditeur de couleurs et sait renoncer', (tester) async {
+    await pumpScreen(tester, _item());
+    final initial = cardPalette(tester);
+
+    await tester.tap(find.text('Ma couleur'));
+    await tester.pumpAndSettle();
+    expect(find.text('Mon dégradé'), findsOne);
+
+    await tester.tap(find.text('Annuler'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Mon dégradé'), findsNothing);
+    expect(cardPalette(tester).top, initial.top);
+  });
+
+  screenTest('applique un dégradé composé à la main', (tester) async {
+    await pumpScreen(tester, _item());
+    final initial = cardPalette(tester);
+
+    await tester.tap(find.text('Ma couleur'));
+    await tester.pumpAndSettle();
+
+    // On déplace la teinte, puis on valide.
+    await tester.drag(find.byType(Slider).first, const Offset(120, 0));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Appliquer'));
+    await tester.pumpAndSettle();
+
+    final custom = cardPalette(tester);
+    expect(custom.top, isNot(initial.top));
+    // Même composé à la main, le fond garde un texte lisible.
+    expect(
+      (custom.backgroundLuminance - custom.foreground.computeLuminance()).abs(),
+      greaterThan(0.3),
+    );
   });
 
   screenTest('se passe d\'auteur dans le texte partagé', (tester) async {

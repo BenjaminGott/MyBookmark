@@ -1,13 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:palette_generator/palette_generator.dart';
 
 import '../../core/theme/app_theme.dart';
+
+/// Les deux familles de cartes.
+enum PaletteFamily {
+  /// Fond clair, texte sombre.
+  light,
+
+  /// Fond sombre, texte blanc.
+  dark,
+}
 
 /// Les couleurs d'une carte de partage : un dégradé et un texte lisible dessus.
 ///
 /// Le dégradé est tiré de la couverture du livre, mais jamais tel quel : une
 /// couverture très claire ou très sombre donnerait un texte illisible. Les
 /// teintes sont donc ramenées dans une plage utilisable avant d'être retenues.
+///
+/// Quel que soit le chemin — automatique, variante proposée ou couleurs
+/// choisies à la main — la couleur du texte et celle de la barre sont toujours
+/// recalculées à partir du fond, jamais laissées au hasard du choix.
 @immutable
 class ProgressCardPalette {
   const ProgressCardPalette({
@@ -29,10 +41,27 @@ class ProgressCardPalette {
     );
   }
 
+  /// Un dégradé entièrement choisi par l'utilisateur.
+  ///
+  /// Les deux couleurs sont prises telles quelles — c'est le principe d'un
+  /// choix manuel — mais le texte et la barre restent calculés, pour qu'un
+  /// dégradé malheureux ne rende pas la carte illisible.
+  factory ProgressCardPalette.custom({
+    required Color top,
+    required Color bottom,
+  }) {
+    return ProgressCardPalette(
+      top: top,
+      bottom: bottom,
+      foreground: _readableOn(top, bottom),
+      accent: _accentFor(top, bottom),
+    );
+  }
+
   /// Le haut du dégradé.
   final Color top;
 
-  /// Le bas du dégradé, toujours plus sombre que [top].
+  /// Le bas du dégradé.
   final Color bottom;
 
   /// La couleur du texte, choisie pour rester lisible sur le dégradé.
@@ -47,79 +76,72 @@ class ProgressCardPalette {
       ? const Color(0xFF16110D)
       : Colors.white;
 
-  /// Analyse une couverture pour en tirer un dégradé.
-  ///
-  /// Toute erreur — image introuvable, décodage impossible, couverture d'une
-  /// seule couleur — retombe sur [ProgressCardPalette.fallback].
-  static Future<ProgressCardPalette> fromCover(ImageProvider? cover) async {
-    if (cover == null) {
-      return ProgressCardPalette.fallback();
-    }
+  /// Luminosité moyenne du dégradé, celle sur laquelle tout se détache.
+  double get backgroundLuminance =>
+      (top.computeLuminance() + bottom.computeLuminance()) / 2;
 
-    try {
-      final palette = await PaletteGenerator.fromImageProvider(
-        cover,
-        maximumColorCount: 12,
-      );
-      return fromColors(
-        palette.dominantColor?.color,
-        palette.darkMutedColor?.color ??
-            palette.darkVibrantColor?.color ??
-            palette.mutedColor?.color,
-      );
-    } on Object {
-      return ProgressCardPalette.fallback();
-    }
-  }
+  /// À quelle famille appartient ce dégradé.
+  PaletteFamily get family =>
+      backgroundLuminance > 0.42 ? PaletteFamily.light : PaletteFamily.dark;
 
   /// Construit une palette à partir de deux couleurs brutes.
-  ///
-  /// Séparé de [fromCover] pour être testable sans décoder d'image.
   ///
   /// Deux familles de cartes, selon la couverture : une couverture claire donne
   /// une carte claire à texte sombre, une couverture sombre donne une carte
   /// sombre à texte blanc. Assombrir systématiquement aurait été plus simple,
   /// mais toutes les couvertures pastel auraient rendu la même carte terne.
-  static ProgressCardPalette fromColors(Color? first, Color? second) {
+  ///
+  /// [force] impose une famille au lieu de la déduire : c'est ce qui permet de
+  /// proposer une variante claire et une variante sombre de la même couverture.
+  static ProgressCardPalette fromColors(
+    Color? first,
+    Color? second, {
+    PaletteFamily? force,
+  }) {
     if (first == null) {
       return ProgressCardPalette.fallback();
     }
 
     final companion = second ?? first;
     final luminance = first.computeLuminance();
+    final family =
+        force ?? (luminance > 0.62 ? PaletteFamily.light : PaletteFamily.dark);
 
-    if (luminance > 0.62) {
+    if (family == PaletteFamily.light) {
+      // Une couleur sombre à qui l'on demande une carte claire doit d'abord
+      // être remontée, sinon la « variante claire » resterait sombre.
+      final base = luminance < 0.5 ? _tint(first, 0.72) : first;
+      final mate = companion.computeLuminance() < 0.5
+          ? _tint(companion, 0.6)
+          : companion;
+
       // Le blanc pur est légèrement rabattu : sans cela le dégradé n'aurait
       // aucun relief et la carte ressemblerait à une feuille vide.
-      final top = _shade(first, luminance > 0.9 ? 0.14 : 0.04);
-      final bottom = _tint(companion, 0.3);
+      final top = _shade(base, base.computeLuminance() > 0.9 ? 0.14 : 0.04);
+      final bottom = _tint(mate, 0.3);
       return ProgressCardPalette(
         top: top,
         bottom: bottom,
         foreground: _readableOn(top, bottom),
-        // Franchement plus sombre que le fond : la portion lue doit se voir
-        // d'un coup d'œil, c'est tout le sujet de la carte.
-        accent: _shade(companion, 0.7),
+        accent: _accentFor(top, bottom),
       );
     }
 
     // Le haut reste vivant, le bas est nettement assombri : ça donne de la
     // profondeur et ça garantit un contraste stable en bas de carte, là où se
     // trouvent les chiffres.
-    final top = luminance < 0.03 ? _tint(first, 0.18) : _shade(first, 0.12);
-    final bottom = _shade(companion, 0.55);
+    final base = luminance > 0.62 ? _shade(first, 0.55) : first;
+    final top = base.computeLuminance() < 0.03
+        ? _tint(base, 0.18)
+        : _shade(base, 0.12);
+    final bottom = _shade(companion, luminance > 0.62 ? 0.75 : 0.55);
     return ProgressCardPalette(
       top: top,
       bottom: bottom,
       foreground: _readableOn(top, bottom),
-      // Franchement plus clair que le fond, pour la même raison.
-      accent: _tint(top, 0.78),
+      accent: _accentFor(top, bottom),
     );
   }
-
-  /// Luminosité moyenne du dégradé, celle sur laquelle tout se détache.
-  double get backgroundLuminance =>
-      (top.computeLuminance() + bottom.computeLuminance()) / 2;
 
   /// Blanc ou presque noir, selon ce qui se lit sur le dégradé.
   ///
@@ -128,6 +150,13 @@ class ProgressCardPalette {
   static Color _readableOn(Color top, Color bottom) {
     final average = (top.computeLuminance() + bottom.computeLuminance()) / 2;
     return average > 0.42 ? const Color(0xFF16110D) : Colors.white;
+  }
+
+  /// La couleur de la portion lue : franchement détachée du fond, dans un sens
+  /// ou dans l'autre, sans quoi la progression ne se verrait pas.
+  static Color _accentFor(Color top, Color bottom) {
+    final average = (top.computeLuminance() + bottom.computeLuminance()) / 2;
+    return average > 0.42 ? _shade(bottom, 0.7) : _tint(top, 0.78);
   }
 
   /// Assombrit [color] de [amount] (0 à 1).
