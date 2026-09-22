@@ -121,19 +121,19 @@ class _LargeLayout extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           _Kicker(item: item, palette: palette),
-          const Spacer(flex: 3),
+          const Spacer(),
           if (cover != null)
             _Cover(cover: cover!, width: 152, height: 228)
           else
             _NoCoverMark(palette: palette),
-          const SizedBox(height: 26),
+          const SizedBox(height: 28),
           _Title(item: item, palette: palette, size: cover == null ? 38 : 27),
-          const Spacer(flex: 2),
+          const Spacer(),
           if (item.currentEntry.rating != null) ...<Widget>[
             _Stars(rating: item.currentEntry.rating!, palette: palette),
-            const SizedBox(height: 18),
+            const SizedBox(height: 20),
           ],
-          _ProgressBlock(item: item, palette: palette, barHeight: 28),
+          _ProgressBlock(item: item, palette: palette, style: _BarStyle.slim),
         ],
       ),
     );
@@ -194,7 +194,7 @@ class _CompactLayout extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          _ProgressBlock(item: item, palette: palette, barHeight: 24),
+          _ProgressBlock(item: item, palette: palette, style: _BarStyle.thick),
         ],
       ),
     );
@@ -384,17 +384,28 @@ class _Stars extends StatelessWidget {
   }
 }
 
+/// Les deux traitements de la barre de progression.
+enum _BarStyle {
+  /// Filet fin, pourcentage en grand chiffre à côté. Le grand format a la
+  /// hauteur nécessaire pour ce traitement aéré.
+  slim,
+
+  /// Barre épaisse, pourcentage logé dedans. Le bloc n'a pas la place d'un
+  /// grand chiffre à part.
+  thick,
+}
+
 /// La barre de progression et la ligne de pages qui l'accompagne.
 class _ProgressBlock extends StatelessWidget {
   const _ProgressBlock({
     required this.item,
     required this.palette,
-    required this.barHeight,
+    required this.style,
   });
 
   final LibraryItem item;
   final ProgressCardPalette palette;
-  final double barHeight;
+  final _BarStyle style;
 
   @override
   Widget build(BuildContext context) {
@@ -436,22 +447,110 @@ class _ProgressBlock extends StatelessWidget {
       );
     }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        _ProgressBar(percent: percent, palette: palette, height: barHeight),
-        const SizedBox(height: 10),
-        Text(
-          'page $page sur $pageCount',
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-            color: palette.foreground.withValues(alpha: 0.8),
-            fontSize: 13,
-            letterSpacing: 0.3,
-          ),
+    final pages = Text(
+      'page $page sur $pageCount',
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      style: TextStyle(
+        color: palette.foreground.withValues(alpha: 0.8),
+        fontSize: 13,
+        letterSpacing: 0.3,
+      ),
+    );
+
+    return switch (style) {
+      _BarStyle.thick => Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            _ThickBar(percent: percent, palette: palette, height: 24),
+            const SizedBox(height: 10),
+            pages,
+          ],
         ),
-      ],
+      _BarStyle.slim => Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            _SlimBar(percent: percent, palette: palette),
+            const SizedBox(height: 14),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: <Widget>[
+                Expanded(child: pages),
+                Text(
+                  '$percent',
+                  key: const Key('progress-label'),
+                  style: TextStyle(
+                    color: palette.foreground,
+                    fontSize: 40,
+                    fontWeight: FontWeight.w300,
+                    height: 0.92,
+                    letterSpacing: -1.5,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 3, bottom: 4),
+                  child: Text(
+                    '%',
+                    style: TextStyle(
+                      color: palette.foreground.withValues(alpha: 0.8),
+                      fontSize: 15,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+    };
+  }
+}
+
+/// Un filet fin : le rail sur toute la largeur, la portion lue par-dessus.
+class _SlimBar extends StatelessWidget {
+  const _SlimBar({required this.percent, required this.palette});
+
+  static const double _height = 6;
+
+  final int percent;
+  final ProgressCardPalette palette;
+
+  @override
+  Widget build(BuildContext context) {
+    final fraction = (percent / 100).clamp(0.0, 1.0);
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return SizedBox(
+          height: _height,
+          child: Stack(
+            children: <Widget>[
+              DecoratedBox(
+                key: const Key('progress-track'),
+                decoration: BoxDecoration(
+                  color: palette.foreground.withValues(alpha: 0.18),
+                  borderRadius: BorderRadius.circular(_height / 2),
+                ),
+                child: const SizedBox.expand(),
+              ),
+              // Haut et bas fixés : un `DecoratedBox` sans enfant serait sinon
+              // haut de zéro et la portion lue ne peindrait rien.
+              Positioned(
+                left: 0,
+                top: 0,
+                bottom: 0,
+                width: constraints.maxWidth * fraction,
+                child: DecoratedBox(
+                  key: const Key('progress-fill'),
+                  decoration: BoxDecoration(
+                    color: palette.accent,
+                    borderRadius: BorderRadius.circular(_height / 2),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
@@ -461,8 +560,8 @@ class _ProgressBlock extends StatelessWidget {
 /// Le chiffre se loge dans la portion lue tant qu'elle est assez large ; en
 /// deçà il passe juste à côté, sur le rail. Sans cette bascule, un livre à 3 %
 /// afficherait un pourcentage illisible, écrasé dans quelques pixels.
-class _ProgressBar extends StatelessWidget {
-  const _ProgressBar({
+class _ThickBar extends StatelessWidget {
+  const _ThickBar({
     required this.percent,
     required this.palette,
     required this.height,

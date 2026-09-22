@@ -199,7 +199,8 @@ void main() {
       expect(find.text('Dune'), findsOne);
       expect(find.text('Frank Herbert'), findsOne);
       expect(find.text('page 120 sur 658'), findsOne);
-      expect(find.text('18 %'), findsOne);
+      expect(find.text('18'), findsOne);
+      expect(find.text('%'), findsOne);
       expect(find.text('EN COURS DE LECTURE'), findsOne);
     });
 
@@ -273,25 +274,33 @@ void main() {
       // retrouvait haut de zéro et ne peignait rien. On mesure donc sa taille,
       // pas seulement sa teinte.
       final fill = tester.getSize(find.byKey(const Key('progress-fill')));
-      expect(fill.height, greaterThan(20));
+      final bar = tester.getSize(find.byKey(const Key('progress-track')));
+      expect(fill.height, bar.height);
+      expect(fill.height, greaterThan(0));
 
       // La carte fait 360 de large, moins 28 de marge de chaque côté ; à 50 %,
       // le remplissage doit couvrir la moitié de cette largeur.
-      final bar = tester.getSize(find.byKey(const Key('progress-track')));
       expect(fill.width, closeTo(bar.width / 2, 1));
-      expect(fill.height, bar.height);
     });
 
     testWidgets('ne dessine rien quand la lecture commence à peine',
         (tester) async {
-      await pumpCard(tester, _item(currentPage: 0, pageCount: 658));
+      await pumpCard(
+        tester,
+        _item(currentPage: 0, pageCount: 658),
+        format: ShareCardFormat.compact,
+      );
 
       expect(tester.getSize(find.byKey(const Key('progress-fill'))).width, 0);
       expect(find.text('0 %'), findsOne);
     });
 
     testWidgets('remplit toute la barre à 100 %', (tester) async {
-      await pumpCard(tester, _item(currentPage: 658, pageCount: 658));
+      await pumpCard(
+        tester,
+        _item(currentPage: 658, pageCount: 658),
+        format: ShareCardFormat.compact,
+      );
 
       final fill = tester.getSize(find.byKey(const Key('progress-fill')));
       final bar = tester.getSize(find.byKey(const Key('progress-track')));
@@ -299,8 +308,12 @@ void main() {
       expect(find.text('100 %'), findsOne);
     });
 
-    testWidgets('écrit le pourcentage dans la barre', (tester) async {
-      await pumpCard(tester, _item(currentPage: 500, pageCount: 658));
+    testWidgets('écrit le pourcentage dans la barre du bloc', (tester) async {
+      await pumpCard(
+        tester,
+        _item(currentPage: 500, pageCount: 658),
+        format: ShareCardFormat.compact,
+      );
 
       // Le chiffre est posé sur la portion lue, donc dans la couleur prévue
       // pour être lue sur elle.
@@ -317,7 +330,11 @@ void main() {
 
     testWidgets('sort le pourcentage de la barre quand elle est trop courte',
         (tester) async {
-      await pumpCard(tester, _item(currentPage: 6, pageCount: 658));
+      await pumpCard(
+        tester,
+        _item(currentPage: 6, pageCount: 658),
+        format: ShareCardFormat.compact,
+      );
 
       // À 1 %, le chiffre ne tiendrait pas dans la portion lue : il passe à
       // côté, sur le rail, dans la couleur du texte courant.
