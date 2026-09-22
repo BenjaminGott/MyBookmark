@@ -1,0 +1,212 @@
+import 'dart:math' as math;
+import 'dart:typed_data';
+import 'dart:ui' as ui;
+
+import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../core/failure.dart';
+import '../../domain/models/library_item.dart';
+import '../providers/share_providers.dart';
+import 'progress_card_palette.dart';
+import 'progress_share_card.dart';
+
+/// Aperçu de la carte de progression, puis partage.
+///
+/// L'ordre des opérations compte : la couverture est chargée et décodée, puis sa
+/// palette est calculée, et seulement ensuite la carte est dessinée. Capturer
+/// avant que l'image ne soit en cache donnerait une couverture vide.
+class ShareProgressScreen extends ConsumerStatefulWidget {
+  const ShareProgressScreen({required this.item, super.key});
+
+  final LibraryItem item;
+
+  @override
+  ConsumerState<ShareProgressScreen> createState() =>
+      _ShareProgressScreenState();
+}
+
+class _ShareProgressScreenState extends ConsumerState<ShareProgressScreen> {
+  final GlobalKey _cardKey = GlobalKey();
+
+  ProgressCardPalette? _palette;
+  ImageProvider? _cover;
+  bool _sharing = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Le chargement a besoin d'un contexte monté pour `precacheImage`.
+    WidgetsBinding.instance.addPostFrameCallback((_) => _prepare());
+  }
+
+  Future<void> _prepare() async {
+    final url = widget.item.book.coverUrl;
+    ImageProvider? cover;
+
+    if (url != null && url.isNotEmpty) {
+      final candidate = ref.read(coverImageProviderFactory)(url);
+      var failed = false;
+      try {
+        // Décodage effectif : sans cette attente, la capture partirait avant
+        // que l'image ne soit disponible et la couverture sortirait blanche.
+        //
+        // `onError` est indispensable : sans lui, `precacheImage` avale l'échec
+        // et rend la main comme si tout allait bien, ce qui ferait dessiner une
+        // image cassée au lieu de basculer sur la variante sans couverture.
+        await precacheImage(
+          candidate,
+          context,
+          onError: (error, stackTrace) => failed = true,
+        );
+      } on Object {
+        failed = true;
+      }
+      cover = failed ? null : candidate;
+    }
+
+    final palette = await ProgressCardPalette.fromCover(cover);
+    if (!mounted) {
+      return;
+    }
+    setState(() {
+      _cover = cover;
+      _palette = palette;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = _palette;
+
+    return Scaffold(
+      appBar: AppBar(title: const Text('Partager ma progression')),
+      body: palette == null
+          ? const Center(child: CircularProgressIndicator())
+          : Column(
+              children: <Widget>[
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: _CardPreview(
+                      cardKey: _cardKey,
+                      item: widget.item,
+                      palette: palette,
+                      cover: _cover,
+                    ),
+                  ),
+                ),
+                SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                    child: FilledButton.icon(
+                      onPressed: _sharing ? null : _share,
+                      icon: const Icon(Icons.share_outlined),
+                      label: Text(_sharing ? 'Préparation…' : 'Partager'),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+    );
+  }
+
+  Future<void> _share() async {
+    setState(() => _sharing = true);
+    try {
+      final bytes = await _capture();
+      if (bytes == null) {
+        _tell('Impossible de préparer l\'image.');
+        return;
+      }
+
+      await ref.read(imageSharingProvider).sharePng(
+            bytes: bytes,
+            fileName: 'biblivre-progression.png',
+            text: _shareText(),
+          );
+    } on AppException catch (error) {
+      _tell(error.message);
+    } finally {
+      if (mounted) {
+        setState(() => _sharing = false);
+      }
+    }
+  }
+
+  /// Capture la carte en 1080 × 1920.
+  Future<Uint8List?> _capture() async {
+    final boundary =
+        _cardKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
+    if (boundary == null) {
+      return null;
+    }
+
+    final image =
+        await boundary.toImage(pixelRatio: ProgressShareCard.captureRatio);
+    try {
+      final data = await image.toByteData(format: ui.ImageByteFormat.png);
+      return data?.buffer.asUint8List();
+    } finally {
+      image.dispose();
+    }
+  }
+
+  String _shareText() {
+    final book = widget.item.book;
+    final author = book.author;
+    return author == null ? book.title : '${book.title} — $author';
+  }
+
+  void _tell(String message) {
+    if (!mounted) {
+      return;
+    }
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(message)));
+  }
+}
+
+/// La carte à sa taille réelle, mise à l'échelle pour l'aperçu.
+///
+/// La mise à l'échelle est appliquée **au-dessus** de la frontière de capture,
+/// que la carte porte elle-même : la carte est donc toujours dessinée en
+/// 360 × 640, quelle que soit la place disponible à l'écran, et l'image
+/// partagée ne dépend pas de la taille du téléphone.
+class _CardPreview extends StatelessWidget {
+  const _CardPreview({
+    required this.cardKey,
+    required this.item,
+    required this.palette,
+    required this.cover,
+  });
+
+  final GlobalKey cardKey;
+  final LibraryItem item;
+  final ProgressCardPalette palette;
+  final ImageProvider? cover;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final scale = math.min(
+          constraints.maxWidth / ProgressShareCard.cardWidth,
+          constraints.maxHeight / ProgressShareCard.cardHeight,
+        );
+
+        return Transform.scale(
+          scale: scale,
+          child: ProgressShareCard(
+            item: item,
+            palette: palette,
+            cover: cover,
+            captureKey: cardKey,
+          ),
+        );
+      },
+    );
+  }
+}

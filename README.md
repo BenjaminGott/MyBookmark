@@ -17,6 +17,8 @@ l'ajout — passé ce point, l'application fonctionne entièrement hors ligne.
 5. Progression : saisie de la page en cours, pourcentage et barre
 6. Saisie manuelle d'un livre, et correction des métadonnées fausses
 7. Export et import JSON de toute la base
+8. Partage de sa progression en carte image 1080 × 1920, dont le dégradé est
+   tiré des couleurs dominantes de la couverture
 
 Thèmes clair et sombre, interface intégralement en français.
 
@@ -30,6 +32,7 @@ Thèmes clair et sombre, interface intégralement en français.
 | Couvertures | `cached_network_image` (jamais stockées en base) |
 | Réglages | `shared_preferences` |
 | Fichiers | `file_picker` (export/import) |
+| Partage | `share_plus`, `path_provider`, `palette_generator` |
 
 `sqlite3_flutter_libs` n'est pas utilisé : il est marqué EOL sur pub.dev,
 `drift_flutter` embarque désormais `sqlite3` 3.x.

@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../domain/models/library_item.dart';
 import '../../../domain/services/reading_progress.dart';
 import '../../providers/book_actions_controller.dart';
+import '../../share/open_progress_sharing.dart';
 import '../../widgets/progress_bar.dart';
 import 'section_card.dart';
 
@@ -91,17 +92,23 @@ class _ProgressCardState extends ConsumerState<ProgressCard> {
               ),
             ],
           ),
-          if (pageCount != null) ...<Widget>[
-            const SizedBox(height: 8),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: TextButton.icon(
-                onPressed: busy ? null : () => _saveValue(pageCount),
-                icon: const Icon(Icons.done_all),
-                label: const Text('Je suis à la dernière page'),
+          const SizedBox(height: 8),
+          Row(
+            children: <Widget>[
+              if (pageCount != null)
+                TextButton.icon(
+                  onPressed: busy ? null : () => _saveValue(pageCount),
+                  icon: const Icon(Icons.done_all),
+                  label: const Text('Dernière page'),
+                ),
+              const Spacer(),
+              TextButton.icon(
+                onPressed: () => openProgressSharing(context, widget.item),
+                icon: const Icon(Icons.share_outlined),
+                label: const Text('Partager'),
               ),
-            ),
-          ],
+            ],
+          ),
         ],
       ),
     );

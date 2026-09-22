@@ -7,6 +7,7 @@ import '../../domain/models/shelf.dart';
 import '../book_form/book_form_screen.dart';
 import '../providers/book_actions_controller.dart';
 import '../providers/book_providers.dart';
+import '../share/open_progress_sharing.dart';
 import '../widgets/status_views.dart';
 import 'widgets/book_header.dart';
 import 'widgets/dates_card.dart';
@@ -101,6 +102,10 @@ class _BookMenu extends ConsumerWidget {
       onSelected: (action) => _handle(context, ref, action),
       itemBuilder: (context) => const <PopupMenuEntry<_BookMenuAction>>[
         PopupMenuItem<_BookMenuAction>(
+          value: _BookMenuAction.share,
+          child: Text('Partager ma progression'),
+        ),
+        PopupMenuItem<_BookMenuAction>(
           value: _BookMenuAction.edit,
           child: Text('Corriger les informations'),
         ),
@@ -122,6 +127,8 @@ class _BookMenu extends ConsumerWidget {
     _BookMenuAction action,
   ) async {
     switch (action) {
+      case _BookMenuAction.share:
+        await openProgressSharing(context, item);
       case _BookMenuAction.edit:
         await openBookEditor(context, ref, bookId: item.book.id);
       case _BookMenuAction.reread:
@@ -194,4 +201,4 @@ class _BookMenu extends ConsumerWidget {
   }
 }
 
-enum _BookMenuAction { edit, reread, delete }
+enum _BookMenuAction { share, edit, reread, delete }
