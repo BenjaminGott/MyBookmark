@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'core/theme/app_theme.dart';
-import 'ui/search/search_screen.dart';
+import 'ui/home_shell.dart';
 
 /// Racine de l'application : thèmes clair et sombre, interface en français.
 class BiblivreApp extends StatelessWidget {
@@ -23,7 +23,7 @@ class BiblivreApp extends StatelessWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      home: const SearchScreen(),
+      home: const HomeShell(),
     );
   }
 }

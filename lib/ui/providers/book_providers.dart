@@ -2,7 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/repositories/book_repository_drift.dart';
 import '../../domain/models/library_item.dart';
-import '../../domain/models/library_query.dart';
 import '../../domain/models/reading_entry.dart';
 import '../../domain/repositories/book_repository.dart';
 import 'database_providers.dart';
@@ -22,11 +21,6 @@ final StreamProvider<Set<String>> knownOlKeysProvider =
     StreamProvider<Set<String>>((ref) {
   return ref.watch(bookRepositoryProvider).watchKnownOlKeys();
 });
-
-/// La bibliothèque pour un filtre et un tri donnés.
-final libraryProvider = StreamProvider.family<List<LibraryItem>, LibraryQuery>(
-  (ref, query) => ref.watch(bookRepositoryProvider).watchLibrary(query),
-);
 
 /// Un livre et sa lecture en cours.
 final bookProvider = StreamProvider.family<LibraryItem?, int>(
