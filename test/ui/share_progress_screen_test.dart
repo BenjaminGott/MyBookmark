@@ -163,7 +163,11 @@ void main() {
     expect(find.widgetWithText(FilledButton, 'Partager'), findsOne);
   });
 
-  screenTest('partage un PNG de 1080 × 1920', (tester) async {
+  /// La hauteur attendue pour l'écran de test : 1000 × 1800, soit un rapport
+  /// de 1,8 — au-delà du 16:9, donc la carte s'allonge d'autant.
+  const expectedLargeHeight = 1944;
+
+  screenTest('partage une story aux proportions de l\'écran', (tester) async {
     await pumpScreen(tester, _item());
 
     await tapShare(tester);
@@ -177,7 +181,9 @@ void main() {
     expect(bytes.sublist(1, 4), <int>[0x50, 0x4E, 0x47]);
     final size = _pngSize(bytes);
     expect(size.width, 1080);
-    expect(size.height, 1920);
+    expect(size.height, expectedLargeHeight);
+    // L'image couvre l'écran : mêmes proportions, aux arrondis près.
+    expect(size.height / size.width, closeTo(1800 / 1000, 0.01));
   });
 
   screenTest('partage le format bloc en 1080 × 636', (tester) async {
@@ -201,7 +207,7 @@ void main() {
     await tapShare(tester);
 
     expect(sharing.fileName, 'biblivre-progression.png');
-    expect(_pngSize(sharing.bytes!), (width: 1080, height: 1920));
+    expect(_pngSize(sharing.bytes!), (width: 1080, height: expectedLargeHeight));
   });
 
   ProgressCardPalette cardPalette(WidgetTester tester) =>
@@ -229,7 +235,7 @@ void main() {
     await tapShare(tester);
 
     expect(sharing.calls, 1);
-    expect(_pngSize(sharing.bytes!), (width: 1080, height: 1920));
+    expect(_pngSize(sharing.bytes!), (width: 1080, height: expectedLargeHeight));
   });
 
   screenTest('ouvre l\'éditeur de couleurs et sait renoncer', (tester) async {
@@ -315,7 +321,7 @@ void main() {
     expect(card.palette.foreground, Colors.white);
 
     await tapShare(tester);
-    expect(_pngSize(sharing.bytes!), (width: 1080, height: 1920));
+    expect(_pngSize(sharing.bytes!), (width: 1080, height: expectedLargeHeight));
   });
 
   screenTest('retombe sur la variante sans image si la couverture échoue',
@@ -332,7 +338,7 @@ void main() {
     expect(find.byType(Image), findsNothing);
 
     await tapShare(tester);
-    expect(_pngSize(sharing.bytes!), (width: 1080, height: 1920));
+    expect(_pngSize(sharing.bytes!), (width: 1080, height: expectedLargeHeight));
   });
 
   screenTest('partage aussi un livre sans nombre de pages', (tester) async {

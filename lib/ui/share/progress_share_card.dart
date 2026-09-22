@@ -11,29 +11,40 @@ import 'progress_card_palette.dart';
 /// Les dimensions sont données en points ; capturées au ratio de
 /// [ProgressShareCard.captureRatio], elles donnent les pixels annoncés.
 enum ShareCardFormat {
-  /// Pleine hauteur, pour une story ou un post : 1080 × 1920.
+  /// Plein écran, pour une story ou un post.
+  ///
+  /// Sa hauteur suit les proportions de l'appareil : sur un téléphone en 20:9,
+  /// une image en 16:9 laisserait des bandes. 1080 × 1920 n'est donc qu'un
+  /// défaut, celui d'un écran 16:9.
   ///
   /// Sans coins arrondis : elle occupe tout l'écran, il n'y a rien derrière.
-  large(360, 640, 'Grand', '1080 × 1920', 0),
+  large(360, 640, 'Grand', 0, adaptsToScreen: true),
 
-  /// Bloc bas, pensé pour être posé à côté d'autre chose : 1080 × 630.
+  /// Bloc bas, pensé pour être posé à côté d'autre chose : 1080 × 636.
   ///
   /// Sa hauteur est celle du bloc de texte, couverture comprise : l'image
   /// s'arrête exactement sur la ligne des pages.
   ///
   /// Coins arrondis et donc transparents : il se pose sur un fond quelconque
   /// sans trancher dessus par un angle droit.
-  compact(360, 212, 'Bloc', '1080 × 636', 26);
+  compact(360, 212, 'Bloc', 26);
 
   const ShareCardFormat(
     this.width,
     this.height,
     this.label,
-    this.pixels,
-    this.cornerRadius,
-  );
+    this.cornerRadius, {
+    this.adaptsToScreen = false,
+  });
+
+  /// Proportions extrêmes acceptées, du 16:9 au 21:9. Au-delà, une carte
+  /// démesurément haute deviendrait illisible une fois réduite.
+  static const double _minAspect = 16 / 9;
+  static const double _maxAspect = 21 / 9;
 
   final double width;
+
+  /// Hauteur par défaut, celle d'un écran 16:9.
   final double height;
 
   /// Rayon des coins, en points. Zéro pour un bord franc.
@@ -42,8 +53,21 @@ enum ShareCardFormat {
   /// Le nom montré dans le sélecteur.
   final String label;
 
+  /// Vrai quand la hauteur suit les proportions de l'appareil.
+  final bool adaptsToScreen;
+
+  /// La hauteur à donner à la carte sur un écran de ce rapport hauteur/largeur.
+  double heightForAspect(double aspect) {
+    if (!adaptsToScreen) {
+      return height;
+    }
+    return width * aspect.clamp(_minAspect, _maxAspect);
+  }
+
   /// La taille de l'image produite, annoncée à l'utilisateur.
-  final String pixels;
+  String pixelsFor(double height) =>
+      '${(width * ProgressShareCard.captureRatio).round()} × '
+      '${(height * ProgressShareCard.captureRatio).round()}';
 
   String get fileName => switch (this) {
     ShareCardFormat.large => 'biblivre-progression.png',
@@ -53,8 +77,9 @@ enum ShareCardFormat {
 
 /// La carte de progression partagée, dessinée à taille fixe.
 ///
-/// Rien dans cette carte ne dépend du thème de l'application ni de la taille de
-/// l'écran : l'image partagée est identique d'un téléphone à l'autre.
+/// Rien dans cette carte ne dépend du thème de l'application. Sa largeur est
+/// toujours la même ; seule la hauteur du grand format suit les proportions de
+/// l'appareil, pour que la story couvre l'écran au lieu d'y laisser des bandes.
 ///
 /// La composition est alignée à gauche et le pourcentage logé dans la barre
 /// elle-même : une mise en page éditoriale, qui ne cherche à ressembler à
@@ -67,6 +92,7 @@ class ProgressShareCard extends StatelessWidget {
     this.format = ShareCardFormat.large,
     this.cover,
     this.captureKey,
+    this.height,
   });
 
   /// Ratio de capture : 360 × 3 = 1080, 640 × 3 = 1920.
@@ -78,6 +104,9 @@ class ProgressShareCard extends StatelessWidget {
 
   /// La couverture, déjà chargée. Nulle si le livre n'en a pas.
   final ImageProvider? cover;
+
+  /// Hauteur imposée, quand le format suit l'écran. Sinon celle du format.
+  final double? height;
 
   /// La clé de la frontière de capture, posée au plus près de la carte.
   ///
@@ -96,7 +125,7 @@ class ProgressShareCard extends StatelessWidget {
         key: captureKey,
         child: SizedBox(
           width: format.width,
-          height: format.height,
+          height: height ?? format.height,
           child: DecoratedBox(
             key: const Key('card-background'),
             decoration: BoxDecoration(
