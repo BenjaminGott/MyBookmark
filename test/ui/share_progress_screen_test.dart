@@ -179,6 +179,30 @@ void main() {
     expect(size.height, 1920);
   });
 
+  screenTest('partage le format bloc en 1080 × 1080', (tester) async {
+    await pumpScreen(tester, _item());
+
+    await tester.tap(find.text('Bloc'));
+    await tester.pump();
+    await tapShare(tester);
+
+    expect(sharing.fileName, 'biblivre-progression-bloc.png');
+    expect(_pngSize(sharing.bytes!), (width: 1080, height: 1080));
+  });
+
+  screenTest('revient au grand format à la demande', (tester) async {
+    await pumpScreen(tester, _item());
+
+    await tester.tap(find.text('Bloc'));
+    await tester.pump();
+    await tester.tap(find.text('Grand'));
+    await tester.pump();
+    await tapShare(tester);
+
+    expect(sharing.fileName, 'biblivre-progression.png');
+    expect(_pngSize(sharing.bytes!), (width: 1080, height: 1920));
+  });
+
   screenTest('se passe d\'auteur dans le texte partagé', (tester) async {
     await pumpScreen(tester, _item(author: null));
 

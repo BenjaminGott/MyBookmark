@@ -169,7 +169,11 @@ void main() {
 
     /// Monte la carte dans un parent volontairement plus grand qu'elle, et aux
     /// contraintes serrées : c'est le cas qui l'étirait avant correction.
-    Future<void> pumpCard(WidgetTester tester, LibraryItem item) async {
+    Future<void> pumpCard(
+      WidgetTester tester,
+      LibraryItem item, {
+      ShareCardFormat format = ShareCardFormat.large,
+    }) async {
       tester.view.physicalSize = const Size(400, 700);
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
@@ -180,6 +184,7 @@ void main() {
             child: ProgressShareCard(
               item: item,
               palette: ProgressCardPalette.fallback(),
+              format: format,
               captureKey: captureKey,
             ),
           ),
@@ -194,8 +199,7 @@ void main() {
       expect(find.text('Dune'), findsOne);
       expect(find.text('Frank Herbert'), findsOne);
       expect(find.text('page 120 sur 658'), findsOne);
-      expect(find.text('18'), findsOne);
-      expect(find.text('%'), findsOne);
+      expect(find.text('18 %'), findsOne);
       expect(find.text('EN COURS DE LECTURE'), findsOne);
     });
 
@@ -204,7 +208,7 @@ void main() {
       await pumpCard(tester, _item(pageCount: null, currentPage: 120));
 
       expect(find.text('En cours'), findsOne);
-      expect(find.text('%'), findsNothing);
+      expect(find.textContaining('%'), findsNothing);
       expect(find.text('page 120'), findsOne);
     });
 
@@ -249,11 +253,92 @@ void main() {
 
       expect(
         tester.getSize(find.byKey(captureKey)),
-        const Size(
-          ProgressShareCard.cardWidth,
-          ProgressShareCard.cardHeight,
-        ),
+        Size(ShareCardFormat.large.width, ShareCardFormat.large.height),
       );
+    });
+
+    testWidgets('n\'affiche pas le nom de l\'application', (tester) async {
+      await pumpCard(tester, _item());
+
+      // La carte appartient au lecteur, pas à l'application : aucune signature.
+      expect(find.textContaining('Biblivre'), findsNothing);
+      expect(find.textContaining('biblivre'), findsNothing);
+    });
+
+    testWidgets('écrit le pourcentage dans la barre', (tester) async {
+      await pumpCard(tester, _item(currentPage: 500, pageCount: 658));
+
+      // Le chiffre est posé sur la portion lue, donc dans la couleur prévue
+      // pour être lue sur elle.
+      final label = tester.widget<Text>(find.text('76 %'));
+      expect(label.style!.color, ProgressCardPalette.fallback().onAccent);
+    });
+
+    testWidgets('sort le pourcentage de la barre quand elle est trop courte',
+        (tester) async {
+      await pumpCard(tester, _item(currentPage: 6, pageCount: 658));
+
+      // À 1 %, le chiffre ne tiendrait pas dans la portion lue : il passe à
+      // côté, sur le rail, dans la couleur du texte courant.
+      final label = tester.widget<Text>(find.text('1 %'));
+      expect(label.style!.color, ProgressCardPalette.fallback().foreground);
+    });
+
+    testWidgets('le format bloc mesure 360 × 360', (tester) async {
+      await pumpCard(tester, _item(), format: ShareCardFormat.compact);
+
+      expect(
+        tester.getSize(find.byKey(captureKey)),
+        Size(ShareCardFormat.compact.width, ShareCardFormat.compact.height),
+      );
+    });
+
+    testWidgets('le format bloc garde titre, auteur et progression',
+        (tester) async {
+      await pumpCard(tester, _item(), format: ShareCardFormat.compact);
+
+      expect(find.text('Dune'), findsOne);
+      expect(find.text('Frank Herbert'), findsOne);
+      expect(find.text('page 120 sur 658'), findsOne);
+      expect(find.text('18 %'), findsOne);
+    });
+
+    testWidgets('le format bloc gère un livre sans nombre de pages',
+        (tester) async {
+      await pumpCard(
+        tester,
+        _item(pageCount: null),
+        format: ShareCardFormat.compact,
+      );
+
+      expect(find.text('En cours'), findsOne);
+      expect(find.textContaining('%'), findsNothing);
+    });
+
+    testWidgets('le format bloc se capture en 1080 × 1080', (tester) async {
+      await pumpCard(tester, _item(), format: ShareCardFormat.compact);
+
+      final boundary =
+          tester.renderObject<RenderRepaintBoundary>(find.byKey(captureKey));
+
+      final size = await tester.runAsync(() async {
+        final image =
+            await boundary.toImage(pixelRatio: ProgressShareCard.captureRatio);
+        final data = await image.toByteData(format: ImageByteFormat.png);
+        image.dispose();
+        return _pngSize(data!.buffer.asUint8List());
+      });
+
+      expect(size, (width: 1080, height: 1080));
+    });
+
+    testWidgets('propose deux noms de fichier distincts', (tester) async {
+      expect(
+        ShareCardFormat.large.fileName,
+        isNot(ShareCardFormat.compact.fileName),
+      );
+      expect(ShareCardFormat.large.fileName, endsWith('.png'));
+      expect(ShareCardFormat.compact.fileName, endsWith('.png'));
     });
 
     testWidgets('se capture en 1080 × 1920', (tester) async {

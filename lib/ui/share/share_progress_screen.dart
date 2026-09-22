@@ -32,6 +32,7 @@ class _ShareProgressScreenState extends ConsumerState<ShareProgressScreen> {
 
   ProgressCardPalette? _palette;
   ImageProvider? _cover;
+  ShareCardFormat _format = ShareCardFormat.large;
   bool _sharing = false;
 
   @override
@@ -94,12 +95,36 @@ class _ShareProgressScreenState extends ConsumerState<ShareProgressScreen> {
                       item: widget.item,
                       palette: palette,
                       cover: _cover,
+                      format: _format,
                     ),
                   ),
                 ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: SegmentedButton<ShareCardFormat>(
+                    segments: <ButtonSegment<ShareCardFormat>>[
+                      for (final format in ShareCardFormat.values)
+                        ButtonSegment<ShareCardFormat>(
+                          value: format,
+                          label: Text(format.label),
+                        ),
+                    ],
+                    selected: <ShareCardFormat>{_format},
+                    showSelectedIcon: false,
+                    onSelectionChanged: _sharing
+                        ? null
+                        : (selection) =>
+                            setState(() => _format = selection.first),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  _format.pixels,
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
                 SafeArea(
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
                     child: FilledButton.icon(
                       onPressed: _sharing ? null : _share,
                       icon: const Icon(Icons.share_outlined),
@@ -123,7 +148,7 @@ class _ShareProgressScreenState extends ConsumerState<ShareProgressScreen> {
 
       await ref.read(imageSharingProvider).sharePng(
             bytes: bytes,
-            fileName: 'biblivre-progression.png',
+            fileName: _format.fileName,
             text: _shareText(),
           );
     } on AppException catch (error) {
@@ -135,7 +160,7 @@ class _ShareProgressScreenState extends ConsumerState<ShareProgressScreen> {
     }
   }
 
-  /// Capture la carte en 1080 × 1920.
+  /// Capture la carte dans la taille de son format.
   Future<Uint8List?> _capture() async {
     final boundary =
         _cardKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
@@ -181,20 +206,22 @@ class _CardPreview extends StatelessWidget {
     required this.item,
     required this.palette,
     required this.cover,
+    required this.format,
   });
 
   final GlobalKey cardKey;
   final LibraryItem item;
   final ProgressCardPalette palette;
   final ImageProvider? cover;
+  final ShareCardFormat format;
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
         final scale = math.min(
-          constraints.maxWidth / ProgressShareCard.cardWidth,
-          constraints.maxHeight / ProgressShareCard.cardHeight,
+          constraints.maxWidth / format.width,
+          constraints.maxHeight / format.height,
         );
 
         return Transform.scale(
@@ -203,6 +230,7 @@ class _CardPreview extends StatelessWidget {
             item: item,
             palette: palette,
             cover: cover,
+            format: format,
             captureKey: cardKey,
           ),
         );

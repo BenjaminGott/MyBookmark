@@ -41,6 +41,12 @@ class ProgressCardPalette {
   /// La couleur de la portion remplie de la barre de progression.
   final Color accent;
 
+  /// La couleur du texte écrit **sur** [accent] : le pourcentage est logé dans
+  /// la barre, il doit se lire sur elle et non sur le fond.
+  Color get onAccent => accent.computeLuminance() > 0.45
+      ? const Color(0xFF16110D)
+      : Colors.white;
+
   /// Analyse une couverture pour en tirer un dégradé.
   ///
   /// Toute erreur — image introuvable, décodage impossible, couverture d'une
