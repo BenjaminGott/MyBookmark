@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'core/theme/app_theme.dart';
+import 'ui/search/search_screen.dart';
 
 /// Racine de l'application : thèmes clair et sombre, interface en français.
 class BiblivreApp extends StatelessWidget {
@@ -22,20 +23,7 @@ class BiblivreApp extends StatelessWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      home: const _HomePlaceholder(),
-    );
-  }
-}
-
-/// Écran temporaire, remplacé par « Ma bibliothèque » à la fonctionnalité 3.
-class _HomePlaceholder extends StatelessWidget {
-  const _HomePlaceholder();
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Biblivre')),
-      body: const Center(child: Text('Bibliothèque en construction')),
+      home: const SearchScreen(),
     );
   }
 }

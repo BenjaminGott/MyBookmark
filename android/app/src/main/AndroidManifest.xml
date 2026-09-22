@@ -1,6 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Seul accès réseau de l'application : l'API Open Library et les
+         couvertures. Toutes les données de lecture restent sur le téléphone. -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+
     <application
-        android:label="biblivre"
+        android:label="Biblivre"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
