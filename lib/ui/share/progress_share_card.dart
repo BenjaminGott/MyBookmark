@@ -75,14 +75,14 @@ class ProgressShareCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   _Kicker(item: item, palette: palette),
-                  const Spacer(),
+                  const Spacer(flex: 3),
                   if (cover != null)
                     _Cover(cover: cover!)
                   else
                     _NoCoverMark(palette: palette),
                   const SizedBox(height: 28),
                   _Title(item: item, palette: palette, large: cover == null),
-                  const Spacer(),
+                  const Spacer(flex: 2),
                   if (item.currentEntry.rating != null) ...<Widget>[
                     _Stars(rating: item.currentEntry.rating!, palette: palette),
                     const SizedBox(height: 20),
@@ -310,7 +310,9 @@ class _Progress extends StatelessWidget {
             child: Stack(
               children: <Widget>[
                 ColoredBox(
-                  color: palette.foreground.withValues(alpha: 0.22),
+                  // Le rail reste discret : c'est la portion lue qui doit
+                  // porter le regard.
+                  color: palette.foreground.withValues(alpha: 0.16),
                   child: const SizedBox.expand(),
                 ),
                 FractionallySizedBox(

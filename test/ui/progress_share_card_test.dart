@@ -124,6 +124,30 @@ void main() {
       }
     });
 
+    test('détache toujours la barre de progression du fond', () {
+      // Sans cet écart, la portion lue se confond avec son rail et la carte
+      // n'affiche plus aucune progression visible — c'est ce qui se produisait
+      // sur l'appareil avant correction.
+      const samples = <Color>[
+        Color(0xFFFFFFFF),
+        Color(0xFF000000),
+        Color(0xFF1B2A41),
+        Color(0xFFE53935),
+        Color(0xFFFDD835),
+        Color(0xFF00897B),
+      ];
+
+      for (final sample in samples) {
+        final palette = ProgressCardPalette.fromColors(sample, sample);
+        expect(
+          (palette.accent.computeLuminance() - palette.backgroundLuminance)
+              .abs(),
+          greaterThan(0.12),
+          reason: 'barre invisible pour ${sample.toARGB32()}',
+        );
+      }
+    });
+
     test('retombe sur la palette de l\'application sans couleur', () {
       final fallback = ProgressCardPalette.fallback();
       final fromNothing = ProgressCardPalette.fromColors(null, null);

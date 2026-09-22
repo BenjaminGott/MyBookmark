@@ -91,7 +91,9 @@ class ProgressCardPalette {
         top: top,
         bottom: bottom,
         foreground: _readableOn(top, bottom),
-        accent: _shade(companion, 0.55),
+        // Franchement plus sombre que le fond : la portion lue doit se voir
+        // d'un coup d'œil, c'est tout le sujet de la carte.
+        accent: _shade(companion, 0.7),
       );
     }
 
@@ -104,9 +106,14 @@ class ProgressCardPalette {
       top: top,
       bottom: bottom,
       foreground: _readableOn(top, bottom),
-      accent: _tint(top, 0.45),
+      // Franchement plus clair que le fond, pour la même raison.
+      accent: _tint(top, 0.78),
     );
   }
+
+  /// Luminosité moyenne du dégradé, celle sur laquelle tout se détache.
+  double get backgroundLuminance =>
+      (top.computeLuminance() + bottom.computeLuminance()) / 2;
 
   /// Blanc ou presque noir, selon ce qui se lit sur le dégradé.
   ///
