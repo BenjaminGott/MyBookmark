@@ -36,6 +36,9 @@ dependencies:
   # Annotations (@immutable) pour la couche domain, sans dépendre de Flutter
   meta: ^1.16.0
 
+  # Choix du fichier d'export et d'import JSON
+  file_picker: ^13.1.0
+
   # Formatage des dates en français
   intl: ^0.20.2 # épinglé à 0.20.2 par flutter_localizations
 

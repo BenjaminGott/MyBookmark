@@ -3,6 +3,7 @@ import 'package:drift_flutter/drift_flutter.dart';
 
 import '../../domain/models/shelf.dart';
 import 'converters/shelf_converter.dart';
+import 'daos/backup_dao.dart';
 import 'daos/books_dao.dart';
 import 'daos/reading_entries_dao.dart';
 import 'daos/tags_dao.dart';
@@ -14,7 +15,7 @@ part 'app_database.g.dart';
 
 @DriftDatabase(
   tables: <Type>[Books, ReadingEntries, Tags, BookTags],
-  daos: <Type>[BooksDao, ReadingEntriesDao, TagsDao],
+  daos: <Type>[BooksDao, ReadingEntriesDao, TagsDao, BackupDao],
 )
 class AppDatabase extends _$AppDatabase {
   /// Base réelle du téléphone, rangée dans le dossier applicatif privé.

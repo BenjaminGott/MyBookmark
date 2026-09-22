@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'book_detail/book_detail_screen.dart';
 import 'library/library_screen.dart';
 import 'search/search_screen.dart';
+import 'settings/settings_screen.dart';
 
 /// Les deux onglets de l'application : sa bibliothèque, et la recherche.
 class HomeShell extends StatefulWidget {
@@ -35,6 +36,7 @@ class _HomeShellState extends State<HomeShell> {
         children: <Widget>[
           LibraryScreen(onOpenSearch: _goToSearch, onOpenBook: _openBook),
           const SearchScreen(),
+          const SettingsScreen(),
         ],
       ),
       bottomNavigationBar: NavigationBar(
@@ -49,6 +51,11 @@ class _HomeShellState extends State<HomeShell> {
           NavigationDestination(
             icon: Icon(Icons.search),
             label: 'Chercher',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.settings_outlined),
+            selectedIcon: Icon(Icons.settings),
+            label: 'Réglages',
           ),
         ],
       ),

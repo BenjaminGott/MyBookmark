@@ -66,3 +66,26 @@ class StorageException extends AppException {
     super.message = 'Enregistrement impossible. Vérifiez la saisie.',
   ]);
 }
+
+/// Le fichier choisi n'est pas un export de Biblivre.
+class MalformedBackupException extends AppException {
+  const MalformedBackupException([
+    super.message = 'Ce fichier n\'est pas une sauvegarde Biblivre valide.',
+  ]);
+}
+
+/// Le fichier vient d'une version plus récente de l'application.
+class UnsupportedBackupVersionException extends AppException {
+  const UnsupportedBackupVersionException(this.version)
+      : super('Cette sauvegarde vient d\'une version plus récente de '
+            'Biblivre. Mettez l\'application à jour pour la lire.');
+
+  final int version;
+}
+
+/// La lecture ou l'écriture du fichier a échoué.
+class FileAccessException extends AppException {
+  const FileAccessException([
+    super.message = 'Impossible d\'accéder au fichier choisi.',
+  ]);
+}
