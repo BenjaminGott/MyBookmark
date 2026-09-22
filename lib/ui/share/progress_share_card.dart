@@ -16,11 +16,14 @@ enum ShareCardFormat {
   /// Sans coins arrondis : elle occupe tout l'écran, il n'y a rien derrière.
   large(360, 640, 'Grand', '1080 × 1920', 0),
 
-  /// Bloc bas, pensé pour être posé à côté d'autre chose : 1080 × 900.
+  /// Bloc bas, pensé pour être posé à côté d'autre chose : 1080 × 750.
+  ///
+  /// Sa hauteur est celle de la couverture : tout le reste tient au-dessus
+  /// d'elle en hauteur, il n'y a pas de place à gagner ailleurs.
   ///
   /// Coins arrondis et donc transparents : il se pose sur un fond quelconque
   /// sans trancher dessus par un angle droit.
-  compact(360, 300, 'Bloc', '1080 × 900', 26);
+  compact(360, 250, 'Bloc', '1080 × 750', 26);
 
   const ShareCardFormat(
     this.width,
@@ -202,20 +205,21 @@ class _CompactLayout extends StatelessWidget {
                         item: item,
                         palette: palette,
                         size: cover == null ? 30 : 20,
-                        maxLines: cover == null ? 4 : 3,
+                        maxLines: cover == null ? 4 : 2,
                       ),
-                      const Spacer(),
-                      if (item.currentEntry.rating != null) ...<Widget>[
-                        _Stars(
-                          rating: item.currentEntry.rating!,
-                          palette: palette,
-                        ),
-                        const SizedBox(height: 12),
-                      ],
+                      const SizedBox(height: 14),
+                      // La progression arrive juste après le titre : c'est
+                      // l'information que la carte vient annoncer.
                       _ProgressBlock(
                         item: item,
                         palette: palette,
                         style: _BarStyle.thick,
+                        trailing: item.currentEntry.rating == null
+                            ? null
+                            : _Stars(
+                                rating: item.currentEntry.rating!,
+                                palette: palette,
+                              ),
                       ),
                     ],
                   ),
@@ -429,11 +433,16 @@ class _ProgressBlock extends StatelessWidget {
     required this.item,
     required this.palette,
     required this.style,
+    this.trailing,
   });
 
   final LibraryItem item;
   final ProgressCardPalette palette;
   final _BarStyle style;
+
+  /// Posé au bout de la ligne des pages : la note, quand il y en a une. La
+  /// mettre là plutôt qu'à part économise une ligne dans le bloc.
+  final Widget? trailing;
 
   @override
   Widget build(BuildContext context) {
@@ -492,7 +501,15 @@ class _ProgressBlock extends StatelessWidget {
           children: <Widget>[
             _ThickBar(percent: percent, palette: palette, height: 24),
             const SizedBox(height: 10),
-            pages,
+            Row(
+              children: <Widget>[
+                Flexible(child: pages),
+                if (trailing != null) ...<Widget>[
+                  const SizedBox(width: 10),
+                  trailing!,
+                ],
+              ],
+            ),
           ],
         ),
       _BarStyle.slim => Column(

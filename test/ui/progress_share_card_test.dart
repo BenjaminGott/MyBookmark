@@ -398,7 +398,7 @@ void main() {
       expect(find.textContaining('%'), findsNothing);
     });
 
-    testWidgets('le format bloc se capture en 1080 × 900', (tester) async {
+    testWidgets('le format bloc se capture en 1080 × 750', (tester) async {
       await pumpCard(tester, _item(), format: ShareCardFormat.compact);
 
       final boundary =
@@ -412,7 +412,7 @@ void main() {
         return _pngSize(data!.buffer.asUint8List());
       });
 
-      expect(size, (width: 1080, height: 900));
+      expect(size, (width: 1080, height: 750));
     });
 
     testWidgets('arrondit les coins du bloc, pas ceux du grand format',
@@ -466,6 +466,31 @@ void main() {
         tester.getRect(find.text('EN COURS DE LECTURE')).left,
         lessThan(cover.right),
       );
+    });
+
+    testWidgets('place la barre juste sous le titre dans le bloc',
+        (tester) async {
+      await pumpCard(
+        tester,
+        _item(rating: 4),
+        format: ShareCardFormat.compact,
+        withCover: true,
+      );
+
+      final title = tester.getRect(find.text('Dune'));
+      final author = tester.getRect(find.text('Frank Herbert'));
+      final bar = tester.getRect(find.byKey(const Key('progress-track')));
+      final pages = tester.getRect(find.text('page 120 sur 658'));
+
+      // Rien ne s'intercale entre le titre et la barre, et la note tient sur
+      // la ligne des pages plutôt que sur une ligne à elle.
+      expect(bar.top, greaterThan(author.bottom));
+      expect(bar.top - author.bottom, lessThan(24));
+      expect(title.bottom, lessThan(author.top + 1));
+      expect(pages.top, greaterThan(bar.bottom));
+
+      final stars = tester.getRect(find.byIcon(Icons.star).first);
+      expect(stars.center.dy, closeTo(pages.center.dy, 6));
     });
 
     testWidgets('propose deux noms de fichier distincts', (tester) async {
