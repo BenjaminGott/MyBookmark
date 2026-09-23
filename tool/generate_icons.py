@@ -18,6 +18,7 @@ ROOT = Path(__file__).resolve().parent.parent
 SOURCE = ROOT / 'branding' / 'logo-source.jpg'
 RES = ROOT / 'android' / 'app' / 'src' / 'main' / 'res'
 COLORS = RES / 'values' / 'colors.xml'
+ASSET = ROOT / 'assets' / 'logo.png'
 
 DENSITIES = {'mdpi': 1, 'hdpi': 1.5, 'xhdpi': 2, 'xxhdpi': 3, 'xxxhdpi': 4}
 
@@ -104,6 +105,10 @@ def main() -> None:
             folder / 'ic_launcher_monochrome.png')
 
     write_background_color(background)
+
+    # Le logo seul, sur fond transparent, pour l'en-tête de l'application.
+    ASSET.parent.mkdir(parents=True, exist_ok=True)
+    place(logo, 192, 1.0).save(ASSET)
 
     # Icône du Play Store : 512 × 512, fond plein, Google arrondit lui-même.
     place(logo, 512, 0.78, background=solid).convert('RGB').save(

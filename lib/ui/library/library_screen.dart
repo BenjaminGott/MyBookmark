@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/failure.dart';
+import '../../core/theme/app_theme.dart';
 import '../../domain/models/library_item.dart';
 import '../../domain/models/library_query.dart';
 import '../../domain/models/shelf.dart';
@@ -29,7 +30,26 @@ class LibraryScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Ma bibliothèque'),
+        title: Row(
+          children: <Widget>[
+            // Décoratif : le titre suffit aux lecteurs d'écran. Le fond vert
+            // de l'icône le garde lisible sur le thème clair.
+            ExcludeSemantics(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: AppTheme.green,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(5),
+                  child: Image.asset('assets/logo.png', width: 30, height: 30),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            const Flexible(child: Text('Ma bibliothèque')),
+          ],
+        ),
         actions: <Widget>[_SortButton(query: query)],
         bottom: _ShelfFilterBar(query: query),
       ),
@@ -78,6 +98,9 @@ class _ShelfFilterBar extends ConsumerWidget implements PreferredSizeWidget {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
             child: FilterChip(
+              // Le fond jaune dit la sélection ; une coche viendrait
+              // recouvrir l'icône des étagères.
+              showCheckmark: false,
               label: const Text('Toutes'),
               selected: query.shelf == null,
               onSelected: (_) => controller.filterByShelf(null),
@@ -87,6 +110,7 @@ class _ShelfFilterBar extends ConsumerWidget implements PreferredSizeWidget {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
               child: FilterChip(
+                showCheckmark: false,
                 avatar: Icon(shelf.icon, size: 18),
                 label: Text(shelf.label),
                 selected: query.shelf == shelf,

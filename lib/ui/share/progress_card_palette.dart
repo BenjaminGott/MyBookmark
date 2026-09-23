@@ -30,14 +30,13 @@ class ProgressCardPalette {
   });
 
   /// La palette utilisée quand il n'y a pas de couverture, ou quand son analyse
-  /// échoue : les teintes de l'application.
+  /// échoue : les couleurs du logo, un dégradé vert et une barre jaune.
   factory ProgressCardPalette.fallback() {
-    const seed = AppTheme.seed;
     return ProgressCardPalette(
-      top: _shade(seed, 0.22),
-      bottom: _shade(seed, 0.62),
+      top: AppTheme.green,
+      bottom: _shade(AppTheme.green, 0.45),
       foreground: Colors.white,
-      accent: _shade(seed, 0.12),
+      accent: AppTheme.yellow,
     );
   }
 
