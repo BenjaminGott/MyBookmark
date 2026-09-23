@@ -43,3 +43,8 @@ kotlin {
 flutter {
     source = "../.."
 }
+
+dependencies {
+    // `FileProvider`, pour confier la carte à Instagram en story.
+    implementation("androidx.core:core-ktx:1.13.1")
+}
