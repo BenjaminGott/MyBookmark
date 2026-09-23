@@ -21,7 +21,8 @@ l'ajout — passé ce point, l'application fonctionne entièrement hors ligne.
    (1080 × 636, par défaut) et story 9:16 (1080 × 1920) — sur un dégradé tiré
    de la couverture, avec variantes claire, sombre et vive, et composition
    manuelle du dégradé ; envoi direct en story Instagram, le bloc posé en
-   sticker sur son dégradé pour garder ses coins arrondis transparents
+   sticker sur son dégradé pour garder ses coins arrondis transparents ;
+   enregistrement de la carte dans la galerie, album « Biblivre »
 
 Thèmes clair et sombre, interface intégralement en français.
 
@@ -35,7 +36,7 @@ Thèmes clair et sombre, interface intégralement en français.
 | Couvertures | `cached_network_image` (jamais stockées en base) |
 | Réglages | `shared_preferences` |
 | Fichiers | `file_picker` (export/import) |
-| Partage | `share_plus`, `path_provider`, `palette_generator` |
+| Partage | `share_plus`, `path_provider`, `palette_generator`, `gal` |
 
 `sqlite3_flutter_libs` n'est pas utilisé : il est marqué EOL sur pub.dev,
 `drift_flutter` embarque désormais `sqlite3` 3.x.
@@ -111,5 +112,13 @@ Sinon, copier `app-arm64-v8a-release.apk` sur le téléphone et l'ouvrir depuis 
 gestionnaire de fichiers ; Android demandera d'autoriser l'installation
 d'applications issues de cette source.
 
-L'APK est signé avec la clé de débogage : il s'installe sans problème, mais ne
-peut pas être publié sur le Play Store en l'état.
+Compilé sur un poste sans `android/key.properties`, l'APK est signé avec la clé
+de débogage : il s'installe, mais ne met pas à jour une version publiée. Les
+releases GitHub, elles, sont signées avec la clé de release (APK et AAB).
+
+## Publier
+
+- Release GitHub : onglet Actions → « Release APK » → tag `vX.Y.Z`.
+- Play Store : voir [docs/PUBLICATION_PLAY_STORE.md](docs/PUBLICATION_PLAY_STORE.md).
+- Icônes : `python3 tool/generate_icons.py` les régénère depuis
+  `branding/logo-source.jpg`.
