@@ -1,0 +1,158 @@
+# Publier Biblivre sur le Play Store
+
+Tout ce qu'il faut faire, dans l'ordre, pour passer des releases GitHub à une
+publication sur Google Play. Les cases déjà faites sont cochées.
+
+Les règles de Google (nombre de testeurs, durée du test, niveau d'API minimal)
+changent régulièrement : la Play Console affiche toujours les exigences en
+vigueur, c'est elle qui fait foi.
+
+---
+
+## 1. Déjà en place dans le projet
+
+- [x] **Identifiant de l'application** : `com.benjamin.biblivre`. Définitif
+      une fois publié, il ne pourra plus jamais changer.
+- [x] **Clé de release** commune à toutes les machines, dans les secrets GitHub
+      (`ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`,
+      `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD`). Le fichier `.p12` et son mot
+      de passe sont sauvegardés hors du dépôt.
+- [x] **Icône** de l'application (adaptative, thématique Android 13, et
+      classique), générée par `tool/generate_icons.py`.
+- [x] **Icône du Play Store** 512 × 512 : `branding/play-store-icon-512.png`.
+- [x] **AAB** : le workflow « Release APK » produit `biblivre-vX.Y.Z.aab` à côté
+      de l'APK. C'est ce fichier qu'on envoie au Play Store.
+
+## 2. Avant de commencer
+
+- [ ] **Vérifier le nom.** Un logiciel libre brésilien de gestion de
+      bibliothèque s'appelle déjà « Biblivre ». Chercher sur le Play Store et
+      sur le web ; en cas de doute, choisir un nom de fiche différent (le nom
+      affiché peut différer de l'identifiant `com.benjamin.biblivre`).
+- [ ] **Préparer 12 testeurs** (amis, famille) avec un compte Google et un
+      téléphone Android : ils seront nécessaires à l'étape 5.
+
+## 3. Créer le compte développeur
+
+1. Aller sur <https://play.google.com/console> et choisir un compte
+   **personnel**.
+2. Payer les frais d'inscription (25 $, une seule fois).
+3. Vérifier son identité (pièce d'identité) et valider un téléphone Android
+   depuis l'application Play Console.
+
+Un compte « organisation » demanderait un numéro D-U-N-S : inutile pour un
+projet personnel.
+
+## 4. Préparer ce que Google demande
+
+### Politique de confidentialité
+
+Une URL publique est obligatoire, même si l'application ne collecte rien. Le
+plus simple : une page GitHub Pages (par exemple `docs/confidentialite.md`
+publié depuis le dépôt). Elle doit dire, en substance :
+
+- les livres, lectures et avis sont stockés **uniquement sur le téléphone** ;
+- l'application envoie à **Open Library** les termes de recherche et télécharge
+  les couvertures ; aucune autre donnée ne quitte l'appareil ;
+- le partage (feuille de partage, story Instagram) n'a lieu qu'à la demande de
+  l'utilisateur ;
+- pas de compte, pas de publicité, pas de statistiques ;
+- une adresse de contact.
+
+La même URL sert à passer l'app Meta (ID `2201363724596999`) en mode **Live**
+sur <https://developers.facebook.com>, ce qui garantit que le partage en story
+fonctionne pour tout le monde.
+
+### Fiche du Play Store
+
+| Élément | Format | État |
+| --- | --- | --- |
+| Nom de l'application | 30 caractères max | à écrire |
+| Description courte | 80 caractères max | à écrire |
+| Description complète | 4000 caractères max | à écrire (le README est une bonne base) |
+| Icône | PNG 512 × 512 | `branding/play-store-icon-512.png` |
+| Image de présentation | PNG ou JPEG 1024 × 500 | à créer |
+| Captures d'écran téléphone | au moins 2, format 9:16 conseillé | à faire sur le téléphone |
+| E-mail de contact | public | à choisir |
+
+### Questionnaires de la console
+
+- **Sécurité des données** : aucune donnée collectée ni partagée par
+  l'application. Les recherches vers Open Library ne sont liées à aucune
+  identité.
+- **Classification du contenu** : questionnaire IARC, application de catalogue
+  sans contenu sensible, la note sera « Tout public » (PEGI 3).
+- **Public cible** : 13 ans et plus, pour ne pas relever des règles
+  spécifiques aux enfants.
+- **Publicités** : non.
+- **Accès à l'application** : aucune connexion requise.
+
+## 5. Signature : choisir la bonne option
+
+Au premier envoi, la console propose **Play App Signing** : Google conserve la
+clé qui signe l'application distribuée, et on ne lui envoie que des fichiers
+signés avec une « clé d'importation ».
+
+- **Option recommandée : donner notre clé à Google.** Dans *Configuration →
+  Intégrité de l'application → Signature*, choisir d'utiliser une clé
+  existante et suivre la procédure (outil PEPK fourni par Google) avec le
+  fichier `.p12`. L'application du Play Store et les APK des releases GitHub
+  portent alors la même signature : un utilisateur peut passer de l'un à
+  l'autre sans désinstaller.
+- **Option par défaut : laisser Google générer la clé.** Plus simple, mais les
+  APK GitHub et la version Play Store deviennent incompatibles : passer de
+  l'un à l'autre imposera de désinstaller, donc de perdre sa bibliothèque.
+
+Ce choix est **définitif** : le faire avant le premier envoi.
+
+## 6. Test fermé (obligatoire pour un compte personnel)
+
+1. *Tester → Test fermé → Créer un canal*.
+2. Envoyer l'AAB de la dernière release GitHub (`biblivre-vX.Y.Z.aab`).
+3. Ajouter les adresses des testeurs, leur envoyer le lien d'inscription.
+4. Garder **au moins 12 testeurs inscrits pendant 14 jours d'affilée**.
+5. Corriger ce qui remonte ; chaque nouvel envoi repasse par une release
+   GitHub (voir étape 8).
+
+## 7. Passer en production
+
+Une fois le test fermé terminé, *Tableau de bord → Demander l'accès à la
+production*. Google pose quelques questions sur le test, puis examine
+l'application (de quelques heures à quelques jours). Ensuite : *Production →
+Créer une version*, envoyer l'AAB, choisir les pays, publier.
+
+## 8. À chaque nouvelle version
+
+1. Dans `pubspec.yaml`, augmenter `version:`. Le nombre après le `+` doit
+   **toujours augmenter** (le Play Store refuse un numéro déjà utilisé) :
+   `1.1.0+2` → `1.2.0+3`.
+2. Merger dans `main`, puis lancer *Actions → Release APK* avec le tag
+   `v1.2.0`.
+3. Télécharger `biblivre-v1.2.0.aab` depuis la release et l'envoyer dans la
+   console (test fermé ou production).
+
+### Plus tard : envoi automatique
+
+Le workflow peut envoyer l'AAB directement au Play Store. Il faudra :
+
+1. créer un compte de service dans Google Cloud et l'inviter dans la Play
+   Console avec le droit de publier ;
+2. mettre sa clé JSON dans un secret GitHub `PLAY_SERVICE_ACCOUNT_JSON` ;
+3. ajouter une étape d'envoi au workflow.
+
+Google impose que le **tout premier** AAB soit envoyé à la main : l'envoi
+automatique ne peut servir qu'à partir de la deuxième version.
+
+## Récapitulatif
+
+- [ ] Nom vérifié
+- [ ] 12 testeurs prêts
+- [ ] Compte Play Console créé et vérifié
+- [ ] Politique de confidentialité en ligne
+- [ ] App Meta passée en mode Live
+- [ ] Fiche remplie (textes, image 1024 × 500, captures)
+- [ ] Questionnaires remplis
+- [ ] Signature : clé existante fournie à Google
+- [ ] Test fermé : 12 testeurs, 14 jours
+- [ ] Accès à la production obtenu
+- [ ] Première version publiée
