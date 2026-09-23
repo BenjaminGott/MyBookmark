@@ -48,6 +48,7 @@ dependencies:
 
   # Formatage des dates en français
   intl: ^0.20.2 # épinglé à 0.20.2 par flutter_localizations
+  gal: ^2.3.3
 
 dev_dependencies:
   flutter_test:

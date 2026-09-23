@@ -181,11 +181,16 @@ class _ShareProgressScreenState extends ConsumerState<ShareProgressScreen> {
                     child: Row(
                       children: <Widget>[
                         if (_instagram) ...<Widget>[
+                          // Libellé court : trois actions tiennent ainsi sur
+                          // une ligne, même sur un téléphone étroit.
                           Expanded(
-                            child: OutlinedButton.icon(
-                              onPressed: _sharing ? null : _shareToStory,
-                              icon: const Icon(Icons.add_circle_outline),
-                              label: const Text('Story Instagram'),
+                            child: Tooltip(
+                              message: 'Partager en story Instagram',
+                              child: OutlinedButton.icon(
+                                onPressed: _sharing ? null : _shareToStory,
+                                icon: const Icon(Icons.add_circle_outline),
+                                label: const Text('Story'),
+                              ),
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -198,6 +203,12 @@ class _ShareProgressScreenState extends ConsumerState<ShareProgressScreen> {
                               _sharing ? 'Préparation…' : 'Partager',
                             ),
                           ),
+                        ),
+                        const SizedBox(width: 8),
+                        IconButton.outlined(
+                          onPressed: _sharing ? null : _save,
+                          icon: const Icon(Icons.download_outlined),
+                          tooltip: 'Enregistrer dans la galerie',
                         ),
                       ],
                     ),
@@ -216,6 +227,19 @@ class _ShareProgressScreenState extends ConsumerState<ShareProgressScreen> {
               text: _shareText(),
             ),
       );
+
+  /// Enregistre la carte dans la galerie, dans l'album « Biblivre ».
+  ///
+  /// L'horodatage évite qu'une nouvelle carte ne prenne le nom d'une
+  /// précédente.
+  Future<void> _save() => _captureThen((bytes) async {
+        final base = _format.fileName.replaceAll('.png', '');
+        await ref.read(imageSavingProvider).savePng(
+              bytes: bytes,
+              name: '$base-${DateTime.now().millisecondsSinceEpoch}',
+            );
+        _tell('Image enregistrée dans la galerie.');
+      });
 
   /// Partage direct en story Instagram.
   ///

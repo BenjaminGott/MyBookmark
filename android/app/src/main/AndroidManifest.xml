@@ -2,11 +2,17 @@
     <!-- Seul accès réseau de l'application : l'API Open Library et les
          couvertures. Toutes les données de lecture restent sur le téléphone. -->
     <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- Enregistrer la carte de partage dans la galerie : seuls Android 9 et
+         antérieurs demandent une permission pour cela. -->
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="29"/>
 
     <application
         android:label="Biblivre"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:requestLegacyExternalStorage="true">
         <activity
             android:name=".MainActivity"
             android:exported="true"

@@ -6,6 +6,7 @@ import 'package:biblivre/domain/models/book.dart';
 import 'package:biblivre/domain/models/library_item.dart';
 import 'package:biblivre/domain/models/reading_entry.dart';
 import 'package:biblivre/domain/models/shelf.dart';
+import 'package:biblivre/domain/repositories/image_saving.dart';
 import 'package:biblivre/domain/repositories/image_sharing.dart';
 import 'package:biblivre/domain/repositories/story_sharing.dart';
 import 'package:biblivre/ui/providers/share_providers.dart';
@@ -39,6 +40,26 @@ class _FakeImageSharing implements ImageSharing {
     this.bytes = bytes;
     this.fileName = fileName;
     this.text = text;
+  }
+}
+
+/// Une galerie sans téléphone : elle retient l'image qu'on lui confie.
+class _FakeImageSaving implements ImageSaving {
+  AppException? failWith;
+  Uint8List? bytes;
+  String? name;
+
+  int calls = 0;
+
+  @override
+  Future<void> savePng({required Uint8List bytes, required String name}) async {
+    calls++;
+    final error = failWith;
+    if (error != null) {
+      throw error;
+    }
+    this.bytes = bytes;
+    this.name = name;
   }
 }
 
@@ -124,9 +145,11 @@ Future<Uint8List> _solidPng(Color color, {int side = 8}) async {
 void main() {
   late _FakeImageSharing sharing;
   late _FakeStorySharing story;
+  late _FakeImageSaving saving;
 
   setUp(() {
     sharing = _FakeImageSharing();
+    saving = _FakeImageSaving();
     story = _FakeStorySharing();
   });
 
@@ -144,6 +167,7 @@ void main() {
         overrides: [
           imageSharingProvider.overrideWithValue(sharing),
           storySharingProvider.overrideWithValue(story),
+          imageSavingProvider.overrideWithValue(saving),
           if (cover != null)
             coverImageProviderFactory.overrideWithValue(
               (url) => MemoryImage(cover),
@@ -392,7 +416,7 @@ void main() {
 
   /// Appuie sur « Story Instagram », puis laisse la capture se faire.
   Future<void> tapStory(WidgetTester tester) async {
-    await tester.tap(find.widgetWithText(OutlinedButton, 'Story Instagram'));
+    await tester.tap(find.widgetWithText(OutlinedButton, 'Story'));
     await tester.pump();
     for (var round = 0; round < 4; round++) {
       await tester.runAsync(
@@ -432,7 +456,57 @@ void main() {
     story = _FakeStorySharing(available: false);
     await pumpScreen(tester, _item());
 
-    expect(find.text('Story Instagram'), findsNothing);
+    expect(find.byTooltip('Partager en story Instagram'), findsNothing);
     expect(find.widgetWithText(FilledButton, 'Partager'), findsOne);
+  });
+
+  /// Appuie sur « Enregistrer », puis laisse la capture se faire.
+  Future<void> tapSave(WidgetTester tester) async {
+    await tester.tap(find.byTooltip('Enregistrer dans la galerie'));
+    await tester.pump();
+    for (var round = 0; round < 4; round++) {
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 60)),
+      );
+      await tester.pump(const Duration(milliseconds: 20));
+    }
+  }
+
+  screenTest('enregistre le bloc dans la galerie', (tester) async {
+    await pumpScreen(tester, _item());
+
+    await tapSave(tester);
+
+    expect(saving.calls, 1);
+    expect(sharing.calls, 0);
+    expect(saving.name, startsWith('biblivre-progression-bloc-'));
+    // Le même PNG que celui partagé : coins transparents compris.
+    expect(_pngSize(saving.bytes!), (width: 1080, height: 636));
+    expect(find.text('Image enregistrée dans la galerie.'), findsOne);
+  });
+
+  screenTest('enregistre la story au format choisi', (tester) async {
+    await pumpScreen(tester, _item());
+
+    await chooseFormat(tester, 'Moyen');
+    await tapSave(tester);
+
+    expect(saving.name, startsWith('biblivre-progression-story-'));
+    expect(_pngSize(saving.bytes!), (width: 1080, height: 1920));
+  });
+
+  screenTest('explique un refus d\'accès à la galerie', (tester) async {
+    saving.failWith = const FileAccessException(
+      'Autorisez l\'accès aux photos pour enregistrer l\'image.',
+    );
+    await pumpScreen(tester, _item());
+
+    await tapSave(tester);
+
+    expect(
+      find.text('Autorisez l\'accès aux photos pour enregistrer l\'image.'),
+      findsOne,
+    );
+    expect(find.text('Image enregistrée dans la galerie.'), findsNothing);
   });
 }
