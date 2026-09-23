@@ -18,10 +18,16 @@ class _FakeSearchRepository implements SearchRepository {
   AppException? failWith;
 
   @override
-  Future<List<BookSearchResult>> search(
+  Stream<List<BookSearchResult>> search(
     String rawQuery, {
     CancellationToken? token,
-  }) async {
+  }) =>
+      Stream<List<BookSearchResult>>.fromFuture(_search(rawQuery, token));
+
+  Future<List<BookSearchResult>> _search(
+    String rawQuery,
+    CancellationToken? token,
+  ) async {
     queries.add(rawQuery);
     if (delay > Duration.zero) {
       await Future<void>.delayed(delay);

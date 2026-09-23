@@ -65,6 +65,8 @@ abstract class BookRepository {
     required int? pageCount,
     required int? firstPublishYear,
     required String? description,
+    required int? coverId,
+    required String? coverUrl,
   });
 
   /// Ouvre une relecture : l'entrée courante est archivée, une neuve démarre.

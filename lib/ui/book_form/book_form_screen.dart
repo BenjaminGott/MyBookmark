@@ -1,12 +1,19 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/failure.dart';
 import '../../domain/models/book.dart';
+import '../../domain/models/book_search_result.dart';
 import '../../domain/models/shelf.dart';
+import '../../domain/repositories/cover_store.dart';
 import '../providers/book_actions_controller.dart';
 import '../providers/book_providers.dart';
 import '../shelf_labels.dart';
+import '../widgets/book_cover.dart';
+import 'cover_search_sheet.dart';
 
 /// Saisie manuelle d'un livre, et correction d'un livre existant.
 ///
@@ -47,8 +54,30 @@ class _BookFormScreenState extends ConsumerState<BookFormScreen> {
 
   Shelf _shelf = Shelf.toRead;
 
+  late String? _coverUrl = widget.existing?.coverUrl;
+  late int? _coverId = widget.existing?.coverId;
+
+  /// Lu une fois ici : `ref` n'est plus utilisable dans [dispose].
+  late final CoverStore _covers = ref.read(coverStoreProvider);
+
+  /// Les images copiées depuis la galerie pendant cette saisie. Celles qui ne
+  /// finissent pas sur le livre sont effacées en quittant l'écran.
+  final List<String> _pickedCovers = <String>[];
+  String? _savedCoverUrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _covers;
+  }
+
   @override
   void dispose() {
+    for (final picked in _pickedCovers) {
+      if (picked != _savedCoverUrl) {
+        _covers.discard(picked);
+      }
+    }
     _title.dispose();
     _author.dispose();
     _pageCount.dispose();
@@ -72,6 +101,18 @@ class _BookFormScreenState extends ConsumerState<BookFormScreen> {
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: <Widget>[
+            _CoverField(
+              url: _coverUrl,
+              onSearch: busy ? null : _searchCover,
+              onPick: busy ? null : _pickCover,
+              onRemove: busy || _coverUrl == null
+                  ? null
+                  : () => setState(() {
+                        _coverUrl = null;
+                        _coverId = null;
+                      }),
+            ),
+            const SizedBox(height: 24),
             TextFormField(
               controller: _title,
               autofocus: !widget.isEditing,
@@ -157,6 +198,39 @@ class _BookFormScreenState extends ConsumerState<BookFormScreen> {
     );
   }
 
+  Future<void> _searchCover() async {
+    final query = <String>[_title.text.trim(), _author.text.trim()]
+        .where((part) => part.isNotEmpty)
+        .join(' ');
+    final picked = await showCoverSearchSheet(context, query: query);
+    if (picked == null || !mounted) {
+      return;
+    }
+    setState(() {
+      _coverUrl = picked.coverUrl(CoverSize.large);
+      _coverId = picked.coverId;
+    });
+  }
+
+  Future<void> _pickCover() async {
+    try {
+      final picked = await _covers.pickFromGallery();
+      if (picked == null || !mounted) {
+        return;
+      }
+      _pickedCovers.add(picked);
+      setState(() {
+        _coverUrl = picked;
+        _coverId = null;
+      });
+    } on AppException catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(error.message)));
+      }
+    }
+  }
+
   String? _validatePageCount(String? value) {
     final text = (value ?? '').trim();
     if (text.isEmpty) {
@@ -200,6 +274,7 @@ class _BookFormScreenState extends ConsumerState<BookFormScreen> {
             pageCount: pageCount,
             firstPublishYear: year,
             description: _description.text,
+            coverUrl: _coverUrl,
           )
         : await controller.editBook(
             bookId: existing.id,
@@ -208,6 +283,8 @@ class _BookFormScreenState extends ConsumerState<BookFormScreen> {
             pageCount: pageCount,
             firstPublishYear: year,
             description: _description.text,
+            coverId: _coverId,
+            coverUrl: _coverUrl,
           );
 
     if (!mounted) {
@@ -220,6 +297,11 @@ class _BookFormScreenState extends ConsumerState<BookFormScreen> {
 
     switch (outcome) {
       case ActionSuccess():
+        _savedCoverUrl = _coverUrl;
+        // L'ancienne image de la galerie, remplacée ou retirée, ne sert plus.
+        if (existing != null && existing.coverUrl != _coverUrl) {
+          unawaited(_covers.discard(existing.coverUrl));
+        }
         Navigator.of(context).pop();
         messenger.showSnackBar(
           SnackBar(
@@ -268,4 +350,56 @@ Future<void> openManualBookForm(BuildContext context) {
       builder: (context) => const BookFormScreen.create(),
     ),
   );
+}
+
+/// La couverture du livre et les trois façons de la changer.
+class _CoverField extends StatelessWidget {
+  const _CoverField({
+    required this.url,
+    required this.onSearch,
+    required this.onPick,
+    required this.onRemove,
+  });
+
+  final String? url;
+  final VoidCallback? onSearch;
+  final VoidCallback? onPick;
+  final VoidCallback? onRemove;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        BookCover(url: url, width: 80, height: 120),
+        const SizedBox(width: 16),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              OutlinedButton.icon(
+                onPressed: onSearch,
+                icon: const Icon(Icons.image_search),
+                label: const Text('Chercher en ligne'),
+              ),
+              const SizedBox(height: 8),
+              OutlinedButton.icon(
+                onPressed: onPick,
+                icon: const Icon(Icons.photo_library_outlined),
+                label: const Text('Depuis la galerie'),
+              ),
+              if (url != null) ...<Widget>[
+                const SizedBox(height: 8),
+                TextButton.icon(
+                  onPressed: onRemove,
+                  icon: const Icon(Icons.hide_image_outlined),
+                  label: const Text('Retirer la couverture'),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ],
+    );
+  }
 }

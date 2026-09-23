@@ -24,14 +24,14 @@ class NetworkException extends AppException {
 /// `dart:async`, que le client réseau attrape par ailleurs.
 class RequestTimeoutException extends AppException {
   const RequestTimeoutException([
-    super.message = 'Open Library met trop de temps à répondre.',
+    super.message = 'La recherche met trop de temps à répondre.',
   ]);
 }
 
-/// Open Library a répondu, mais avec une erreur.
+/// Le service de livres a répondu, mais avec une erreur.
 class ServerException extends AppException {
   const ServerException(this.statusCode)
-      : super('Open Library a renvoyé une erreur. Réessayez plus tard.');
+      : super('Le service de livres a renvoyé une erreur. Réessayez plus tard.');
 
   final int statusCode;
 
@@ -42,7 +42,7 @@ class ServerException extends AppException {
 /// La réponse est arrivée mais reste incompréhensible.
 class MalformedResponseException extends AppException {
   const MalformedResponseException([
-    super.message = 'Réponse illisible d\'Open Library.',
+    super.message = 'Réponse illisible du service de livres.',
   ]);
 }
 

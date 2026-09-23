@@ -77,15 +77,18 @@ class BookSearchController extends Notifier<SearchState> {
     _pending = token;
 
     try {
-      final results = await _repository.search(rawQuery, token: token);
+      // Les premiers résultats s'affichent dès qu'une source répond ; la barre
+      // de progression reste jusqu'à la liste définitive.
+      await for (final results in _repository.search(rawQuery, token: token)) {
+        if (token.isCancelled) {
+          return;
+        }
+        state = state.copyWith(results: results, error: () => null);
+      }
       if (token.isCancelled) {
         return;
       }
-      state = state.copyWith(
-        status: SearchStatus.success,
-        results: results,
-        error: () => null,
-      );
+      state = state.copyWith(status: SearchStatus.success, error: () => null);
     } on RequestCancelledException {
       // Une frappe plus récente a pris la main : cet écran n'a rien à dire.
     } on AppException catch (error) {

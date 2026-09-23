@@ -19,11 +19,11 @@ class _FakeSearchRepository implements SearchRepository {
   int calls = 0;
 
   @override
-  Future<List<BookSearchResult>> search(
+  Stream<List<BookSearchResult>> search(
     String rawQuery, {
     CancellationToken? token,
-  }) async =>
-      const <BookSearchResult>[];
+  }) =>
+      Stream<List<BookSearchResult>>.value(const <BookSearchResult>[]);
 
   @override
   Future<String?> loadDescription(
@@ -87,6 +87,25 @@ void main() {
 
       final book = await repository.findById(bookId);
       expect(book!.coverUrl, 'https://covers.openlibrary.org/b/id/8231856-L.jpg');
+    });
+
+    test('garde la couverture et le résumé d\'Apple Books', () async {
+      final search = _FakeSearchRepository(description: 'En anglais.');
+      final repository = buildRepository(search);
+
+      final bookId = await repository.addFromSearch(
+        _dune.copyWith(
+          artworkUrl: 'https://apple.test/200x300bb.jpg',
+          largeArtworkUrl: 'https://apple.test/600x900bb.jpg',
+          description: 'Sur Arrakis, la planète des sables.',
+        ),
+        Shelf.toRead,
+      );
+
+      final book = await repository.findById(bookId);
+      expect(book!.coverUrl, 'https://apple.test/600x900bb.jpg');
+      expect(book.description, 'Sur Arrakis, la planète des sables.');
+      expect(search.calls, 0, reason: 'résumé déjà connu, pas d\'appel');
     });
 
     test('ajoute quand même le livre si le résumé est injoignable', () async {
@@ -206,10 +225,13 @@ void main() {
         pageCount: 658,
         firstPublishYear: 1965,
         description: null,
+        coverId: null,
+        coverUrl: 'file:///covers/dune.jpg',
       );
 
       final book = await repository.findById(bookId);
       expect(book!.pageCount, 658);
+      expect(book.coverUrl, 'file:///covers/dune.jpg');
       expect(book.author, 'Frank Herbert');
     });
 

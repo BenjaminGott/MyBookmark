@@ -44,7 +44,10 @@ class DriftBookRepository implements BookRepository {
 
   @override
   Future<int> addFromSearch(BookSearchResult result, Shelf shelf) async {
-    final description = await _tryLoadDescription(result.olKey);
+    // Le résumé d'Apple Books, en français, est déjà là : inutile de
+    // redemander celui d'Open Library, souvent en anglais.
+    final description =
+        result.description ?? await _tryLoadDescription(result.olKey);
     return _guard(() => database.booksDao.addBook(
       olKey: result.olKey,
       title: result.title,
@@ -131,6 +134,8 @@ class DriftBookRepository implements BookRepository {
     required int? pageCount,
     required int? firstPublishYear,
     required String? description,
+    required int? coverId,
+    required String? coverUrl,
   }) {
     return _guard(() => database.booksDao.updateBook(
       bookId,
@@ -140,6 +145,8 @@ class DriftBookRepository implements BookRepository {
         pageCount: Value<int?>(pageCount),
         firstPublishYear: Value<int?>(firstPublishYear),
         description: Value<String?>(_nullIfBlank(description)),
+        coverId: Value<int?>(coverId),
+        coverUrl: Value<String?>(_nullIfBlank(coverUrl)),
       ),
     ));
   }

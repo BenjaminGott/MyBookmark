@@ -48,6 +48,7 @@ class BookActionsController extends Notifier<bool> {
     int? pageCount,
     int? firstPublishYear,
     String? description,
+    String? coverUrl,
   }) {
     return _run(
       () => _repository.addManual(
@@ -57,6 +58,7 @@ class BookActionsController extends Notifier<bool> {
         pageCount: pageCount,
         firstPublishYear: firstPublishYear,
         description: description,
+        coverUrl: coverUrl,
       ),
     );
   }
@@ -120,6 +122,8 @@ class BookActionsController extends Notifier<bool> {
     required int? pageCount,
     required int? firstPublishYear,
     required String? description,
+    required int? coverId,
+    required String? coverUrl,
   }) {
     return _run(() async {
       await _repository.editBook(
@@ -129,6 +133,8 @@ class BookActionsController extends Notifier<bool> {
         pageCount: pageCount,
         firstPublishYear: firstPublishYear,
         description: description,
+        coverId: coverId,
+        coverUrl: coverUrl,
       );
       return null;
     });
@@ -140,7 +146,10 @@ class BookActionsController extends Notifier<bool> {
 
   Future<ActionResult> deleteBook(int bookId) {
     return _run(() async {
+      final book = await _repository.findById(bookId);
       await _repository.deleteBook(bookId);
+      // Une couverture choisie dans la galerie part avec son livre.
+      await ref.read(coverStoreProvider).discard(book?.coverUrl);
       return null;
     });
   }

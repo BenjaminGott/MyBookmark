@@ -13,7 +13,7 @@ import '../widgets/status_views.dart';
 import 'search_controller.dart';
 import 'search_state.dart';
 
-/// Recherche de livres dans Open Library, avec autocomplétion.
+/// Recherche de livres dans Open Library et Apple Books, avec autocomplétion.
 class SearchScreen extends ConsumerStatefulWidget {
   const SearchScreen({super.key});
 
@@ -100,7 +100,7 @@ class _Results extends ConsumerWidget {
       return EmptyState(
         icon: Icons.search_off,
         title: 'Aucun résultat',
-        message: 'Open Library ne connaît pas ce titre. '
+        message: 'Ni Open Library ni Apple Books ne connaissent ce titre. '
             'Vérifiez l\'orthographe, ou saisissez le livre vous-même.',
         action: FilledButton.tonalIcon(
           onPressed: () => openManualBookForm(context),
