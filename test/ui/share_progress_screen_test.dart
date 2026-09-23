@@ -7,6 +7,7 @@ import 'package:biblivre/domain/models/library_item.dart';
 import 'package:biblivre/domain/models/reading_entry.dart';
 import 'package:biblivre/domain/models/shelf.dart';
 import 'package:biblivre/domain/repositories/image_sharing.dart';
+import 'package:biblivre/domain/repositories/story_sharing.dart';
 import 'package:biblivre/ui/providers/share_providers.dart';
 import 'package:biblivre/ui/share/progress_card_palette.dart';
 import 'package:biblivre/ui/share/progress_share_card.dart';
@@ -38,6 +39,37 @@ class _FakeImageSharing implements ImageSharing {
     this.bytes = bytes;
     this.fileName = fileName;
     this.text = text;
+  }
+}
+
+/// Une story Instagram sans Instagram : elle retient ce qu'on lui confie.
+class _FakeStorySharing implements StorySharing {
+  _FakeStorySharing({this.available = true});
+
+  final bool available;
+  Uint8List? bytes;
+  bool? asSticker;
+  Color? topColor;
+  Color? bottomColor;
+
+  int calls = 0;
+
+  @override
+  Future<bool> isAvailable() async => available;
+
+  @override
+  Future<void> sharePng({
+    required Uint8List bytes,
+    required String fileName,
+    required bool asSticker,
+    required Color topColor,
+    required Color bottomColor,
+  }) async {
+    calls++;
+    this.bytes = bytes;
+    this.asSticker = asSticker;
+    this.topColor = topColor;
+    this.bottomColor = bottomColor;
   }
 }
 
@@ -91,9 +123,11 @@ Future<Uint8List> _solidPng(Color color, {int side = 8}) async {
 
 void main() {
   late _FakeImageSharing sharing;
+  late _FakeStorySharing story;
 
   setUp(() {
     sharing = _FakeImageSharing();
+    story = _FakeStorySharing();
   });
 
   Future<void> pumpScreen(
@@ -109,6 +143,7 @@ void main() {
       ProviderScope(
         overrides: [
           imageSharingProvider.overrideWithValue(sharing),
+          storySharingProvider.overrideWithValue(story),
           if (cover != null)
             coverImageProviderFactory.overrideWithValue(
               (url) => MemoryImage(cover),
@@ -353,5 +388,51 @@ void main() {
     await tapShare(tester);
 
     expect(_pngSize(sharing.bytes!).width, 1080);
+  });
+
+  /// Appuie sur « Story Instagram », puis laisse la capture se faire.
+  Future<void> tapStory(WidgetTester tester) async {
+    await tester.tap(find.widgetWithText(OutlinedButton, 'Story Instagram'));
+    await tester.pump();
+    for (var round = 0; round < 4; round++) {
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 60)),
+      );
+      await tester.pump(const Duration(milliseconds: 20));
+    }
+  }
+
+  screenTest('envoie le bloc en sticker sur le dégradé de la carte', (
+    tester,
+  ) async {
+    await pumpScreen(tester, _item());
+    final palette = cardPalette(tester);
+
+    await tapStory(tester);
+
+    expect(story.calls, 1);
+    expect(sharing.calls, 0);
+    expect(story.asSticker, isTrue);
+    expect(story.topColor, palette.top);
+    expect(story.bottomColor, palette.bottom);
+    expect(_pngSize(story.bytes!), (width: 1080, height: 636));
+  });
+
+  screenTest('envoie la story en fond, pas en sticker', (tester) async {
+    await pumpScreen(tester, _item());
+
+    await chooseFormat(tester, 'Moyen');
+    await tapStory(tester);
+
+    expect(story.asSticker, isFalse);
+    expect(_pngSize(story.bytes!), (width: 1080, height: 1920));
+  });
+
+  screenTest('ne propose pas la story sans Instagram', (tester) async {
+    story = _FakeStorySharing(available: false);
+    await pumpScreen(tester, _item());
+
+    expect(find.text('Story Instagram'), findsNothing);
+    expect(find.widgetWithText(FilledButton, 'Partager'), findsOne);
   });
 }

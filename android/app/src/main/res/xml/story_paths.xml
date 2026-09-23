@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Les cartes partagées en story sont écrites dans le cache, et seulement
+     là : c'est tout ce qu'Instagram a le droit de lire. -->
+<paths>
+    <cache-path name="story" path="." />
+</paths>

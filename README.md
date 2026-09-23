@@ -20,7 +20,8 @@ l'ajout — passé ce point, l'application fonctionne entièrement hors ligne.
 8. Partage de sa progression en carte image, en deux formats — bloc
    (1080 × 636, par défaut) et story 9:16 (1080 × 1920) — sur un dégradé tiré
    de la couverture, avec variantes claire, sombre et vive, et composition
-   manuelle du dégradé
+   manuelle du dégradé ; envoi direct en story Instagram, le bloc posé en
+   sticker sur son dégradé pour garder ses coins arrondis transparents
 
 Thèmes clair et sombre, interface intégralement en français.
 

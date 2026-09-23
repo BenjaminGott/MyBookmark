@@ -1,0 +1,48 @@
+# Publie une release GitHub avec l'APK : à chaque tag `v*` (ex. `v1.1.0`), ou à
+# la main depuis l'onglet Actions, en donnant le tag à créer.
+name: Release APK
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag de la release (ex. v1.1.0)'
+        required: true
+
+env:
+  TAG: ${{ inputs.tag || github.ref_name }}
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - run: flutter pub get
+      - run: flutter test
+      - run: flutter build apk --release
+
+      - name: Nomme l'APK d'après le tag
+        run: cp build/app/outputs/flutter-apk/app-release.apk "biblivre-${TAG}.apk"
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.TAG }}
+          target_commitish: ${{ github.sha }}
+          files: biblivre-*.apk
+          generate_release_notes: true

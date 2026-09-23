@@ -47,6 +47,9 @@ class _ShareProgressScreenState extends ConsumerState<ShareProgressScreen> {
   ShareCardFormat _format = ShareCardFormat.compact;
   bool _sharing = false;
 
+  /// Vrai si Instagram peut recevoir la carte directement en story.
+  bool _instagram = false;
+
   /// Le fond réellement appliqué à la carte.
   ProgressCardPalette? get _palette {
     final backgrounds = _backgrounds;
@@ -92,12 +95,14 @@ class _ShareProgressScreenState extends ConsumerState<ShareProgressScreen> {
     final backgrounds = CardBackgrounds.forCover(
       await CoverColors.fromCover(cover),
     );
+    final instagram = await ref.read(storySharingProvider).isAvailable();
     if (!mounted) {
       return;
     }
     setState(() {
       _cover = cover;
       _backgrounds = backgrounds;
+      _instagram = instagram;
     });
   }
 
@@ -173,10 +178,28 @@ class _ShareProgressScreenState extends ConsumerState<ShareProgressScreen> {
                 SafeArea(
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-                    child: FilledButton.icon(
-                      onPressed: _sharing ? null : _share,
-                      icon: const Icon(Icons.share_outlined),
-                      label: Text(_sharing ? 'Préparation…' : 'Partager'),
+                    child: Row(
+                      children: <Widget>[
+                        if (_instagram) ...<Widget>[
+                          Expanded(
+                            child: OutlinedButton.icon(
+                              onPressed: _sharing ? null : _shareToStory,
+                              icon: const Icon(Icons.add_circle_outline),
+                              label: const Text('Story Instagram'),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                        ],
+                        Expanded(
+                          child: FilledButton.icon(
+                            onPressed: _sharing ? null : _share,
+                            icon: const Icon(Icons.share_outlined),
+                            label: Text(
+                              _sharing ? 'Préparation…' : 'Partager',
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -185,7 +208,36 @@ class _ShareProgressScreenState extends ConsumerState<ShareProgressScreen> {
     );
   }
 
-  Future<void> _share() async {
+  /// Partage par la feuille de partage du système.
+  Future<void> _share() => _captureThen(
+        (bytes) => ref.read(imageSharingProvider).sharePng(
+              bytes: bytes,
+              fileName: _format.fileName,
+              text: _shareText(),
+            ),
+      );
+
+  /// Partage direct en story Instagram.
+  ///
+  /// Le bloc part en sticker sur le dégradé de la carte, comme le fait
+  /// Spotify : ses coins arrondis restent transparents. La story, déjà en
+  /// 9:16, devient le fond lui-même.
+  Future<void> _shareToStory() {
+    final palette = _palette!;
+    return _captureThen(
+      (bytes) => ref.read(storySharingProvider).sharePng(
+            bytes: bytes,
+            fileName: _format.fileName,
+            asSticker: _format == ShareCardFormat.compact,
+            topColor: palette.top,
+            bottomColor: palette.bottom,
+          ),
+    );
+  }
+
+  Future<void> _captureThen(
+    Future<void> Function(Uint8List bytes) send,
+  ) async {
     setState(() => _sharing = true);
     try {
       final bytes = await _capture();
@@ -194,11 +246,7 @@ class _ShareProgressScreenState extends ConsumerState<ShareProgressScreen> {
         return;
       }
 
-      await ref.read(imageSharingProvider).sharePng(
-            bytes: bytes,
-            fileName: _format.fileName,
-            text: _shareText(),
-          );
+      await send(bytes);
     } on AppException catch (error) {
       _tell(error.message);
     } finally {
