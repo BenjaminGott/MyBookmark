@@ -82,9 +82,13 @@ inscription (25 $) permet de publier **autant d'applications qu'on veut**.
 
 ### Politique de confidentialité
 
-Une URL publique est obligatoire, même si l'application ne collecte rien. Le
-plus simple : une page GitHub Pages (par exemple `docs/confidentialite.md`
-publié depuis le dépôt). Elle doit dire, en substance :
+Une URL publique est obligatoire, même si l'application ne collecte rien.
+
+**En ligne :** <https://benjamingott.github.io/biblivre/confidentialite/>,
+publiée depuis le dépôt public `BenjaminGott/BenjaminGott.github.io` (le site
+des applications, avec la page <https://benjamingott.github.io/biblivre/>).
+La mettre à jour si l'app change sa façon de traiter les données. Elle dit, en
+substance :
 
 - les livres, lectures et avis sont stockés **uniquement sur le téléphone** ;
 - l'application envoie les termes de recherche à **Open Library** et à
@@ -188,7 +192,7 @@ automatique ne peut servir qu'à partir de la deuxième version.
 - [ ] 12 testeurs prêts (compte personnel)
 - [ ] Compte Google dédié, type de compte et nom de développeur choisis
 - [ ] Compte Play Console créé et vérifié
-- [ ] Politique de confidentialité en ligne
+- [x] Politique de confidentialité en ligne
 - [ ] App Meta passée en mode Live
 - [ ] Fiche remplie (textes, image 1024 × 500, captures)
 - [ ] Questionnaires remplis
