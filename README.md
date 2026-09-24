@@ -147,3 +147,11 @@ releases GitHub, elles, sont signées avec la clé de release (APK et AAB).
 - Play Store : voir [docs/PUBLICATION_PLAY_STORE.md](docs/PUBLICATION_PLAY_STORE.md).
 - Icônes : `python3 tool/generate_icons.py` les régénère depuis
   `branding/logo-source.jpg`.
+- Captures pour le site (et le Play Store) : de vrais écrans de l'app, avec une
+  bibliothèque de démonstration, posés sur une fresque découpée en panneaux.
+
+  ```bash
+  python3 tool/screenshots/covers.py
+  flutter test tool/screenshots/capture_test.dart
+  python3 tool/screenshots/compose.py <dossier> [--lang en|fr]
+  ```
