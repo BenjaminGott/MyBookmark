@@ -39,7 +39,7 @@ CAPTIONS = {
     ],
     'fr': [
         'Toute votre\nbibliothèque',
-        'Suivez chaque page\nlue',
+        'Suivez chaque\npage lue',
         'Trouvez un livre\nen un instant',
         'Partagez votre\nprogression',
     ],
@@ -170,7 +170,7 @@ def compose(out_dir, lang):
     phone_w = 760
     for index, (name, caption) in enumerate(zip(SCREENS, CAPTIONS[lang])):
         left = index * PANEL_W
-        device = phone(Image.open(RAW / f'{name}.png'), phone_w)
+        device = phone(Image.open(RAW / f'{lang}-{name}.png'), phone_w)
         x = left + (PANEL_W - phone_w) // 2
         y = 520
 

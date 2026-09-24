@@ -3,11 +3,12 @@
 // Ce n'est pas un test : c'est un script qui passe par `flutter test` pour
 // dessiner les vrais écrans, avec les vraies polices, sans téléphone.
 //
-//     python3 tool/screenshots/covers.py
+//     python3 tool/screenshots/fetch_covers.py
 //     flutter test tool/screenshots/capture_test.dart
-//     python3 tool/screenshots/compose.py <dossier de sortie>
+//     python3 tool/screenshots/compose.py <dossier de sortie> --lang en|fr
 //
-// Les PNG bruts sont écrits dans build/screenshots/raw/, en 1080 × 2340.
+// Deux séries, anglaise et française, chacune avec ses livres. Les PNG bruts
+// sont écrits dans build/screenshots/raw/<langue>-*.png, en 1080 × 2340.
 import 'dart:io';
 import 'dart:ui' as ui;
 
@@ -79,182 +80,287 @@ Future<void> _loadFonts() async {
   )..addFont(read('MaterialIcons-Regular.otf'))).load();
 }
 
-/// La bibliothèque de démonstration.
-Future<Map<String, int>> _seed(AppDatabase db) async {
+/// Un livre de la bibliothèque de démonstration.
+class _Book {
+  const _Book(
+    this.key,
+    this.title,
+    this.author,
+    this.pages,
+    this.year,
+    this.shelf, {
+    this.page,
+    this.rating,
+    this.olKey,
+  });
+
+  final String key;
+  final String title;
+  final String author;
+  final int pages;
+  final int year;
+  final Shelf shelf;
+  final int? page;
+  final int? rating;
+  final String? olKey;
+}
+
+/// Une série de captures : sa langue, sa bibliothèque, sa recherche.
+class _Series {
+  const _Series({
+    required this.lang,
+    required this.library,
+    required this.query,
+    required this.results,
+    required this.shareLabel,
+  });
+
+  final String lang;
+
+  /// Du plus ancien au plus récent : la bibliothèque montre l'inverse. Le
+  /// dernier est le livre mis en avant (fiche et carte de partage).
+  final List<_Book> library;
+  final String query;
+  final List<_Book> results;
+  final String shareLabel;
+
+  String get featured => library.last.key;
+}
+
+const List<_Series> _series = <_Series>[
+  _Series(
+    lang: 'en',
+    library: <_Book>[
+      _Book(
+        'jane-eyre',
+        'Jane Eyre',
+        'Charlotte Brontë',
+        532,
+        1847,
+        Shelf.toRead,
+      ),
+      _Book('dracula', 'Dracula', 'Bram Stoker', 418, 1897, Shelf.toRead),
+      _Book(
+        'frankenstein',
+        'Frankenstein',
+        'Mary Shelley',
+        280,
+        1818,
+        Shelf.read,
+        rating: 4,
+      ),
+      _Book(
+        'pride',
+        'Pride and Prejudice',
+        'Jane Austen',
+        432,
+        1813,
+        Shelf.read,
+        rating: 5,
+        olKey: '/works/OL66554W',
+      ),
+      _Book(
+        'prince-en',
+        'The Little Prince',
+        'Antoine de Saint-Exupéry',
+        96,
+        1943,
+        Shelf.reading,
+        page: 72,
+      ),
+      _Book(
+        'knight-en',
+        'The Knight and the Moth',
+        'Rachel Gillig',
+        400,
+        2025,
+        Shelf.reading,
+        page: 248,
+      ),
+    ],
+    query: 'austen',
+    results: <_Book>[
+      _Book(
+        'pride',
+        'Pride and Prejudice',
+        'Jane Austen',
+        432,
+        1813,
+        Shelf.read,
+        olKey: '/works/OL66554W',
+      ),
+      _Book('emma', 'Emma', 'Jane Austen', 474, 1815, Shelf.toRead),
+      _Book(
+        'sense',
+        'Sense and Sensibility',
+        'Jane Austen',
+        409,
+        1811,
+        Shelf.toRead,
+      ),
+      _Book('persuasion', 'Persuasion', 'Jane Austen', 249, 1817, Shelf.toRead),
+    ],
+    shareLabel: 'Share my progress',
+  ),
+  _Series(
+    lang: 'fr',
+    library: <_Book>[
+      _Book(
+        'bovary',
+        'Madame Bovary',
+        'Gustave Flaubert',
+        480,
+        1857,
+        Shelf.toRead,
+      ),
+      _Book(
+        'mousquetaires',
+        'Les Trois Mousquetaires',
+        'Alexandre Dumas',
+        880,
+        1844,
+        Shelf.toRead,
+      ),
+      _Book(
+        'monte-cristo',
+        'Le Comte de Monte-Cristo',
+        'Alexandre Dumas',
+        1504,
+        1844,
+        Shelf.read,
+        rating: 4,
+      ),
+      _Book(
+        'miserables',
+        'Les Misérables',
+        'Victor Hugo',
+        1488,
+        1862,
+        Shelf.read,
+        rating: 5,
+        olKey: '/works/OL1115639W',
+      ),
+      _Book(
+        'prince-fr',
+        'Le Petit Prince',
+        'Antoine de Saint-Exupéry',
+        96,
+        1943,
+        Shelf.reading,
+        page: 72,
+      ),
+      _Book(
+        'knight-fr',
+        'Le chevalier et la phalène',
+        'Rachel Gillig',
+        400,
+        2025,
+        Shelf.reading,
+        page: 248,
+      ),
+    ],
+    query: 'hugo',
+    results: <_Book>[
+      _Book(
+        'miserables',
+        'Les Misérables',
+        'Victor Hugo',
+        1488,
+        1862,
+        Shelf.read,
+        olKey: '/works/OL1115639W',
+      ),
+      _Book(
+        'notre-dame',
+        'Notre-Dame de Paris',
+        'Victor Hugo',
+        640,
+        1831,
+        Shelf.toRead,
+      ),
+      _Book(
+        'contemplations',
+        'Les Contemplations',
+        'Victor Hugo',
+        512,
+        1856,
+        Shelf.toRead,
+      ),
+      _Book(
+        'quatrevingt',
+        'Quatrevingt-treize',
+        'Victor Hugo',
+        480,
+        1874,
+        Shelf.toRead,
+      ),
+    ],
+    shareLabel: 'Partager ma progression',
+  ),
+];
+
+/// Remplit la base avec la bibliothèque d'une série.
+Future<Map<String, int>> _seed(AppDatabase db, _Series series) async {
   final ids = <String, int>{};
-  final dao = db.booksDao;
-  final entries = db.readingEntriesDao;
   final now = DateTime(2026, 9, 24);
+  final books = series.library;
 
-  Future<int> add(
-    String key,
-    String title,
-    String author,
-    int pages,
-    Shelf shelf,
-    int year, {
-    int daysAgo = 0,
-    String? olKey,
-    String? description,
-  }) async {
-    final id = await dao.addBook(
-      title: title,
-      author: author,
-      pageCount: pages,
-      shelf: shelf,
-      firstPublishYear: year,
-      olKey: olKey,
-      coverUrl: _cover(key),
-      description: description,
-      now: now.subtract(Duration(days: daysAgo)),
+  for (var index = 0; index < books.length; index++) {
+    final book = books[index];
+    final id = await db.booksDao.addBook(
+      title: book.title,
+      author: book.author,
+      pageCount: book.pages,
+      shelf: book.shelf,
+      firstPublishYear: book.year,
+      olKey: book.olKey,
+      coverUrl: _cover(book.key),
+      now: now.subtract(Duration(days: (books.length - index) * 5)),
     );
-    ids[key] = id;
-    return id;
-  }
+    ids[book.key] = id;
 
-  // Ajoutés du plus ancien au plus récent : la bibliothèque les montre dans
-  // l'ordre inverse.
-  await add(
-    'gatsby',
-    'The Great Gatsby',
-    'F. Scott Fitzgerald',
-    180,
-    Shelf.read,
-    1925,
-    daysAgo: 40,
-  );
-  await add(
-    'frankenstein',
-    'Frankenstein',
-    'Mary Shelley',
-    280,
-    Shelf.read,
-    1818,
-    daysAgo: 30,
-  );
-  await add(
-    'pride',
-    'Pride and Prejudice',
-    'Jane Austen',
-    432,
-    Shelf.read,
-    1813,
-    daysAgo: 25,
-    olKey: '/works/OL66554W',
-  );
-  await add(
-    'little-women',
-    'Little Women',
-    'Louisa May Alcott',
-    759,
-    Shelf.toRead,
-    1868,
-    daysAgo: 20,
-  );
-  await add(
-    'jane-eyre',
-    'Jane Eyre',
-    'Charlotte Brontë',
-    532,
-    Shelf.toRead,
-    1847,
-    daysAgo: 15,
-  );
-  await add(
-    'dracula',
-    'Dracula',
-    'Bram Stoker',
-    418,
-    Shelf.toRead,
-    1897,
-    daysAgo: 10,
-  );
-  await add(
-    'odyssey',
-    'The Odyssey',
-    'Homer',
-    541,
-    Shelf.reading,
-    -700,
-    daysAgo: 6,
-  );
-  await add(
-    'moby-dick',
-    'Moby-Dick',
-    'Herman Melville',
-    635,
-    Shelf.reading,
-    1851,
-    daysAgo: 2,
-    description:
-        'Ishmael signs on to the whaler Pequod, only to discover that its '
-        'captain, Ahab, has one purpose: to hunt down the white whale that '
-        'took his leg. A sea story, an encyclopedia of whaling and a '
-        'meditation on obsession, all at once.',
-  );
-
-  Future<void> progress(String key, int page, {int? rating}) async {
-    final entry = await entries.findCurrentEntry(ids[key]!);
-    await entries.updateCurrentPage(entryId: entry!.id, page: page);
-    await entries.updateEntry(
-      entry.id,
-      startedAt: Value<DateTime?>(now.subtract(const Duration(days: 12))),
-      rating: Value<int?>(rating),
-    );
-  }
-
-  await progress('moby-dick', 412);
-  await progress('odyssey', 136);
-  for (final (key, rating) in <(String, int)>[
-    ('pride', 5),
-    ('frankenstein', 4),
-    ('gatsby', 4),
-  ]) {
-    final entry = await entries.findCurrentEntry(ids[key]!);
-    await entries.updateEntry(entry!.id, rating: Value<int?>(rating));
+    final entry = await db.readingEntriesDao.findCurrentEntry(id);
+    final page = book.page;
+    if (page != null) {
+      await db.readingEntriesDao.updateCurrentPage(
+        entryId: entry!.id,
+        page: page,
+      );
+      await db.readingEntriesDao.updateEntry(
+        entry.id,
+        startedAt: Value<DateTime?>(now.subtract(const Duration(days: 12))),
+      );
+    }
+    if (book.rating != null) {
+      await db.readingEntriesDao.updateEntry(
+        entry!.id,
+        rating: Value<int?>(book.rating),
+      );
+    }
   }
   return ids;
 }
 
-/// La recherche « austen », sans réseau.
+/// La recherche de la série, sans réseau.
 class _DemoSearch implements SearchRepository {
+  const _DemoSearch(this.results);
+
+  final List<_Book> results;
+
   @override
   Stream<List<BookSearchResult>> search(
     String rawQuery, {
     CancellationToken? token,
   }) => Stream<List<BookSearchResult>>.value(<BookSearchResult>[
-    BookSearchResult(
-      olKey: '/works/OL66554W',
-      title: 'Pride and Prejudice',
-      author: 'Jane Austen',
-      firstPublishYear: 1813,
-      pageCount: 432,
-      artworkUrl: _cover('pride'),
-    ),
-    BookSearchResult(
-      olKey: '/works/OL66562W',
-      title: 'Emma',
-      author: 'Jane Austen',
-      firstPublishYear: 1815,
-      pageCount: 474,
-      artworkUrl: _cover('emma'),
-    ),
-    BookSearchResult(
-      olKey: '/works/OL66534W',
-      title: 'Sense and Sensibility',
-      author: 'Jane Austen',
-      firstPublishYear: 1811,
-      pageCount: 409,
-      artworkUrl: _cover('sense'),
-    ),
-    BookSearchResult(
-      olKey: '/works/OL66508W',
-      title: 'Persuasion',
-      author: 'Jane Austen',
-      firstPublishYear: 1817,
-      pageCount: 249,
-      artworkUrl: _cover('persuasion'),
-    ),
+    for (final book in results)
+      BookSearchResult(
+        olKey: book.olKey ?? 'apple:${book.key}',
+        title: book.title,
+        author: book.author,
+        firstPublishYear: book.year,
+        pageCount: book.pages,
+        artworkUrl: _cover(book.key),
+      ),
   ]);
 
   @override
@@ -280,18 +386,9 @@ class _DemoStory implements StorySharing {
 }
 
 void main() {
-  late AppDatabase db;
-  late Map<String, int> ids;
   final frame = GlobalKey();
 
   setUpAll(_loadFonts);
-
-  setUp(() async {
-    db = createTestDatabase();
-    ids = await _seed(db);
-  });
-
-  tearDown(() => db.close());
 
   /// Laisse le temps de lire la base et de décoder les couvertures, qui
   /// passent par de vraies entrées-sorties.
@@ -304,88 +401,104 @@ void main() {
     }
   }
 
-  Future<void> pumpApp(WidgetTester tester, Widget home) async {
-    // `flutter test` remplace les ombres par un trait noir : on veut les
-    // vraies. Remis en place à la capture, le binding le vérifiant.
-    debugDisableShadows = false;
-    tester.view.physicalSize = _logical * _ratio;
-    tester.view.devicePixelRatio = _ratio;
-    // La barre d'état et la barre de gestes d'un vrai téléphone.
-    tester.view.padding = const FakeViewPadding(top: 24 * _ratio);
-    addTearDown(tester.view.reset);
+  for (final series in _series) {
+    group(series.lang, () {
+      late AppDatabase db;
+      late Map<String, int> ids;
 
-    await tester.pumpWidget(
-      ProviderScope(
-        overrides: [
-          databaseProvider.overrideWithValue(db),
-          searchRepositoryProvider.overrideWithValue(_DemoSearch()),
-          storySharingProvider.overrideWithValue(_DemoStory()),
-          preferencesServiceProvider.overrideWithValue(
-            PreferencesService(null),
-          ),
-        ],
-        child: RepaintBoundary(
-          key: frame,
-          child: MaterialApp(
-            debugShowCheckedModeBanner: false,
-            theme: AppTheme.light,
-            locale: const Locale('en'),
-            localizationsDelegates: AppLocalizations.localizationsDelegates,
-            supportedLocales: AppLocalizations.supportedLocales,
-            home: home,
-          ),
-        ),
-      ),
-    );
-    // Comme sur un écran tactile : pas de contour de focus clavier. Réglé
-    // après le montage, le binding de test le remettant à zéro.
-    FocusManager.instance.highlightStrategy =
-        FocusHighlightStrategy.alwaysTouch;
-    await settle(tester);
-  }
+      setUp(() async {
+        db = createTestDatabase();
+        ids = await _seed(db, series);
+      });
 
-  Future<void> capture(WidgetTester tester, String name) async {
-    await settle(tester);
-    final boundary =
-        frame.currentContext!.findRenderObject()! as RenderRepaintBoundary;
-    await tester.runAsync(() async {
-      final image = await boundary.toImage(pixelRatio: _ratio);
-      final data = await image.toByteData(format: ui.ImageByteFormat.png);
-      image.dispose();
-      final file = File('${_build.path}/raw/$name.png');
-      await file.parent.create(recursive: true);
-      await file.writeAsBytes(data!.buffer.asUint8List());
+      tearDown(() => db.close());
+
+      Future<void> pumpApp(WidgetTester tester, Widget home) async {
+        // `flutter test` remplace les ombres par un trait noir : on veut les
+        // vraies. Remis en place à la capture, le binding le vérifiant.
+        debugDisableShadows = false;
+        tester.view.physicalSize = _logical * _ratio;
+        tester.view.devicePixelRatio = _ratio;
+        // La barre d'état d'un vrai téléphone, dessinée par compose.py.
+        tester.view.padding = const FakeViewPadding(top: 24 * _ratio);
+        addTearDown(tester.view.reset);
+
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              databaseProvider.overrideWithValue(db),
+              searchRepositoryProvider.overrideWithValue(
+                _DemoSearch(series.results),
+              ),
+              storySharingProvider.overrideWithValue(_DemoStory()),
+              preferencesServiceProvider.overrideWithValue(
+                PreferencesService(null),
+              ),
+            ],
+            child: RepaintBoundary(
+              key: frame,
+              child: MaterialApp(
+                debugShowCheckedModeBanner: false,
+                theme: AppTheme.light,
+                locale: Locale(series.lang),
+                localizationsDelegates: AppLocalizations.localizationsDelegates,
+                supportedLocales: AppLocalizations.supportedLocales,
+                home: home,
+              ),
+            ),
+          ),
+        );
+        // Comme sur un écran tactile : pas de contour de focus clavier.
+        // Réglé après le montage, le binding de test le remettant à zéro.
+        FocusManager.instance.highlightStrategy =
+            FocusHighlightStrategy.alwaysTouch;
+        await settle(tester);
+      }
+
+      Future<void> capture(WidgetTester tester, String name) async {
+        await settle(tester);
+        final boundary =
+            frame.currentContext!.findRenderObject()! as RenderRepaintBoundary;
+        await tester.runAsync(() async {
+          final image = await boundary.toImage(pixelRatio: _ratio);
+          final data = await image.toByteData(format: ui.ImageByteFormat.png);
+          image.dispose();
+          final file = File('${_build.path}/raw/${series.lang}-$name.png');
+          await file.parent.create(recursive: true);
+          await file.writeAsBytes(data!.buffer.asUint8List());
+        });
+        debugDisableShadows = true;
+        // Démonte avant la fin : le flux drift laisserait un minuteur.
+        await tester.pumpWidget(const SizedBox.shrink());
+        await tester.pump(const Duration(milliseconds: 10));
+      }
+
+      testWidgets('1-library', (tester) async {
+        await pumpApp(tester, const HomeShell());
+        await capture(tester, '1-library');
+      });
+
+      testWidgets('2-book', (tester) async {
+        await pumpApp(tester, BookDetailScreen(bookId: ids[series.featured]!));
+        await capture(tester, '2-book');
+      });
+
+      testWidgets('3-search', (tester) async {
+        await pumpApp(tester, const SearchScreen());
+        await tester.enterText(find.byType(TextField), series.query);
+        await tester.pump(const Duration(milliseconds: 400));
+        await capture(tester, '3-search');
+      });
+
+      testWidgets('4-share', (tester) async {
+        await pumpApp(tester, BookDetailScreen(bookId: ids[series.featured]!));
+        await tester.tap(find.byTooltip('Actions'));
+        await settle(tester);
+        await tester.tap(find.text(series.shareLabel));
+        await settle(tester);
+        await settle(tester);
+        await capture(tester, '4-share');
+      });
     });
-    debugDisableShadows = true;
-    // Démonte avant la fin : le flux drift laisserait un minuteur en attente.
-    await tester.pumpWidget(const SizedBox.shrink());
-    await tester.pump(const Duration(milliseconds: 10));
   }
-
-  testWidgets('1-library', (tester) async {
-    await pumpApp(tester, const HomeShell());
-    await capture(tester, '1-library');
-  });
-
-  testWidgets('2-book', (tester) async {
-    await pumpApp(tester, BookDetailScreen(bookId: ids['moby-dick']!));
-    await capture(tester, '2-book');
-  });
-
-  testWidgets('3-search', (tester) async {
-    await pumpApp(tester, const SearchScreen());
-    await tester.enterText(find.byType(TextField), 'austen');
-    await tester.pump(const Duration(milliseconds: 400));
-    await capture(tester, '3-search');
-  });
-
-  testWidgets('4-share', (tester) async {
-    await pumpApp(tester, BookDetailScreen(bookId: ids['moby-dick']!));
-    await tester.tap(find.byTooltip('Actions'));
-    await settle(tester);
-    await tester.tap(find.text('Share my progress'));
-    await settle(tester);
-    await settle(tester);
-    await capture(tester, '4-share');
-  });
 }

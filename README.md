@@ -151,7 +151,13 @@ releases GitHub, elles, sont signées avec la clé de release (APK et AAB).
   bibliothèque de démonstration, posés sur une fresque découpée en panneaux.
 
   ```bash
-  python3 tool/screenshots/covers.py
+  python3 tool/screenshots/fetch_covers.py   # vraies couvertures (Apple Books)
   flutter test tool/screenshots/capture_test.dart
-  python3 tool/screenshots/compose.py <dossier> [--lang en|fr]
+  python3 tool/screenshots/compose.py <dossier> --lang en   # ou fr
   ```
+
+  Deux séries : anglaise (*The Knight and the Moth*, classiques anglais) et
+  française (*Le chevalier et la phalène*, classiques français). Une
+  couverture posée dans `tool/screenshots/covers/<livre>.*` remplace celle
+  d'Apple Books. Les couvertures appartiennent à leurs éditeurs : à réserver
+  au site, et à vérifier avant tout usage sur le Play Store.
