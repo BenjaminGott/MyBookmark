@@ -4,10 +4,12 @@ Une seule grande fresque (fond vert, ruban jaune de marque-page qui court d'un
 bout à l'autre) est dessinée, les téléphones y sont posés, puis elle est
 découpée en panneaux 9:16 : mis côte à côte, ils se prolongent l'un l'autre.
 
-    python3 tool/screenshots/compose.py <dossier de sortie> [--lang en]
+    python3 tool/screenshots/compose.py <dossier de sortie> [--lang en] [--store]
 
 Écrit panel-1.webp … panel-4.webp (720 × 1280) dans le dossier de sortie, et
-la fresque entière en PNG dans build/screenshots/.
+la fresque entière en PNG dans build/screenshots/. Avec --store, écrit plutôt
+les fichiers de la fiche Play Store : screenshot-1.png … (1080 × 1920) et
+feature-graphic.png (1024 × 500), sans transparence comme Google l'exige.
 """
 
 import math
@@ -162,7 +164,52 @@ def phone(screenshot, width):
     return body
 
 
-def compose(out_dir, lang):
+TAGLINES = {
+    'en': ('MyBookmark', 'Your reading journal, on your phone'),
+    'fr': ('Mon marque-page', 'Votre carnet de lecture, dans votre poche'),
+}
+
+
+def feature_graphic(lang):
+    """L'image de présentation du Play Store : 1024 × 500."""
+    width, height = 1024, 500
+    img = Image.new('RGB', (width, height), GREEN)
+    draw = ImageDraw.Draw(img)
+    for x in range(width):
+        t = x / width
+        color = tuple(round(GREEN[i] * (1 - t) + GREEN_DARK[i] * t) for i in range(3))
+        draw.line((x, 0, x, height), fill=color)
+
+    # Le ruban, en diagonale douce, avec sa queue d'aronde.
+    ribbon = Image.new('RGBA', (width, height), (0, 0, 0, 0))
+    rd = ImageDraw.Draw(ribbon)
+    top, bottom = [], []
+    for x in range(-20, width - 90, 6):
+        y = 380 + 60 * math.sin(x / width * math.tau + 1.2)
+        top.append((x, y - 26))
+        bottom.append((x, y + 26))
+    ex = width - 90
+    ey = 380 + 60 * math.sin(ex / width * math.tau + 1.2)
+    tail = [(ex + 70, ey - 26), (ex + 34, ey), (ex + 70, ey + 26)]
+    rd.polygon(top + tail + bottom[::-1], fill=YELLOW + (255,))
+    img.paste(ribbon, (0, 0), ribbon)
+
+    icon = Image.open(ROOT / 'branding' / 'play-store-icon-512.png').convert('RGB')
+    icon = icon.resize((220, 220), Image.LANCZOS)
+    mask = Image.new('L', icon.size, 0)
+    ImageDraw.Draw(mask).rounded_rectangle((0, 0, 219, 219), radius=48, fill=255)
+    img.paste(icon, (90, 110), mask)
+
+    name, tagline = TAGLINES[lang]
+    draw = ImageDraw.Draw(img)
+    draw.text((360, 200), name, font=ImageFont.truetype(
+        material_font('Roboto-Bold.ttf'), 72), fill=(255, 255, 255), anchor='ls')
+    draw.text((362, 262), tagline, font=ImageFont.truetype(
+        material_font('Roboto-Regular.ttf'), 32), fill=(226, 238, 234), anchor='ls')
+    return img
+
+
+def compose(out_dir, lang, store=False):
     count = len(SCREENS)
     fresco = background(PANEL_W * count, PANEL_H).convert('RGBA')
     title_font = ImageFont.truetype(material_font('Roboto-Bold.ttf'), 86)
@@ -194,15 +241,24 @@ def compose(out_dir, lang):
     out.mkdir(parents=True, exist_ok=True)
     for index in range(count):
         panel = fresco.crop((index * PANEL_W, 0, (index + 1) * PANEL_W, PANEL_H))
-        panel.resize((720, 1280), Image.LANCZOS).save(
-            out / f'panel-{index + 1}.webp', quality=86, method=6)
+        if store:
+            panel.save(out / f'screenshot-{index + 1}.png', optimize=True)
+        else:
+            panel.resize((720, 1280), Image.LANCZOS).save(
+                out / f'panel-{index + 1}.webp', quality=86, method=6)
+    if store:
+        feature_graphic(lang).save(out / 'feature-graphic.png', optimize=True)
 
 
 if __name__ == '__main__':
     args = sys.argv[1:]
     language = 'en'
+    store = '--store' in args
+    if store:
+        args.remove('--store')
     if '--lang' in args:
         i = args.index('--lang')
         language = args[i + 1]
         del args[i:i + 2]
-    compose(args[0] if args else ROOT / 'build' / 'screenshots' / 'panels', language)
+    compose(args[0] if args else ROOT / 'build' / 'screenshots' / 'panels',
+            language, store)
