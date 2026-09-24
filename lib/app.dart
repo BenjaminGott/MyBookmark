@@ -9,8 +9,8 @@ import 'ui/home_shell.dart';
 import 'ui/providers/settings_providers.dart';
 import 'ui/welcome/welcome_screen.dart';
 
-/// Racine de l'application : thèmes clair et sombre, interface en français
-/// ou en anglais.
+/// Racine de l'application : thèmes clair et sombre, interface en français,
+/// anglais, espagnol, allemand, italien ou portugais.
 class MyBookmarkApp extends ConsumerWidget {
   const MyBookmarkApp({super.key});
 
@@ -59,7 +59,8 @@ Locale resolveLocale(List<Locale>? preferred, Iterable<Locale> supported) {
 AppLanguage systemLanguage() {
   final locales = WidgetsBinding.instance.platformDispatcher.locales;
   final resolved = resolveLocale(locales, AppLocalizations.supportedLocales);
-  return resolved.languageCode == 'fr'
-      ? AppLanguage.french
-      : AppLanguage.english;
+  return AppLanguage.values.firstWhere(
+    (language) => language.languageCode == resolved.languageCode,
+    orElse: () => AppLanguage.english,
+  );
 }

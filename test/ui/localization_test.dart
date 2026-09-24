@@ -24,12 +24,56 @@ void main() {
   setUpAll(initializeDateFormatting);
 
   group('Traductions', () {
-    test('chaque texte français a sa traduction anglaise', () {
-      final french = _messages(_arb('fr')).toSet();
-      final english = _messages(_arb('en')).toSet();
+    for (final code in <String>['en', 'es', 'de', 'it', 'pt']) {
+      test('chaque texte français a sa traduction en « $code »', () {
+        final french = _messages(_arb('fr')).toSet();
+        final translated = _messages(_arb(code)).toSet();
 
-      expect(english.difference(french), isEmpty, reason: 'clés en trop');
-      expect(french.difference(english), isEmpty, reason: 'clés manquantes');
+        expect(translated.difference(french), isEmpty, reason: 'clés en trop');
+        expect(
+          french.difference(translated),
+          isEmpty,
+          reason: 'clés manquantes',
+        );
+      });
+    }
+
+    test('chaque langue sait formater ses pluriels et ses dates', () {
+      final date = DateTime(2026, 3, 14);
+      for (final locale in AppLocalizations.supportedLocales) {
+        final l10n = lookupAppLocalizations(locale);
+        // Aucun message ne doit lever, et chaque pluriel dépend du nombre.
+        expect(l10n.pageCount(1), isNot(l10n.pageCount(2)), reason: '$locale');
+        expect(l10n.booksImported(0), isNotEmpty, reason: '$locale');
+        expect(
+          l10n.importAlreadyPresent(3, 10),
+          contains('10'),
+          reason: '$locale',
+        );
+        expect(l10n.longDate(date), contains('2026'), reason: '$locale');
+      }
+    });
+
+    test('les nouvelles langues sont bien traduites', () {
+      expect(
+        lookupAppLocalizations(const Locale('es')).navLibrary,
+        'Biblioteca',
+      );
+      expect(
+        lookupAppLocalizations(const Locale('de')).navSettings,
+        'Einstellungen',
+      );
+      expect(
+        lookupAppLocalizations(const Locale('it')).shelfToRead,
+        'Da leggere',
+      );
+      expect(lookupAppLocalizations(const Locale('pt')).shelfReading, 'Lendo');
+      expect(
+        lookupAppLocalizations(
+          const Locale('de'),
+        ).longDate(DateTime(2026, 3, 14)),
+        '14. März 2026',
+      );
     });
 
     test('le nom de l\'application suit la langue', () {
@@ -79,7 +123,7 @@ void main() {
     test('passe à l\'anglais pour une langue non prise en charge', () {
       expect(
         resolveLocale(const <Locale>[
-          Locale('de'),
+          Locale('ru'),
           Locale('ja'),
         ], AppLocalizations.supportedLocales),
         const Locale('en'),
@@ -117,11 +161,29 @@ void main() {
       return container;
     }
 
-    testWidgets('propose les deux langues', (tester) async {
+    testWidgets('propose toutes les langues', (tester) async {
       await pumpWelcome(tester);
 
-      expect(find.text('Français'), findsOne);
-      expect(find.text('English'), findsOne);
+      for (final name in <String>[
+        'Français',
+        'English',
+        'Español',
+        'Deutsch',
+        'Italiano',
+        'Português',
+      ]) {
+        expect(find.text(name), findsOne, reason: name);
+      }
+    });
+
+    testWidgets('se traduit aussi en allemand', (tester) async {
+      await pumpWelcome(tester);
+
+      await tester.tap(find.text('Deutsch'));
+      await tester.pump();
+
+      expect(find.text('Wähle deine Sprache'), findsOne);
+      expect(find.text('Weiter'), findsOne);
     });
 
     testWidgets('se traduit dès qu\'on choisit une langue', (tester) async {

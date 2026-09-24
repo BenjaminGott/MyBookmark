@@ -28,26 +28,33 @@ l'application : c'est interne et invisible pour les utilisateurs.
    manuelle du dégradé ; envoi direct en story Instagram, le bloc posé en
    sticker sur son dégradé pour garder ses coins arrondis transparents ;
    enregistrement de la carte dans la galerie, album « MyBookmark »
-9. Interface en français et en anglais : la langue se choisit au premier
-   lancement (celle du téléphone est proposée d'office), puis dans les
-   réglages
+9. Interface en français, anglais, espagnol, allemand, italien et portugais
+   (brésilien) : la langue se choisit au premier lancement (celle du
+   téléphone est proposée d'office), puis dans les réglages
+10. Recherche Apple Books dans la boutique du pays du téléphone, pour
+   proposer les éditions locales
 
 Thèmes clair et sombre.
 
 ## Traductions
 
 Les textes de l'interface sont dans `lib/l10n/app_fr.arb` (la référence) et
-`lib/l10n/app_en.arb`. Pour ajouter ou modifier un texte : l'écrire dans les
-deux fichiers, puis `flutter gen-l10n` (ou simplement `flutter pub get`)
-régénère `AppLocalizations`. Un test vérifie que les deux fichiers ont les
-mêmes clés.
+ses traductions `app_en`, `app_es`, `app_de`, `app_it` et `app_pt.arb`. Pour
+ajouter ou modifier un texte : l'écrire dans chaque fichier, puis
+`flutter gen-l10n` (ou simplement `flutter pub get`) régénère
+`AppLocalizations`. Un test vérifie que toutes les langues ont les mêmes clés.
+
+Pour ajouter une langue : un fichier `app_xx.arb`, une valeur dans
+`AppLanguage` (et son nom dans `app_language_label.dart`), et au besoin un
+pays de boutique par défaut dans `storeCountry`.
 
 Les couches `data/` et `domain/` ne produisent jamais de texte affiché : une
 erreur porte une raison (`AppErrorReason`), que l'interface traduit dans
 `ui/l10n/error_text.dart`.
 
 Le nom sous l'icône suit la langue du téléphone :
-`android/app/src/main/res/values/strings.xml` (anglais) et `values-fr/`.
+`android/app/src/main/res/values/strings.xml` (« MyBookmark », pour toutes
+les langues) et `values-fr/` (« Mon marque-page »).
 
 ## Stack
 

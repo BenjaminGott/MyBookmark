@@ -48,7 +48,7 @@ Turn your progress into a beautiful card in the colours of the book cover. Post 
 YOUR DATA STAYS YOURS
 No account, no ads, no tracking. Your library lives on your phone only. Export it to a single file whenever you like, and import it on another device.
 
-Light and dark themes. English or French interface.
+Light and dark themes. Available in English, French, Spanish, German, Italian and Portuguese.
 ```
 
 ---
@@ -90,7 +90,7 @@ Transformez votre avancée en une jolie carte aux couleurs de la couverture. Pub
 VOS DONNÉES RESTENT À VOUS
 Pas de compte, pas de publicité, pas de pistage. Votre bibliothèque reste sur votre téléphone. Exportez-la dans un fichier quand vous voulez, et importez-la sur un autre appareil.
 
-Thèmes clair et sombre. Interface en français ou en anglais.
+Thèmes clair et sombre. Disponible en français, anglais, espagnol, allemand, italien et portugais.
 ```
 
 ---

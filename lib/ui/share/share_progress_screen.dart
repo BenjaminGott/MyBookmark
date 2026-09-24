@@ -186,25 +186,37 @@ class _ShareProgressScreenState extends ConsumerState<ShareProgressScreen> {
                           // Libellé court : trois actions tiennent ainsi sur
                           // une ligne, même sur un téléphone étroit.
                           Expanded(
+                            flex: 2,
                             child: Tooltip(
                               message: context.l10n.storyTooltip,
                               child: OutlinedButton.icon(
                                 onPressed: _sharing ? null : _shareToStory,
                                 icon: const Icon(Icons.add_circle_outline),
-                                label: Text(context.l10n.story),
+                                label: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Text(context.l10n.story, maxLines: 1),
+                                ),
                               ),
                             ),
                           ),
                           const SizedBox(width: 12),
                         ],
+                        // Plus large que « Story » : « Partager » est le mot le
+                        // plus long selon les langues (« Compartilhar »). Il
+                        // rétrécit un peu plutôt que de passer à la ligne.
                         Expanded(
+                          flex: 3,
                           child: FilledButton.icon(
                             onPressed: _sharing ? null : _share,
                             icon: const Icon(Icons.share_outlined),
-                            label: Text(
-                              _sharing
-                                  ? context.l10n.preparing
-                                  : context.l10n.share,
+                            label: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                _sharing
+                                    ? context.l10n.preparing
+                                    : context.l10n.share,
+                                maxLines: 1,
+                              ),
                             ),
                           ),
                         ),
