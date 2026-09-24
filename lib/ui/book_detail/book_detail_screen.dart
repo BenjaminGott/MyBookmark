@@ -5,6 +5,8 @@ import '../../core/failure.dart';
 import '../../domain/models/library_item.dart';
 import '../../domain/models/shelf.dart';
 import '../book_form/book_form_screen.dart';
+import '../l10n/error_text.dart';
+import '../l10n/l10n.dart';
 import '../providers/book_actions_controller.dart';
 import '../providers/book_providers.dart';
 import '../share/open_progress_sharing.dart';
@@ -38,15 +40,15 @@ class BookDetailScreen extends ConsumerWidget {
         error: (error, _) => ErrorView(
           error: error is AppException
               ? error
-              : const StorageException('Lecture du livre impossible.'),
+              : const StorageException(AppErrorReason.bookReadFailed),
         ),
         data: (item) {
           if (item == null) {
             // Le livre vient d'être supprimé, ici ou depuis un autre écran.
-            return const EmptyState(
+            return EmptyState(
               icon: Icons.delete_outline,
-              title: 'Livre supprimé',
-              message: 'Ce livre n\'est plus dans votre bibliothèque.',
+              title: context.l10n.bookDeletedTitle,
+              message: context.l10n.bookDeletedMessage,
             );
           }
           return _BookDetail(item: item);
@@ -97,25 +99,25 @@ class _BookMenu extends ConsumerWidget {
     final busy = ref.watch(bookActionsProvider);
 
     return PopupMenuButton<_BookMenuAction>(
-      tooltip: 'Actions',
+      tooltip: context.l10n.actionsTooltip,
       enabled: !busy,
       onSelected: (action) => _handle(context, ref, action),
-      itemBuilder: (context) => const <PopupMenuEntry<_BookMenuAction>>[
+      itemBuilder: (context) => <PopupMenuEntry<_BookMenuAction>>[
         PopupMenuItem<_BookMenuAction>(
           value: _BookMenuAction.share,
-          child: Text('Partager ma progression'),
+          child: Text(context.l10n.shareProgress),
         ),
         PopupMenuItem<_BookMenuAction>(
           value: _BookMenuAction.edit,
-          child: Text('Corriger les informations'),
+          child: Text(context.l10n.editBookDetails),
         ),
         PopupMenuItem<_BookMenuAction>(
           value: _BookMenuAction.reread,
-          child: Text('Commencer une relecture'),
+          child: Text(context.l10n.startReread),
         ),
         PopupMenuItem<_BookMenuAction>(
           value: _BookMenuAction.delete,
-          child: Text('Supprimer de ma bibliothèque'),
+          child: Text(context.l10n.removeFromLibrary),
         ),
       ],
     );
@@ -148,9 +150,8 @@ class _BookMenu extends ConsumerWidget {
       SnackBar(
         content: Text(
           switch (outcome) {
-            ActionSuccess() => 'Relecture commencée. La lecture précédente '
-                'reste dans l\'historique.',
-            ActionFailure(message: final message) => message,
+            ActionSuccess() => context.l10n.rereadStarted,
+            ActionFailure(:final error) => error.describe(context.l10n),
           },
         ),
       ),
@@ -161,20 +162,16 @@ class _BookMenu extends ConsumerWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Supprimer ce livre ?'),
-        content: Text(
-          '« ${item.book.title} » sera retiré de votre bibliothèque, avec sa '
-          'note, son avis et tout son historique de lecture. '
-          'C\'est définitif.',
-        ),
+        title: Text(context.l10n.deleteBookTitle),
+        content: Text(context.l10n.deleteBookMessage(item.book.title)),
         actions: <Widget>[
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Annuler'),
+            child: Text(context.l10n.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Supprimer'),
+            child: Text(context.l10n.delete),
           ),
         ],
       ),
@@ -194,9 +191,10 @@ class _BookMenu extends ConsumerWidget {
       case ActionSuccess():
         // La fiche n'a plus de sujet : on revient à la bibliothèque.
         Navigator.of(context).pop();
-      case ActionFailure(message: final message):
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(message)));
+      case ActionFailure(:final error):
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(error.describe(context.l10n))),
+        );
     }
   }
 }

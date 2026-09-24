@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../domain/models/shelf.dart';
+import '../l10n/l10n.dart';
 import '../shelf_labels.dart';
 
 /// Demande dans quelle étagère ranger un livre.
@@ -31,9 +32,9 @@ Future<Shelf?> showShelfPicker(
           for (final shelf in Shelf.values)
             ListTile(
               leading: Icon(shelf.icon),
-              title: Text(shelf.label),
+              title: Text(shelf.label(context.l10n)),
               trailing: shelf == current
-                  ? const Icon(Icons.check, semanticLabel: 'Étagère actuelle')
+                  ? Icon(Icons.check, semanticLabel: context.l10n.currentShelf)
                   : null,
               onTap: () => Navigator.of(context).pop(shelf),
             ),

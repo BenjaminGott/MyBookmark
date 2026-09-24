@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../domain/models/library_item.dart';
 import '../../domain/models/shelf.dart';
 import '../../domain/services/reading_progress.dart';
+import '../l10n/l10n.dart';
 import '../shelf_labels.dart';
 import 'progress_card_palette.dart';
 
@@ -20,16 +21,16 @@ enum ShareCardFormat {
   /// s'arrête exactement sur la ligne des pages. Coins arrondis et donc
   /// transparents, pour se poser sur un fond quelconque sans y trancher un
   /// angle droit.
-  compact(360, 212, 'Bloc', 26),
+  compact(360, 212, 26),
 
   /// Story au format de référence : 1080 × 1920.
   ///
   /// Le 9:16 qu'Instagram, TikTok et Snapchat acceptent sans recadrer. Il
   /// laisse des bandes sur un téléphone allongé, mais il ne sera jamais rogné
   /// où qu'il finisse.
-  story(360, 640, 'Moyen', 0);
+  story(360, 640, 0);
 
-  const ShareCardFormat(this.width, this.height, this.label, this.cornerRadius);
+  const ShareCardFormat(this.width, this.height, this.cornerRadius);
 
   final double width;
   final double height;
@@ -38,7 +39,10 @@ enum ShareCardFormat {
   final double cornerRadius;
 
   /// Le nom montré dans le sélecteur.
-  final String label;
+  String label(AppLocalizations l10n) => switch (this) {
+    ShareCardFormat.compact => l10n.formatCompact,
+    ShareCardFormat.story => l10n.formatStory,
+  };
 
   /// La taille de l'image produite, annoncée à l'utilisateur.
   String get pixels =>
@@ -46,8 +50,8 @@ enum ShareCardFormat {
       '${(height * ProgressShareCard.captureRatio).round()}';
 
   String get fileName => switch (this) {
-    ShareCardFormat.compact => 'biblivre-progression-bloc.png',
-    ShareCardFormat.story => 'biblivre-progression-story.png',
+    ShareCardFormat.compact => 'mybookmark-progress-card.png',
+    ShareCardFormat.story => 'mybookmark-progress-story.png',
   };
 }
 
@@ -279,10 +283,11 @@ class _Kicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final label = switch (item.shelf) {
-      Shelf.reading => 'EN COURS DE LECTURE',
-      Shelf.read => 'LECTURE TERMINÉE',
-      Shelf.toRead => 'DANS MA PILE',
+      Shelf.reading => l10n.cardKickerReading,
+      Shelf.read => l10n.cardKickerRead,
+      Shelf.toRead => l10n.cardKickerToRead,
     };
 
     return Row(
@@ -447,7 +452,7 @@ class _Author extends StatelessWidget {
     return Align(
       alignment: Alignment.topLeft,
       child: Text(
-        item.book.author ?? 'Auteur inconnu',
+        item.book.author ?? context.l10n.unknownAuthor,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: TextStyle(
@@ -543,7 +548,9 @@ class _ProgressBlock extends StatelessWidget {
         children: <Widget>[
           Expanded(
             child: Text(
-              page > 0 ? 'page $page' : 'nombre de pages inconnu',
+              page > 0
+                  ? context.l10n.cardPage(page)
+                  : context.l10n.cardPageUnknown,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
@@ -554,7 +561,7 @@ class _ProgressBlock extends StatelessWidget {
             ),
           ),
           Text(
-            item.shelf.label,
+            item.shelf.label(context.l10n),
             style: TextStyle(
               color: palette.foreground,
               fontSize: 20,
@@ -567,7 +574,8 @@ class _ProgressBlock extends StatelessWidget {
     }
 
     final pages = Text(
-      'page $page sur $pageCount',
+      // Un pourcentage existe : le nombre de pages est donc connu.
+      context.l10n.cardPageOf(page, pageCount!),
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
       style: TextStyle(
@@ -762,7 +770,7 @@ class _ThickBar extends StatelessWidget {
                         ? Alignment.centerRight
                         : Alignment.centerLeft,
                     child: Text(
-                      '$percent %',
+                      context.l10n.percent(percent),
                       key: const Key('progress-label'),
                       style: TextStyle(
                         color: inside ? palette.onAccent : palette.foreground,

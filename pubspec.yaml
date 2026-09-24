@@ -2,7 +2,7 @@ name: biblivre
 description: "Suivi de lecture personnel, 100 % local"
 publish_to: 'none'
 
-version: 1.2.2+5
+version: 1.3.0+6
 
 environment:
   sdk: ^3.12.2
@@ -46,7 +46,7 @@ dependencies:
   # flutter/packages, et il fait exactement le travail attendu.
   palette_generator: ^0.3.3+7
 
-  # Formatage des dates en français
+  # Formatage des dates selon la langue
   intl: ^0.20.2 # épinglé à 0.20.2 par flutter_localizations
   gal: ^2.3.3
 
@@ -61,6 +61,8 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  # Génère AppLocalizations depuis lib/l10n (voir l10n.yaml).
+  generate: true
 
   # Le logo de l'en-tête, produit par tool/generate_icons.py.
   assets:

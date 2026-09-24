@@ -139,9 +139,9 @@ void main() {
         repository.addFromSearch(_dune, Shelf.read),
         throwsA(
           isA<DuplicateBookException>().having(
-            (error) => error.message,
-            'message',
-            'Ce livre est déjà dans votre bibliothèque.',
+            (error) => error.reason,
+            'reason',
+            AppErrorReason.duplicateBook,
           ),
         ),
       );

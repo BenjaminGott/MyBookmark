@@ -1,8 +1,10 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../domain/models/app_language.dart';
 import '../../domain/models/app_theme_mode.dart';
 
-/// Les réglages simples, hors base de données : thème et objectif annuel.
+/// Les réglages simples, hors base de données : thème, langue et objectif
+/// annuel.
 ///
 /// `shared_preferences` suffit ici : ce sont deux valeurs isolées, sans
 /// relation avec les livres, et les perdre serait sans gravité.
@@ -10,6 +12,7 @@ class PreferencesService {
   PreferencesService(this._preferences);
 
   static const String _themeKey = 'theme_mode';
+  static const String _languageKey = 'language';
   static const String _goalPrefix = 'reading_goal_';
 
   /// Nul quand les préférences n'ont pas pu être chargées.
@@ -38,6 +41,15 @@ class PreferencesService {
 
   Future<void> setThemeMode(AppThemeMode mode) async {
     await _preferences?.setString(_themeKey, mode.wireName);
+  }
+
+  /// La langue choisie, ou `null` si l'utilisateur n'en a encore choisi
+  /// aucune (premier lancement).
+  AppLanguage? get language =>
+      AppLanguage.fromWire(_preferences?.getString(_languageKey));
+
+  Future<void> setLanguage(AppLanguage language) async {
+    await _preferences?.setString(_languageKey, language.wireName);
   }
 
   /// Objectif de lecture d'une année, prévu pour le défi annuel à venir.

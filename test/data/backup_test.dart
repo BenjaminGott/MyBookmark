@@ -203,11 +203,11 @@ void main() {
     test('propose un nom de fichier daté', () {
       expect(
         repository.suggestedFileName(now: DateTime(2026, 9, 22)),
-        'biblivre-2026-09-22.json',
+        'mybookmark-2026-09-22.json',
       );
       expect(
         repository.suggestedFileName(now: DateTime(2026, 3, 7)),
-        'biblivre-2026-03-07.json',
+        'mybookmark-2026-03-07.json',
       );
     });
 

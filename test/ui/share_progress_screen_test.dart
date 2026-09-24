@@ -9,6 +9,7 @@ import 'package:biblivre/domain/models/shelf.dart';
 import 'package:biblivre/domain/repositories/image_saving.dart';
 import 'package:biblivre/domain/repositories/image_sharing.dart';
 import 'package:biblivre/domain/repositories/story_sharing.dart';
+import 'package:biblivre/l10n/app_localizations.dart';
 import 'package:biblivre/ui/providers/share_providers.dart';
 import 'package:biblivre/ui/share/progress_card_palette.dart';
 import 'package:biblivre/ui/share/progress_share_card.dart';
@@ -173,7 +174,12 @@ void main() {
               (url) => MemoryImage(cover),
             ),
         ],
-        child: MaterialApp(home: ShareProgressScreen(item: item)),
+        child: MaterialApp(
+          locale: const Locale('fr'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: ShareProgressScreen(item: item),
+        ),
       ),
     );
     await tester.pump();
@@ -237,7 +243,7 @@ void main() {
     await tapShare(tester);
 
     expect(sharing.calls, 1);
-    expect(sharing.fileName, 'biblivre-progression-bloc.png');
+    expect(sharing.fileName, 'mybookmark-progress-card.png');
     expect(sharing.text, 'Dune — Frank Herbert');
 
     final bytes = sharing.bytes!;
@@ -252,7 +258,7 @@ void main() {
     await chooseFormat(tester, 'Moyen');
     await tapShare(tester);
 
-    expect(sharing.fileName, 'biblivre-progression-story.png');
+    expect(sharing.fileName, 'mybookmark-progress-story.png');
     // Le 9:16 attendu par les plateformes, quel que soit l'appareil.
     expect(_pngSize(sharing.bytes!), (width: 1080, height: 1920));
   });
@@ -264,7 +270,7 @@ void main() {
     await chooseFormat(tester, 'Bloc');
     await tapShare(tester);
 
-    expect(sharing.fileName, 'biblivre-progression-bloc.png');
+    expect(sharing.fileName, 'mybookmark-progress-card.png');
     expect(_pngSize(sharing.bytes!), (width: 1080, height: 636));
   });
 
@@ -342,7 +348,7 @@ void main() {
   });
 
   screenTest('explique un échec de partage sans planter', (tester) async {
-    sharing.failWith = const FileAccessException('Le partage a échoué.');
+    sharing.failWith = const FileAccessException(AppErrorReason.shareFailed);
     await pumpScreen(tester, _item());
 
     await tapShare(tester);
@@ -479,7 +485,7 @@ void main() {
 
     expect(saving.calls, 1);
     expect(sharing.calls, 0);
-    expect(saving.name, startsWith('biblivre-progression-bloc-'));
+    expect(saving.name, startsWith('mybookmark-progress-card-'));
     // Le même PNG que celui partagé : coins transparents compris.
     expect(_pngSize(saving.bytes!), (width: 1080, height: 636));
     expect(find.text('Image enregistrée dans la galerie.'), findsOne);
@@ -491,14 +497,12 @@ void main() {
     await chooseFormat(tester, 'Moyen');
     await tapSave(tester);
 
-    expect(saving.name, startsWith('biblivre-progression-story-'));
+    expect(saving.name, startsWith('mybookmark-progress-story-'));
     expect(_pngSize(saving.bytes!), (width: 1080, height: 1920));
   });
 
   screenTest('explique un refus d\'accès à la galerie', (tester) async {
-    saving.failWith = const FileAccessException(
-      'Autorisez l\'accès aux photos pour enregistrer l\'image.',
-    );
+    saving.failWith = const FileAccessException(AppErrorReason.photoAccess);
     await pumpScreen(tester, _item());
 
     await tapSave(tester);

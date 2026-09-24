@@ -1,8 +1,11 @@
 import 'package:biblivre/core/failure.dart';
 import 'package:biblivre/data/local/app_database.dart';
+import 'package:biblivre/data/prefs/preferences_service.dart';
+import 'package:biblivre/domain/models/app_language.dart';
 import 'package:biblivre/domain/models/app_theme_mode.dart';
 import 'package:biblivre/domain/models/shelf.dart';
 import 'package:biblivre/domain/repositories/file_exchange.dart';
+import 'package:biblivre/l10n/app_localizations.dart';
 import 'package:biblivre/ui/providers/database_providers.dart';
 import 'package:biblivre/ui/providers/settings_providers.dart';
 import 'package:biblivre/ui/settings/settings_screen.dart';
@@ -89,8 +92,17 @@ void main() {
           // Le thème n'est pas l'objet de ces tests : on court-circuite les
           // préférences, qui exigeraient un canal de plateforme.
           themeModeProvider.overrideWith(_FixedThemeMode.new),
+          // Préférences sans stockage : la langue reste celle du système.
+          preferencesServiceProvider.overrideWithValue(
+            PreferencesService(null),
+          ),
         ],
-        child: const MaterialApp(home: SettingsScreen()),
+        child: const MaterialApp(
+          locale: Locale('fr'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: SettingsScreen(),
+        ),
       ),
     );
     await settle(tester);
@@ -107,6 +119,21 @@ void main() {
     });
   }
 
+  settingsTest('change la langue de l\'interface', (tester) async {
+    await pumpSettings(tester);
+
+    // Sans choix enregistré, la langue du téléphone est cochée.
+    expect(find.text('Langue du téléphone'), findsOne);
+
+    await tester.tap(find.text('English'));
+    await tester.pump();
+
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(SettingsScreen)),
+    );
+    expect(container.read(languageProvider), AppLanguage.english);
+  });
+
   settingsTest('exporte la bibliothèque dans un fichier daté', (tester) async {
     await db.booksDao.addBook(title: 'Dune', shelf: Shelf.read);
     await pumpSettings(tester);
@@ -114,7 +141,7 @@ void main() {
     await tester.tap(find.text('Exporter ma bibliothèque'));
     await settle(tester);
 
-    expect(files.savedFileName, matches(r'^biblivre-\d{4}-\d{2}-\d{2}\.json$'));
+    expect(files.savedFileName, matches(r'^mybookmark-\d{4}-\d{2}-\d{2}\.json$'));
     expect(files.savedContents, contains('Dune'));
     expect(find.textContaining('Bibliothèque exportée'), findsOne);
   });
@@ -211,7 +238,7 @@ void main() {
     await settle(tester);
 
     expect(
-      find.text('Ce fichier n\'est pas une sauvegarde Biblivre valide.'),
+      find.text('Ce fichier n\'est pas une sauvegarde valide.'),
       findsOne,
     );
     expect(await db.booksDao.watchLibrary().first, isEmpty);

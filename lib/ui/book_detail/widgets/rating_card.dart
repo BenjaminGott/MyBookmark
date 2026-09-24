@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../domain/models/library_item.dart';
+import '../../l10n/error_text.dart';
+import '../../l10n/l10n.dart';
 import '../../providers/book_actions_controller.dart';
 import '../../widgets/star_rating.dart';
 import 'section_card.dart';
@@ -35,7 +37,7 @@ class _RatingCardState extends ConsumerState<RatingCard> {
     final entry = widget.item.currentEntry;
 
     return SectionCard(
-      title: 'Ma note et mon avis',
+      title: context.l10n.ratingAndReview,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
@@ -49,7 +51,7 @@ class _RatingCardState extends ConsumerState<RatingCard> {
               const SizedBox(width: 8),
               if (entry.rating == null)
                 Text(
-                  'Pas encore noté',
+                  context.l10n.notRatedYet,
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
             ],
@@ -66,9 +68,9 @@ class _RatingCardState extends ConsumerState<RatingCard> {
                 setState(() => _dirty = dirty);
               }
             },
-            decoration: const InputDecoration(
-              labelText: 'Mon avis',
-              hintText: 'Ce que vous en avez pensé, pour vous en souvenir.',
+            decoration: InputDecoration(
+              labelText: context.l10n.myReview,
+              hintText: context.l10n.reviewHint,
               alignLabelWithHint: true,
             ),
           ),
@@ -78,7 +80,7 @@ class _RatingCardState extends ConsumerState<RatingCard> {
             child: FilledButton(
               // Rien à enregistrer tant que le texte n'a pas changé.
               onPressed: busy || !_dirty ? null : _saveReview,
-              child: const Text('Enregistrer l\'avis'),
+              child: Text(context.l10n.saveReview),
             ),
           ),
         ],
@@ -94,7 +96,9 @@ class _RatingCardState extends ConsumerState<RatingCard> {
       return;
     }
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text((outcome as ActionFailure).message)),
+      SnackBar(
+        content: Text((outcome as ActionFailure).error.describe(context.l10n)),
+      ),
     );
   }
 
@@ -107,12 +111,13 @@ class _RatingCardState extends ConsumerState<RatingCard> {
     }
 
     final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
     switch (outcome) {
       case ActionSuccess():
         setState(() => _dirty = false);
-        messenger.showSnackBar(const SnackBar(content: Text('Avis enregistré')));
-      case ActionFailure(message: final message):
-        messenger.showSnackBar(SnackBar(content: Text(message)));
+        messenger.showSnackBar(SnackBar(content: Text(l10n.reviewSaved)));
+      case ActionFailure(:final error):
+        messenger.showSnackBar(SnackBar(content: Text(error.describe(l10n))));
     }
   }
 }

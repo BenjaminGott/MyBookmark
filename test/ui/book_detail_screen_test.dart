@@ -1,5 +1,6 @@
 import 'package:biblivre/data/local/app_database.dart';
 import 'package:biblivre/domain/models/shelf.dart';
+import 'package:biblivre/l10n/app_localizations.dart';
 import 'package:biblivre/ui/book_detail/book_detail_screen.dart';
 import 'package:biblivre/ui/providers/database_providers.dart';
 import 'package:biblivre/ui/widgets/star_rating.dart';
@@ -44,7 +45,12 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [databaseProvider.overrideWithValue(db)],
-        child: MaterialApp(home: BookDetailScreen(bookId: bookId)),
+        child: MaterialApp(
+          locale: const Locale('fr'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: BookDetailScreen(bookId: bookId),
+        ),
       ),
     );
     await settle(tester);

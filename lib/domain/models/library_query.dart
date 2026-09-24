@@ -3,17 +3,9 @@ import 'package:meta/meta.dart';
 import 'shelf.dart';
 
 /// Critère de tri de « Ma bibliothèque ».
-enum LibrarySort {
-  title('Titre'),
-  author('Auteur'),
-  addedAt('Date d\'ajout'),
-  rating('Note');
-
-  const LibrarySort(this.label);
-
-  /// Libellé affiché dans le menu de tri.
-  final String label;
-}
+///
+/// Le libellé affiché dépend de la langue : il est donné par l'interface.
+enum LibrarySort { title, author, addedAt, rating }
 
 /// Le filtre et le tri actuellement appliqués à la bibliothèque.
 @immutable

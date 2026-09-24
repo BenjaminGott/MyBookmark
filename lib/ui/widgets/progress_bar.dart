@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../domain/services/reading_progress.dart';
+import '../l10n/l10n.dart';
 
 /// Avancement d'une lecture : barre et pourcentage calculés sur le nombre de
 /// pages du livre.
@@ -24,6 +25,7 @@ class ReadingProgressBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
     final fraction =
         ReadingProgress.fraction(currentPage: currentPage, pageCount: pageCount);
     final percent =
@@ -32,8 +34,8 @@ class ReadingProgressBar extends StatelessWidget {
     if (fraction == null) {
       return Text(
         currentPage > 0
-            ? 'Page $currentPage · nombre de pages inconnu'
-            : 'Nombre de pages inconnu',
+            ? l10n.progressPageUnknownTotal(currentPage)
+            : l10n.pageCountUnknown,
         style: theme.textTheme.bodySmall
             ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
       );
@@ -52,7 +54,7 @@ class ReadingProgressBar extends StatelessWidget {
         children: <Widget>[
           Expanded(child: bar),
           const SizedBox(width: 8),
-          Text('$percent %', style: theme.textTheme.labelSmall),
+          Text(l10n.percent(percent!), style: theme.textTheme.labelSmall),
         ],
       );
     }
@@ -63,7 +65,7 @@ class ReadingProgressBar extends StatelessWidget {
         bar,
         const SizedBox(height: 6),
         Text(
-          'Page $currentPage sur $pageCount · $percent %',
+          l10n.progressPageOf(currentPage, pageCount!, percent!),
           style: theme.textTheme.bodySmall
               ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
         ),

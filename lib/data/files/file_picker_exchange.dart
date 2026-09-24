@@ -28,7 +28,7 @@ class FilePickerExchange implements FileExchange {
       return saved != null;
     } on PlatformException {
       throw const FileAccessException(
-        'Enregistrement impossible à cet emplacement.',
+        AppErrorReason.exportLocation,
       );
     }
   }
@@ -53,10 +53,10 @@ class FilePickerExchange implements FileExchange {
     try {
       return utf8.decode(await file.readAsBytes());
     } on PlatformException {
-      throw const FileAccessException('Lecture du fichier impossible.');
+      throw const FileAccessException(AppErrorReason.fileRead);
     } on FormatException {
       throw const MalformedBackupException(
-        'Ce fichier n\'est pas du texte lisible.',
+        AppErrorReason.backupNotText,
       );
     }
   }

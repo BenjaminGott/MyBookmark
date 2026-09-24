@@ -38,9 +38,9 @@ class FilePickerCoverStore implements CoverStore {
       await copy.writeAsBytes(await picked.readAsBytes(), flush: true);
       return copy.uri.toString();
     } on PlatformException {
-      throw const FileAccessException('Lecture de l\'image impossible.');
+      throw const FileAccessException(AppErrorReason.imageRead);
     } on FileSystemException {
-      throw const FileAccessException('Copie de l\'image impossible.');
+      throw const FileAccessException(AppErrorReason.imageCopy);
     }
   }
 

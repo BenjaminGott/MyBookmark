@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/formatters.dart';
 import '../../../domain/models/library_item.dart';
+import '../../l10n/l10n.dart';
 import '../../widgets/book_cover.dart';
 
 /// Grande couverture, titre, auteur et métadonnées du livre.
@@ -14,11 +14,15 @@ class BookHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final book = item.book;
+    final l10n = context.l10n;
+    final pageCount = book.pageCount;
 
     final details = <String>[
       if (book.firstPublishYear != null) '${book.firstPublishYear}',
-      Formatters.pages(book.pageCount),
-      if (book.isManual) 'Saisi à la main',
+      pageCount == null || pageCount <= 0
+          ? l10n.pageCountUnknown
+          : l10n.pageCount(pageCount),
+      if (book.isManual) l10n.enteredManually,
     ];
 
     return Column(
@@ -40,7 +44,7 @@ class BookHeader extends StatelessWidget {
         ),
         const SizedBox(height: 4),
         Text(
-          book.author ?? 'Auteur inconnu',
+          book.author ?? l10n.unknownAuthor,
           style: theme.textTheme.titleMedium
               ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
           textAlign: TextAlign.center,

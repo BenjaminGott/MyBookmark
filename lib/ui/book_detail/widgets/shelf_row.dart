@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../domain/models/library_item.dart';
 import '../../../domain/models/shelf.dart';
+import '../../l10n/error_text.dart';
+import '../../l10n/l10n.dart';
 import '../../providers/book_actions_controller.dart';
 import '../../shelf_labels.dart';
 
@@ -22,7 +24,7 @@ class ShelfRow extends ConsumerWidget {
           ButtonSegment<Shelf>(
             value: shelf,
             icon: Icon(shelf.icon),
-            label: Text(shelf.label),
+            label: Text(shelf.label(context.l10n)),
           ),
       ],
       selected: <Shelf>{item.shelf},
@@ -41,7 +43,9 @@ class ShelfRow extends ConsumerWidget {
       return;
     }
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text((outcome as ActionFailure).message)),
+      SnackBar(
+        content: Text((outcome as ActionFailure).error.describe(context.l10n)),
+      ),
     );
   }
 }
