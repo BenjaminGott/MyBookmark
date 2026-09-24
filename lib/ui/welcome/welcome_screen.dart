@@ -22,10 +22,10 @@ class WelcomeScreen extends ConsumerStatefulWidget {
 class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
   late AppLanguage _selected = systemLanguage();
 
-  static const List<AppLanguage> _choices = <AppLanguage>[
-    AppLanguage.french,
-    AppLanguage.english,
-  ];
+  /// Toutes les langues, sauf « celle du téléphone » : ici, on en choisit une.
+  static final List<AppLanguage> _choices = AppLanguage.values
+      .where((language) => language != AppLanguage.system)
+      .toList();
 
   @override
   Widget build(BuildContext context) {

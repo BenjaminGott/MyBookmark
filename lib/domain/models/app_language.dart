@@ -5,7 +5,11 @@ enum AppLanguage {
   /// Suit la langue du téléphone (anglais si elle n'est pas prise en charge).
   system('system', null),
   french('fr', 'fr'),
-  english('en', 'en');
+  english('en', 'en'),
+  spanish('es', 'es'),
+  german('de', 'de'),
+  italian('it', 'it'),
+  portuguese('pt', 'pt');
 
   const AppLanguage(this.wireName, this.languageCode);
 

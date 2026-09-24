@@ -8,5 +8,9 @@ extension AppLanguageLabel on AppLanguage {
     AppLanguage.system => l10n.languageSystem,
     AppLanguage.french => l10n.languageFrench,
     AppLanguage.english => l10n.languageEnglish,
+    AppLanguage.spanish => l10n.languageSpanish,
+    AppLanguage.german => l10n.languageGerman,
+    AppLanguage.italian => l10n.languageItalian,
+    AppLanguage.portuguese => l10n.languagePortuguese,
   };
 }

@@ -7,18 +7,29 @@ import 'json_http.dart';
 /// Accès à la recherche publique d'Apple Books (API iTunes Search) : pas de
 /// clé, pas de compte.
 ///
-/// Complète Open Library : le catalogue français y est mieux couvert, la
+/// Complète Open Library : les catalogues nationaux y sont mieux couverts, la
 /// réponse arrive en une seconde environ et les couvertures, servies par le
 /// CDN d'Apple, en quelques centaines de millisecondes.
+///
+/// La recherche se fait dans la boutique du pays de l'utilisateur : c'est
+/// elle qui décide des éditions proposées (française en France, allemande en
+/// Allemagne…). Le paramètre `lang` de l'API n'accepte que l'anglais et le
+/// japonais : il n'est pas envoyé.
 class AppleBooksClient {
-  AppleBooksClient({http.Client? httpClient, Duration? timeout})
-      : _http = JsonHttp(httpClient: httpClient, timeout: timeout);
+  AppleBooksClient({
+    http.Client? httpClient,
+    Duration? timeout,
+    this.country = 'US',
+  }) : _http = JsonHttp(httpClient: httpClient, timeout: timeout);
 
   static const String _host = 'itunes.apple.com';
 
   final JsonHttp _http;
 
-  /// Cherche des livres numériques dans la boutique française.
+  /// Code pays ISO 3166 de la boutique interrogée, par exemple `FR`.
+  final String country;
+
+  /// Cherche des livres numériques dans la boutique de [country].
   Future<List<BookSearchResult>> search(
     String normalizedQuery, {
     int limit = 20,
@@ -31,8 +42,7 @@ class AppleBooksClient {
     final uri = Uri.https(_host, '/search', <String, String>{
       'term': normalizedQuery,
       'media': 'ebook',
-      'country': 'FR',
-      'lang': 'fr_fr',
+      'country': country,
       'limit': '$limit',
     });
 
