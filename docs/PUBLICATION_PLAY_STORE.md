@@ -88,9 +88,11 @@ inscription (25 $) permet de publier **autant d'applications qu'on veut**.
 
 Une URL publique est obligatoire, même si l'application ne collecte rien.
 
-**En ligne :** <https://benjamingott.github.io/mybookmark/confidentialite/>,
-publiée depuis le dépôt public `BenjaminGott/BenjaminGott.github.io` (le site
-des applications, avec la page <https://benjamingott.github.io/mybookmark/>).
+**En ligne :** <https://benjamingott.github.io/mybookmark/privacy/> (en
+anglais, l'adresse à donner à Google et à Meta) et
+<https://benjamingott.github.io/mybookmark/fr/privacy/> (en français), publiées
+depuis le dépôt public `BenjaminGott/BenjaminGott.github.io` (le site des
+applications, avec la page <https://benjamingott.github.io/mybookmark/>).
 Les anciennes adresses `/biblivre/…` y redirigent.
 La mettre à jour si l'app change sa façon de traiter les données. Elle dit, en
 substance :
