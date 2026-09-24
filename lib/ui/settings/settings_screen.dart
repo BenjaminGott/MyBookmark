@@ -4,9 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/models/app_language.dart';
 import '../../domain/models/app_theme_mode.dart';
 import '../../domain/models/backup.dart';
-import '../l10n/app_language_label.dart';
 import '../l10n/error_text.dart';
 import '../l10n/l10n.dart';
+import '../l10n/language_dropdown.dart';
 import '../providers/settings_providers.dart';
 import 'backup_controller.dart';
 
@@ -52,21 +52,13 @@ class SettingsScreen extends ConsumerWidget {
           ),
           const Divider(),
           _SectionTitle(l10n.language),
-          RadioGroup<AppLanguage>(
-            groupValue: language,
-            onChanged: (value) {
-              if (value != null) {
-                ref.read(languageProvider.notifier).select(value);
-              }
-            },
-            child: Column(
-              children: <Widget>[
-                for (final option in AppLanguage.values)
-                  RadioListTile<AppLanguage>(
-                    value: option,
-                    title: Text(option.label(l10n)),
-                  ),
-              ],
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+            child: LanguageDropdown(
+              languages: AppLanguage.values,
+              value: language,
+              onChanged: (value) =>
+                  ref.read(languageProvider.notifier).select(value),
             ),
           ),
           const Divider(),
@@ -241,10 +233,9 @@ class _SectionTitle extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(16, 20, 16, 8),
       child: Text(
         title,
-        style: Theme.of(context)
-            .textTheme
-            .titleSmall
-            ?.copyWith(color: Theme.of(context).colorScheme.primary),
+        style: Theme.of(context).textTheme.titleSmall?.copyWith(
+          color: Theme.of(context).colorScheme.primary,
+        ),
       ),
     );
   }

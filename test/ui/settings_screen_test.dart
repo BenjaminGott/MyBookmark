@@ -6,6 +6,7 @@ import 'package:biblivre/domain/models/app_theme_mode.dart';
 import 'package:biblivre/domain/models/shelf.dart';
 import 'package:biblivre/domain/repositories/file_exchange.dart';
 import 'package:biblivre/l10n/app_localizations.dart';
+import 'package:biblivre/ui/l10n/language_dropdown.dart';
 import 'package:biblivre/ui/providers/database_providers.dart';
 import 'package:biblivre/ui/providers/settings_providers.dart';
 import 'package:biblivre/ui/settings/settings_screen.dart';
@@ -122,11 +123,13 @@ void main() {
   settingsTest('change la langue de l\'interface', (tester) async {
     await pumpSettings(tester);
 
-    // Sans choix enregistré, la langue du téléphone est cochée.
+    // Sans choix enregistré, la langue du téléphone est affichée.
     expect(find.text('Langue du téléphone'), findsOne);
 
-    await tester.tap(find.text('English'));
-    await tester.pump();
+    await tester.tap(find.byType(LanguageDropdown));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('English').last);
+    await tester.pumpAndSettle();
 
     final container = ProviderScope.containerOf(
       tester.element(find.byType(SettingsScreen)),
@@ -141,13 +144,17 @@ void main() {
     await tester.tap(find.text('Exporter ma bibliothèque'));
     await settle(tester);
 
-    expect(files.savedFileName, matches(r'^mybookmark-\d{4}-\d{2}-\d{2}\.json$'));
+    expect(
+      files.savedFileName,
+      matches(r'^mybookmark-\d{4}-\d{2}-\d{2}\.json$'),
+    );
     expect(files.savedContents, contains('Dune'));
     expect(find.textContaining('Bibliothèque exportée'), findsOne);
   });
 
-  settingsTest('ne dit rien si l\'utilisateur annule l\'enregistrement',
-      (tester) async {
+  settingsTest('ne dit rien si l\'utilisateur annule l\'enregistrement', (
+    tester,
+  ) async {
     files.cancelSave = true;
     await pumpSettings(tester);
 
@@ -157,9 +164,11 @@ void main() {
     expect(find.byType(SnackBar), findsNothing);
   });
 
-  settingsTest('importe sans rien demander quand la base est vide',
-      (tester) async {
-    files.toReturn = '{"version": 1, "books": [{"title": "Dune", '
+  settingsTest('importe sans rien demander quand la base est vide', (
+    tester,
+  ) async {
+    files.toReturn =
+        '{"version": 1, "books": [{"title": "Dune", '
         '"readings": [{"shelf": "read", "isCurrent": true}]}]}';
     await pumpSettings(tester);
 
@@ -172,10 +181,12 @@ void main() {
     expect(find.textContaining('1 livre importé'), findsOne);
   });
 
-  settingsTest('demande fusion ou remplacement sur une base non vide',
-      (tester) async {
+  settingsTest('demande fusion ou remplacement sur une base non vide', (
+    tester,
+  ) async {
     await db.booksDao.addBook(title: 'Zazie', shelf: Shelf.toRead);
-    files.toReturn = '{"version": 1, "books": [{"title": "Dune", '
+    files.toReturn =
+        '{"version": 1, "books": [{"title": "Dune", '
         '"readings": [{"shelf": "read", "isCurrent": true}]}]}';
     await pumpSettings(tester);
 
@@ -196,7 +207,8 @@ void main() {
 
   settingsTest('remplace toute la bibliothèque sur demande', (tester) async {
     await db.booksDao.addBook(title: 'Zazie', shelf: Shelf.toRead);
-    files.toReturn = '{"version": 1, "books": [{"title": "Dune", '
+    files.toReturn =
+        '{"version": 1, "books": [{"title": "Dune", '
         '"readings": [{"shelf": "read", "isCurrent": true}]}]}';
     await pumpSettings(tester);
 
@@ -212,10 +224,12 @@ void main() {
     expect(find.textContaining('Bibliothèque remplacée'), findsOne);
   });
 
-  settingsTest('n\'écrit rien si l\'utilisateur annule le dialogue',
-      (tester) async {
+  settingsTest('n\'écrit rien si l\'utilisateur annule le dialogue', (
+    tester,
+  ) async {
     await db.booksDao.addBook(title: 'Zazie', shelf: Shelf.toRead);
-    files.toReturn = '{"version": 1, "books": [{"title": "Dune", '
+    files.toReturn =
+        '{"version": 1, "books": [{"title": "Dune", '
         '"readings": [{"shelf": "read", "isCurrent": true}]}]}';
     await pumpSettings(tester);
 
@@ -237,15 +251,13 @@ void main() {
     await tester.tap(find.text('Importer une sauvegarde'));
     await settle(tester);
 
-    expect(
-      find.text('Ce fichier n\'est pas une sauvegarde valide.'),
-      findsOne,
-    );
+    expect(find.text('Ce fichier n\'est pas une sauvegarde valide.'), findsOne);
     expect(await db.booksDao.watchLibrary().first, isEmpty);
   });
 
-  settingsTest('explique un fichier venu d\'une version plus récente',
-      (tester) async {
+  settingsTest('explique un fichier venu d\'une version plus récente', (
+    tester,
+  ) async {
     files.toReturn = '{"version": 99, "books": []}';
     await pumpSettings(tester);
 

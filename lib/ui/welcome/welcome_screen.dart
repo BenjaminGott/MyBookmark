@@ -4,14 +4,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app.dart';
 import '../../core/theme/app_theme.dart';
 import '../../domain/models/app_language.dart';
-import '../l10n/app_language_label.dart';
 import '../l10n/l10n.dart';
+import '../l10n/language_dropdown.dart';
 import '../providers/settings_providers.dart';
 
 /// Premier lancement : le choix de la langue, avant tout le reste.
 ///
 /// La langue du téléphone est proposée d'office. L'écran se traduit dès qu'on
-/// touche une option, pour que chacun voie ce qu'il choisit.
+/// choisit une langue dans la liste, pour que chacun voie ce qu'il choisit.
 class WelcomeScreen extends ConsumerStatefulWidget {
   const WelcomeScreen({super.key});
 
@@ -87,22 +87,10 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                   style: theme.textTheme.titleSmall,
                 ),
                 const SizedBox(height: 8),
-                RadioGroup<AppLanguage>(
-                  groupValue: _selected,
-                  onChanged: (value) {
-                    if (value != null) {
-                      setState(() => _selected = value);
-                    }
-                  },
-                  child: Column(
-                    children: <Widget>[
-                      for (final language in _choices)
-                        RadioListTile<AppLanguage>(
-                          value: language,
-                          title: Text(language.label(l10n)),
-                        ),
-                    ],
-                  ),
+                LanguageDropdown(
+                  languages: _choices,
+                  value: _selected,
+                  onChanged: (value) => setState(() => _selected = value),
                 ),
                 const SizedBox(height: 4),
                 Text(
