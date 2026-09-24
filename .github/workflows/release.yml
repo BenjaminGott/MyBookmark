@@ -1,5 +1,6 @@
-# Publie une release GitHub avec l'APK : à chaque tag `v*` (ex. `v1.1.0`), ou à
-# la main depuis l'onglet Actions, en donnant le tag à créer.
+# Publie une release GitHub avec l'APK et l'AAB, puis envoie l'AAB sur la piste
+# « Test fermé » du Play Store (plus tard : la production). À chaque tag `v*`
+# (ex. `v1.1.0`), ou à la main depuis l'onglet Actions, en donnant le tag.
 name: Release APK
 
 on:
@@ -56,8 +57,9 @@ jobs:
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
-          flutter build apk --release
-          flutter build appbundle --release
+          number=$(tool/ci/build_number.sh)
+          flutter build apk --release --build-number "$number"
+          flutter build appbundle --release --build-number "$number"
 
       - name: Nomme les fichiers d'après le tag
         run: |
@@ -72,3 +74,14 @@ jobs:
             mybookmark-*.apk
             mybookmark-*.aab
           generate_release_notes: true
+
+      # La piste se règle dans les variables du dépôt (PLAY_CLOSED_TRACK) :
+      # « alpha » est le test fermé par défaut, « production » le jour venu.
+      - uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          packageName: com.libergot.mybookmark
+          releaseFiles: mybookmark-${{ env.TAG }}.aab
+          releaseName: ${{ env.TAG }}
+          track: ${{ vars.PLAY_CLOSED_TRACK || 'alpha' }}
+          status: ${{ vars.PLAY_RELEASE_STATUS || 'completed' }}
