@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/formatters.dart';
 import '../../../domain/models/reading_entry.dart';
+import '../../l10n/l10n.dart';
 import '../../providers/book_providers.dart';
 import '../../shelf_labels.dart';
 import '../../widgets/star_rating.dart';
@@ -27,7 +27,7 @@ class ReadingHistoryCard extends ConsumerWidget {
     final past = entries.where((entry) => !entry.isCurrent).toList();
 
     return SectionCard(
-      title: 'Lectures précédentes (${past.length})',
+      title: context.l10n.previousReadings(past.length),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
@@ -46,9 +46,12 @@ class _PastEntry extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
+    final startedAt = entry.startedAt;
+    final finishedAt = entry.finishedAt;
     final period = <String>[
-      if (entry.startedAt != null) 'du ${Formatters.shortDate(entry.startedAt)}',
-      if (entry.finishedAt != null) 'au ${Formatters.shortDate(entry.finishedAt)}',
+      if (startedAt != null) l10n.historyFrom(startedAt),
+      if (finishedAt != null) l10n.historyTo(finishedAt),
     ].join(' ');
 
     return Padding(
@@ -62,7 +65,7 @@ class _PastEntry extends StatelessWidget {
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
-                  period.isEmpty ? 'Dates non renseignées' : period,
+                  period.isEmpty ? l10n.datesNotSet : period,
                   style: theme.textTheme.bodySmall,
                 ),
               ),

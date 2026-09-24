@@ -22,8 +22,6 @@ class ActionFailure extends ActionResult {
   const ActionFailure(this.error);
 
   final AppException error;
-
-  String get message => error.message;
 }
 
 /// Toutes les écritures déclenchées par un geste de l'utilisateur.

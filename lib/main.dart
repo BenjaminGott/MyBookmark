@@ -12,8 +12,9 @@ Future<void> main() async {
   // produirait avant le premier écran — l'application n'afficherait que du noir.
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Charge les noms de mois et de jours en français avant le premier écran.
-  await initializeDateFormatting('fr_FR');
+  // Charge les noms de mois et de jours de chaque langue avant le premier
+  // écran.
+  await initializeDateFormatting();
 
   runApp(
     ProviderScope(
@@ -22,7 +23,7 @@ Future<void> main() async {
           await PreferencesService.loadOrDefaults(),
         ),
       ],
-      child: const BiblivreApp(),
+      child: const MyBookmarkApp(),
     ),
   );
 }

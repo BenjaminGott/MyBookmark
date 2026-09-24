@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/models/book_search_result.dart';
 import '../../domain/repositories/search_repository.dart';
 import '../book_form/book_form_screen.dart';
+import '../l10n/error_text.dart';
+import '../l10n/l10n.dart';
 import '../providers/book_actions_controller.dart';
 import '../providers/book_providers.dart';
 import '../shelf_labels.dart';
@@ -36,7 +38,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     final controller = ref.read(searchControllerProvider.notifier);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Chercher un livre')),
+      appBar: AppBar(title: Text(context.l10n.searchABook)),
       body: Column(
         children: <Widget>[
           Padding(
@@ -47,13 +49,13 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               textInputAction: TextInputAction.search,
               onChanged: controller.onQueryChanged,
               decoration: InputDecoration(
-                hintText: 'Titre ou auteur',
+                hintText: context.l10n.searchHint,
                 prefixIcon: const Icon(Icons.search),
                 suffixIcon: _field.text.isEmpty
                     ? null
                     : IconButton(
                         icon: const Icon(Icons.clear),
-                        tooltip: 'Effacer',
+                        tooltip: context.l10n.clear,
                         onPressed: () {
                           _field.clear();
                           controller.clear();
@@ -89,23 +91,22 @@ class _Results extends ConsumerWidget {
     if (state.status == SearchStatus.idle) {
       return EmptyState(
         icon: Icons.search,
-        title: 'Cherchez un livre',
+        title: context.l10n.searchPromptTitle,
         message: state.query.trim().isEmpty
-            ? 'Tapez un titre ou un nom d\'auteur.'
-            : 'Encore $kMinQueryLength caractères minimum.',
+            ? context.l10n.searchPromptMessage
+            : context.l10n.searchMinChars(kMinQueryLength),
       );
     }
 
     if (state.hasNoResult) {
       return EmptyState(
         icon: Icons.search_off,
-        title: 'Aucun résultat',
-        message: 'Ni Open Library ni Apple Books ne connaissent ce titre. '
-            'Vérifiez l\'orthographe, ou saisissez le livre vous-même.',
+        title: context.l10n.noResultsTitle,
+        message: context.l10n.noResultsMessage,
         action: FilledButton.tonalIcon(
           onPressed: () => openManualBookForm(context),
           icon: const Icon(Icons.edit_outlined),
-          label: const Text('Saisir le livre à la main'),
+          label: Text(context.l10n.addBookByHand),
         ),
       );
     }
@@ -147,14 +148,14 @@ class _ResultTile extends ConsumerWidget {
       leading: BookCover(url: result.coverUrl()),
       title: Text(result.title, maxLines: 2, overflow: TextOverflow.ellipsis),
       subtitle: Text(
-        _subtitle(result),
+        _subtitle(context.l10n, result),
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       ),
       trailing: alreadyAdded
           ? Icon(
               Icons.library_add_check,
-              semanticLabel: 'Déjà dans votre bibliothèque',
+              semanticLabel: context.l10n.alreadyInLibrary,
               color: Theme.of(context).colorScheme.primary,
             )
           : const Icon(Icons.add),
@@ -176,14 +177,15 @@ class _ResultTile extends ConsumerWidget {
       return;
     }
 
+    final l10n = context.l10n;
     final messenger = ScaffoldMessenger.of(context);
     messenger.hideCurrentSnackBar();
     messenger.showSnackBar(
       SnackBar(
         content: Text(
           switch (outcome) {
-            ActionSuccess() => shelf.addedMessage,
-            ActionFailure(message: final message) => message,
+            ActionSuccess() => shelf.addedMessage(l10n),
+            ActionFailure(:final error) => error.describe(l10n),
           },
         ),
       ),
@@ -191,11 +193,12 @@ class _ResultTile extends ConsumerWidget {
   }
 
   /// Auteur, année et pages, en sautant ce qu'Open Library ne sait pas.
-  static String _subtitle(BookSearchResult result) {
+  static String _subtitle(AppLocalizations l10n, BookSearchResult result) {
+    final pageCount = result.pageCount;
     final parts = <String>[
-      result.author ?? 'Auteur inconnu',
+      result.author ?? l10n.unknownAuthor,
       if (result.firstPublishYear != null) '${result.firstPublishYear}',
-      if (result.pageCount != null) '${result.pageCount} pages',
+      if (pageCount != null) l10n.pageCount(pageCount),
     ];
     return parts.join(' · ');
   }

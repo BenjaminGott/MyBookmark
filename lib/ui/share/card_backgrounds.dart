@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:palette_generator/palette_generator.dart';
 
+import '../l10n/l10n.dart';
 import 'progress_card_palette.dart';
 
-/// Un fond proposé dans le sélecteur, avec le nom qui l'annonce.
+/// Les sortes de fonds proposés ; leur nom affiché dépend de la langue.
+enum BackgroundKind { automatic, dark, light, vivid, night, paper }
+
+/// Un fond proposé dans le sélecteur, avec la sorte qui l'annonce.
 @immutable
 class BackgroundOption {
-  const BackgroundOption({required this.label, required this.palette});
+  const BackgroundOption({required this.kind, required this.palette});
 
-  final String label;
+  final BackgroundKind kind;
   final ProgressCardPalette palette;
 }
 
@@ -79,22 +83,22 @@ class CardBackgrounds {
     if (colors.isEmpty) {
       return <BackgroundOption>[
         BackgroundOption(
-          label: 'Automatique',
+          kind: BackgroundKind.automatic,
           palette: ProgressCardPalette.fallback(),
         ),
-        BackgroundOption(label: 'Nuit', palette: night),
-        BackgroundOption(label: 'Papier', palette: paper),
+        BackgroundOption(kind: BackgroundKind.night, palette: night),
+        BackgroundOption(kind: BackgroundKind.paper, palette: paper),
       ];
     }
 
     final base = colors.dominant ?? colors.vibrant;
     final options = <BackgroundOption>[
       BackgroundOption(
-        label: 'Automatique',
+        kind: BackgroundKind.automatic,
         palette: ProgressCardPalette.fromColors(base, colors.dark),
       ),
       BackgroundOption(
-        label: 'Sombre',
+        kind: BackgroundKind.dark,
         palette: ProgressCardPalette.fromColors(
           base,
           colors.dark ?? base,
@@ -102,7 +106,7 @@ class CardBackgrounds {
         ),
       ),
       BackgroundOption(
-        label: 'Clair',
+        kind: BackgroundKind.light,
         palette: ProgressCardPalette.fromColors(
           colors.light ?? base,
           base,
@@ -117,7 +121,7 @@ class CardBackgrounds {
     if (vibrant != null && vibrant != base) {
       options.add(
         BackgroundOption(
-          label: 'Vif',
+          kind: BackgroundKind.vivid,
           palette: ProgressCardPalette.fromColors(vibrant, colors.dark),
         ),
       );
@@ -125,8 +129,20 @@ class CardBackgrounds {
 
     return <BackgroundOption>[
       ...options,
-      BackgroundOption(label: 'Nuit', palette: night),
-      BackgroundOption(label: 'Papier', palette: paper),
+      BackgroundOption(kind: BackgroundKind.night, palette: night),
+      BackgroundOption(kind: BackgroundKind.paper, palette: paper),
     ];
   }
+}
+
+/// Nom affiché de chaque sorte de fond.
+extension BackgroundKindLabel on BackgroundKind {
+  String label(AppLocalizations l10n) => switch (this) {
+        BackgroundKind.automatic => l10n.backgroundAuto,
+        BackgroundKind.dark => l10n.backgroundDark,
+        BackgroundKind.light => l10n.backgroundLight,
+        BackgroundKind.vivid => l10n.backgroundVivid,
+        BackgroundKind.night => l10n.backgroundNight,
+        BackgroundKind.paper => l10n.backgroundPaper,
+      };
 }

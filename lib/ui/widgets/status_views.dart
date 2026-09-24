@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../core/failure.dart';
+import '../l10n/error_text.dart';
+import '../l10n/l10n.dart';
 
 /// Écran vide expliqué : jamais de page blanche sans un mot.
 class EmptyState extends StatelessWidget {
@@ -68,14 +70,14 @@ class ErrorView extends StatelessWidget {
       icon: error is NetworkException
           ? Icons.wifi_off_outlined
           : Icons.error_outline,
-      title: 'Ça n\'a pas marché',
-      message: error.message,
+      title: context.l10n.errorTitle,
+      message: error.describe(context.l10n),
       action: onRetry == null
           ? null
           : FilledButton.tonalIcon(
               onPressed: onRetry,
               icon: const Icon(Icons.refresh),
-              label: const Text('Réessayer'),
+              label: Text(context.l10n.retry),
             ),
     );
   }

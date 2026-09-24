@@ -61,14 +61,14 @@ jobs:
 
       - name: Nomme les fichiers d'après le tag
         run: |
-          cp build/app/outputs/flutter-apk/app-release.apk "biblivre-${TAG}.apk"
-          cp build/app/outputs/bundle/release/app-release.aab "biblivre-${TAG}.aab"
+          cp build/app/outputs/flutter-apk/app-release.apk "mybookmark-${TAG}.apk"
+          cp build/app/outputs/bundle/release/app-release.aab "mybookmark-${TAG}.aab"
 
       - uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.TAG }}
           target_commitish: ${{ github.sha }}
           files: |
-            biblivre-*.apk
-            biblivre-*.aab
+            mybookmark-*.apk
+            mybookmark-*.aab
           generate_release_notes: true

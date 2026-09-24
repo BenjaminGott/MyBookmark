@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/failure.dart';
 import '../../domain/models/book_search_result.dart';
+import '../l10n/error_text.dart';
+import '../l10n/l10n.dart';
 import '../providers/search_providers.dart';
 import '../widgets/book_cover.dart';
 
@@ -60,9 +62,9 @@ class _CoverSearchSheetState extends ConsumerState<_CoverSearchSheet> {
               child: TextField(
                 controller: _field,
                 textInputAction: TextInputAction.search,
-                decoration: const InputDecoration(
-                  labelText: 'Chercher une couverture',
-                  prefixIcon: Icon(Icons.image_search),
+                decoration: InputDecoration(
+                  labelText: context.l10n.searchCover,
+                  prefixIcon: const Icon(Icons.image_search),
                 ),
                 onSubmitted: (query) =>
                     setState(() => _results = _search(query)),
@@ -76,8 +78,8 @@ class _CoverSearchSheetState extends ConsumerState<_CoverSearchSheet> {
                   if (error != null) {
                     return _Message(
                       error is AppException
-                          ? error.message
-                          : 'La recherche a échoué.',
+                          ? error.describe(context.l10n)
+                          : context.l10n.searchFailed,
                     );
                   }
                   final results = snapshot.data;
@@ -87,9 +89,7 @@ class _CoverSearchSheetState extends ConsumerState<_CoverSearchSheet> {
                     return const Center(child: CircularProgressIndicator());
                   }
                   if (results.isEmpty) {
-                    return const _Message(
-                      'Aucune couverture trouvée. Essayez un autre titre.',
-                    );
+                    return _Message(context.l10n.noCoverFound);
                   }
                   return GridView.builder(
                     padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),

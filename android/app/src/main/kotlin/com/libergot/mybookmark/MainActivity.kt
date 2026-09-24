@@ -1,4 +1,4 @@
-package com.benjamin.biblivre
+package com.libergot.mybookmark
 
 import android.content.ActivityNotFoundException
 import android.content.Intent
@@ -64,7 +64,7 @@ class MainActivity : FlutterActivity() {
     }
 
     private companion object {
-        const val STORY_CHANNEL = "com.benjamin.biblivre/instagram_story"
+        const val STORY_CHANNEL = "com.libergot.mybookmark/instagram_story"
         const val ADD_TO_STORY = "com.instagram.share.ADD_TO_STORY"
         const val INSTAGRAM = "com.instagram.android"
 

@@ -9,6 +9,8 @@ import '../../domain/models/book.dart';
 import '../../domain/models/book_search_result.dart';
 import '../../domain/models/shelf.dart';
 import '../../domain/repositories/cover_store.dart';
+import '../l10n/error_text.dart';
+import '../l10n/l10n.dart';
 import '../providers/book_actions_controller.dart';
 import '../providers/book_providers.dart';
 import '../shelf_labels.dart';
@@ -89,11 +91,12 @@ class _BookFormScreenState extends ConsumerState<BookFormScreen> {
   @override
   Widget build(BuildContext context) {
     final busy = ref.watch(bookActionsProvider);
+    final l10n = context.l10n;
 
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          widget.isEditing ? 'Corriger les informations' : 'Ajouter un livre',
+          widget.isEditing ? l10n.editBookDetails : l10n.addBookTitle,
         ),
       ),
       body: Form(
@@ -117,19 +120,18 @@ class _BookFormScreenState extends ConsumerState<BookFormScreen> {
               controller: _title,
               autofocus: !widget.isEditing,
               textCapitalization: TextCapitalization.sentences,
-              decoration: const InputDecoration(
-                labelText: 'Titre *',
-                hintText: 'Obligatoire',
+              decoration: InputDecoration(
+                labelText: l10n.titleRequiredLabel,
+                hintText: l10n.requiredHint,
               ),
-              validator: (value) => (value ?? '').trim().isEmpty
-                  ? 'Le titre est obligatoire.'
-                  : null,
+              validator: (value) =>
+                  (value ?? '').trim().isEmpty ? l10n.titleRequired : null,
             ),
             const SizedBox(height: 16),
             TextFormField(
               controller: _author,
               textCapitalization: TextCapitalization.words,
-              decoration: const InputDecoration(labelText: 'Auteur'),
+              decoration: InputDecoration(labelText: l10n.authorLabel),
             ),
             const SizedBox(height: 16),
             TextFormField(
@@ -138,9 +140,9 @@ class _BookFormScreenState extends ConsumerState<BookFormScreen> {
               inputFormatters: <TextInputFormatter>[
                 FilteringTextInputFormatter.digitsOnly,
               ],
-              decoration: const InputDecoration(
-                labelText: 'Nombre de pages',
-                helperText: 'Laissez vide si vous ne le connaissez pas.',
+              decoration: InputDecoration(
+                labelText: l10n.pageCountLabel,
+                helperText: l10n.pageCountHelper,
               ),
               validator: _validatePageCount,
             ),
@@ -151,9 +153,7 @@ class _BookFormScreenState extends ConsumerState<BookFormScreen> {
               inputFormatters: <TextInputFormatter>[
                 FilteringTextInputFormatter.digitsOnly,
               ],
-              decoration: const InputDecoration(
-                labelText: 'Année de parution',
-              ),
+              decoration: InputDecoration(labelText: l10n.yearLabel),
               validator: _validateYear,
             ),
             const SizedBox(height: 16),
@@ -163,14 +163,17 @@ class _BookFormScreenState extends ConsumerState<BookFormScreen> {
               maxLines: 10,
               keyboardType: TextInputType.multiline,
               textCapitalization: TextCapitalization.sentences,
-              decoration: const InputDecoration(
-                labelText: 'Résumé',
+              decoration: InputDecoration(
+                labelText: l10n.summary,
                 alignLabelWithHint: true,
               ),
             ),
             if (!widget.isEditing) ...<Widget>[
               const SizedBox(height: 24),
-              Text('Étagère', style: Theme.of(context).textTheme.titleSmall),
+              Text(
+                l10n.shelfLabel,
+                style: Theme.of(context).textTheme.titleSmall,
+              ),
               const SizedBox(height: 8),
               SegmentedButton<Shelf>(
                 segments: <ButtonSegment<Shelf>>[
@@ -178,7 +181,7 @@ class _BookFormScreenState extends ConsumerState<BookFormScreen> {
                     ButtonSegment<Shelf>(
                       value: shelf,
                       icon: Icon(shelf.icon),
-                      label: Text(shelf.label),
+                      label: Text(shelf.label(l10n)),
                     ),
                 ],
                 selected: <Shelf>{_shelf},
@@ -190,7 +193,7 @@ class _BookFormScreenState extends ConsumerState<BookFormScreen> {
             const SizedBox(height: 32),
             FilledButton(
               onPressed: busy ? null : _submit,
-              child: Text(widget.isEditing ? 'Enregistrer' : 'Ajouter'),
+              child: Text(widget.isEditing ? l10n.save : l10n.add),
             ),
           ],
         ),
@@ -225,8 +228,9 @@ class _BookFormScreenState extends ConsumerState<BookFormScreen> {
       });
     } on AppException catch (error) {
       if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(error.message)));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(error.describe(context.l10n))),
+        );
       }
     }
   }
@@ -238,7 +242,7 @@ class _BookFormScreenState extends ConsumerState<BookFormScreen> {
     }
     final pages = int.tryParse(text);
     if (pages == null || pages <= 0) {
-      return 'Indiquez un nombre de pages supérieur à zéro.';
+      return context.l10n.pageCountInvalid;
     }
     return null;
   }
@@ -251,7 +255,7 @@ class _BookFormScreenState extends ConsumerState<BookFormScreen> {
     final year = int.tryParse(text);
     final nextYear = DateTime.now().year + 1;
     if (year == null || year < 1 || year > nextYear) {
-      return 'Indiquez une année entre 1 et $nextYear.';
+      return context.l10n.yearInvalid(nextYear);
     }
     return null;
   }
@@ -294,6 +298,7 @@ class _BookFormScreenState extends ConsumerState<BookFormScreen> {
     // Le messager est récupéré avant de fermer l'écran : après le pop, ce
     // contexte n'est plus monté.
     final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
 
     switch (outcome) {
       case ActionSuccess():
@@ -307,13 +312,13 @@ class _BookFormScreenState extends ConsumerState<BookFormScreen> {
           SnackBar(
             content: Text(
               widget.isEditing
-                  ? 'Informations mises à jour'
-                  : _shelf.addedMessage,
+                  ? l10n.detailsUpdated
+                  : _shelf.addedMessage(l10n),
             ),
           ),
         );
-      case ActionFailure(message: final message):
-        messenger.showSnackBar(SnackBar(content: Text(message)));
+      case ActionFailure(:final error):
+        messenger.showSnackBar(SnackBar(content: Text(error.describe(l10n))));
     }
   }
 }
@@ -331,7 +336,7 @@ Future<void> openBookEditor(
 
   if (book == null) {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Ce livre n\'existe plus.')),
+      SnackBar(content: Text(context.l10n.bookGone)),
     );
     return;
   }
@@ -380,20 +385,20 @@ class _CoverField extends StatelessWidget {
               OutlinedButton.icon(
                 onPressed: onSearch,
                 icon: const Icon(Icons.image_search),
-                label: const Text('Chercher en ligne'),
+                label: Text(context.l10n.searchOnline),
               ),
               const SizedBox(height: 8),
               OutlinedButton.icon(
                 onPressed: onPick,
                 icon: const Icon(Icons.photo_library_outlined),
-                label: const Text('Depuis la galerie'),
+                label: Text(context.l10n.fromGallery),
               ),
               if (url != null) ...<Widget>[
                 const SizedBox(height: 8),
                 TextButton.icon(
                   onPressed: onRemove,
                   icon: const Icon(Icons.hide_image_outlined),
-                  label: const Text('Retirer la couverture'),
+                  label: Text(context.l10n.removeCover),
                 ),
               ],
             ],

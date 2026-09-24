@@ -29,7 +29,7 @@ class JsonBackupRepository implements BackupRepository {
     final date = now ?? DateTime.now();
     final month = date.month.toString().padLeft(2, '0');
     final day = date.day.toString().padLeft(2, '0');
-    return 'biblivre-${date.year}-$month-$day.json';
+    return 'mybookmark-${date.year}-$month-$day.json';
   }
 
   @override

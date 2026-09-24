@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/l10n.dart';
+
 /// Une note de 1 à 5 étoiles entières.
 ///
 /// En lecture seule quand [onChanged] est nul. Sinon, toucher une étoile note,
@@ -24,11 +26,12 @@ class StarRating extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final current = rating;
     final interactive = onChanged != null;
+    final l10n = context.l10n;
 
     return Semantics(
       label: current == null
-          ? 'Pas encore noté'
-          : 'Noté $current sur $maxRating',
+          ? l10n.notRatedYet
+          : l10n.ratedOutOf(current, maxRating),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
@@ -38,7 +41,7 @@ class StarRating extends StatelessWidget {
               constraints: const BoxConstraints(),
               visualDensity: VisualDensity.compact,
               iconSize: size,
-              tooltip: interactive ? '$star étoile${star > 1 ? 's' : ''}' : null,
+              tooltip: interactive ? l10n.starCount(star) : null,
               onPressed: interactive
                   ? () => onChanged!(current == star ? null : star)
                   : null,

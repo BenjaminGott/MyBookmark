@@ -24,7 +24,7 @@ fun signingValue(property: String, environment: String): String? =
 val releaseStoreFile = signingValue("storeFile", "ANDROID_KEYSTORE_PATH")
 
 android {
-    namespace = "com.benjamin.biblivre"
+    namespace = "com.libergot.mybookmark"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -35,7 +35,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.benjamin.biblivre"
+        applicationId = "com.libergot.mybookmark"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion

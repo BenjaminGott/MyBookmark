@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../domain/models/library_item.dart';
 import '../../../domain/services/reading_progress.dart';
+import '../../l10n/error_text.dart';
+import '../../l10n/l10n.dart';
 import '../../providers/book_actions_controller.dart';
 import '../../share/open_progress_sharing.dart';
 import '../../widgets/progress_bar.dart';
@@ -53,7 +55,7 @@ class _ProgressCardState extends ConsumerState<ProgressCard> {
     final pageCount = widget.item.book.pageCount;
 
     return SectionCard(
-      title: 'Progression',
+      title: context.l10n.progressTitle,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
@@ -75,10 +77,10 @@ class _ProgressCardState extends ConsumerState<ProgressCard> {
                   textInputAction: TextInputAction.done,
                   onSubmitted: (_) => _save(),
                   decoration: InputDecoration(
-                    labelText: 'Page en cours',
+                    labelText: context.l10n.currentPage,
                     helperText: pageCount == null
-                        ? 'Nombre de pages inconnu'
-                        : 'sur $pageCount',
+                        ? context.l10n.pageCountUnknown
+                        : context.l10n.ofPages(pageCount),
                   ),
                 ),
               ),
@@ -87,7 +89,7 @@ class _ProgressCardState extends ConsumerState<ProgressCard> {
                 padding: const EdgeInsets.only(top: 4),
                 child: FilledButton(
                   onPressed: busy ? null : _save,
-                  child: const Text('Enregistrer'),
+                  child: Text(context.l10n.save),
                 ),
               ),
             ],
@@ -99,13 +101,13 @@ class _ProgressCardState extends ConsumerState<ProgressCard> {
                 TextButton.icon(
                   onPressed: busy ? null : () => _saveValue(pageCount),
                   icon: const Icon(Icons.done_all),
-                  label: const Text('Dernière page'),
+                  label: Text(context.l10n.lastPage),
                 ),
               const Spacer(),
               TextButton.icon(
                 onPressed: () => openProgressSharing(context, widget.item),
                 icon: const Icon(Icons.share_outlined),
-                label: const Text('Partager'),
+                label: Text(context.l10n.share),
               ),
             ],
           ),
@@ -132,20 +134,16 @@ class _ProgressCardState extends ConsumerState<ProgressCard> {
     }
 
     final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
     switch (outcome) {
       case ActionSuccess():
-        if (clamped != page) {
+        if (clamped != page && pageCount != null) {
           messenger.showSnackBar(
-            SnackBar(
-              content: Text(
-                'Ce livre fait $pageCount pages : la progression a été '
-                'enregistrée à la page $clamped.',
-              ),
-            ),
+            SnackBar(content: Text(l10n.pageClamped(pageCount, clamped))),
           );
         }
-      case ActionFailure(message: final message):
-        messenger.showSnackBar(SnackBar(content: Text(message)));
+      case ActionFailure(:final error):
+        messenger.showSnackBar(SnackBar(content: Text(error.describe(l10n))));
     }
   }
 }

@@ -104,7 +104,7 @@ class BackupCodec {
     if (title == null) {
       // Un livre sans titre ne peut pas être inséré : la base le refuserait.
       throw const MalformedBackupException(
-        'Ce fichier contient un livre sans titre.',
+        AppErrorReason.backupUntitledBook,
       );
     }
 
@@ -140,7 +140,7 @@ class BackupCodec {
     final shelf = rawShelf is String ? Shelf.tryParse(rawShelf) : null;
     if (shelf == null) {
       throw const MalformedBackupException(
-        'Ce fichier contient une étagère inconnue.',
+        AppErrorReason.backupUnknownShelf,
       );
     }
 

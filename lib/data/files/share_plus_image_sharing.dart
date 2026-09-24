@@ -29,11 +29,11 @@ class SharePlusImageSharing implements ImageSharing {
       await file.writeAsBytes(bytes, flush: true);
     } on FileSystemException {
       throw const FileAccessException(
-        'Impossible de préparer l\'image à partager.',
+        AppErrorReason.imagePrepare,
       );
     } on MissingPlatformDirectoryException {
       throw const FileAccessException(
-        'Impossible de préparer l\'image à partager.',
+        AppErrorReason.imagePrepare,
       );
     }
 
@@ -45,7 +45,7 @@ class SharePlusImageSharing implements ImageSharing {
         ),
       );
     } on PlatformException {
-      throw const FileAccessException('Le partage a échoué.');
+      throw const FileAccessException(AppErrorReason.shareFailed);
     }
   }
 }

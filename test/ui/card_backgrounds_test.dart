@@ -13,6 +13,17 @@ const Map<String, Color> _covers = <String, Color>{
   'vert forêt': Color(0xFF1B5E20),
 };
 
+/// Les sortes de fonds proposées, dans l'ordre.
+List<BackgroundKind> _kinds(List<BackgroundOption> options) =>
+    options.map((option) => option.kind).toList();
+
+/// Le dégradé du fond d'une sorte donnée.
+ProgressCardPalette _palette(
+  List<BackgroundOption> options,
+  BackgroundKind kind,
+) =>
+    options.firstWhere((option) => option.kind == kind).palette;
+
 void main() {
   group('CardBackgrounds.forCover', () {
     test('propose l\'automatique en premier', () {
@@ -20,7 +31,7 @@ void main() {
         const CoverColors(dominant: Color(0xFF12253F)),
       );
 
-      expect(options.first.label, 'Automatique');
+      expect(options.first.kind, BackgroundKind.automatic);
     });
 
     test('propose une variante claire et une sombre', () {
@@ -32,13 +43,13 @@ void main() {
         ),
       );
 
-      final labels = options.map((option) => option.label).toList();
-      expect(labels, containsAll(<String>['Clair', 'Sombre']));
+      expect(
+        _kinds(options),
+        containsAll(<BackgroundKind>[BackgroundKind.light, BackgroundKind.dark]),
+      );
 
-      final clair =
-          options.firstWhere((option) => option.label == 'Clair').palette;
-      final sombre =
-          options.firstWhere((option) => option.label == 'Sombre').palette;
+      final clair = _palette(options, BackgroundKind.light);
+      final sombre = _palette(options, BackgroundKind.dark);
 
       expect(clair.family, PaletteFamily.light);
       expect(sombre.family, PaletteFamily.dark);
@@ -53,10 +64,8 @@ void main() {
         final options = CardBackgrounds.forCover(
           CoverColors(dominant: entry.value),
         );
-        final clair =
-            options.firstWhere((option) => option.label == 'Clair').palette;
-        final sombre =
-            options.firstWhere((option) => option.label == 'Sombre').palette;
+        final clair = _palette(options, BackgroundKind.light);
+        final sombre = _palette(options, BackgroundKind.dark);
 
         expect(clair.family, PaletteFamily.light, reason: entry.key);
         expect(sombre.family, PaletteFamily.dark, reason: entry.key);
@@ -71,7 +80,7 @@ void main() {
         ),
       );
 
-      expect(options.map((option) => option.label), contains('Vif'));
+      expect(_kinds(options), contains(BackgroundKind.vivid));
     });
 
     test('n\'ajoute pas de fond vif s\'il doublonne l\'automatique', () {
@@ -82,7 +91,7 @@ void main() {
         ),
       );
 
-      expect(options.map((option) => option.label), isNot(contains('Vif')));
+      expect(_kinds(options), isNot(contains(BackgroundKind.vivid)));
     });
 
     test('propose toujours deux fonds neutres', () {
@@ -90,15 +99,17 @@ void main() {
         const CoverColors(dominant: Color(0xFF12253F)),
       );
 
-      expect(options.map((option) => option.label),
-          containsAll(<String>['Nuit', 'Papier']));
+      expect(
+        _kinds(options),
+        containsAll(<BackgroundKind>[BackgroundKind.night, BackgroundKind.paper]),
+      );
     });
 
     test('propose quand même des fonds sans couverture', () {
       final options = CardBackgrounds.forCover(CoverColors.none);
 
       expect(options, isNotEmpty);
-      expect(options.first.label, 'Automatique');
+      expect(options.first.kind, BackgroundKind.automatic);
       expect(options.first.palette.top, ProgressCardPalette.fallback().top);
     });
 
@@ -116,7 +127,7 @@ void main() {
           expect(
             contrast,
             greaterThan(0.3),
-            reason: '${option.label} sur ${entry.key}',
+            reason: '${option.kind.name} sur ${entry.key}',
           );
         }
       }
@@ -136,7 +147,7 @@ void main() {
           expect(
             contrast,
             greaterThan(0.12),
-            reason: '${option.label} sur ${entry.key}',
+            reason: '${option.kind.name} sur ${entry.key}',
           );
         }
       }

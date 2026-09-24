@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/files/file_picker_exchange.dart';
 import '../../data/prefs/preferences_service.dart';
 import '../../data/repositories/backup_repository_json.dart';
+import '../../domain/models/app_language.dart';
 import '../../domain/models/app_theme_mode.dart';
 import '../../domain/repositories/backup_repository.dart';
 import '../../domain/repositories/file_exchange.dart';
@@ -33,6 +34,20 @@ class ThemeModeController extends Notifier<AppThemeMode> {
 
 final NotifierProvider<ThemeModeController, AppThemeMode> themeModeProvider =
     NotifierProvider<ThemeModeController, AppThemeMode>(ThemeModeController.new);
+
+/// La langue choisie, ou `null` tant que l'écran d'accueil n'a pas été passé.
+class LanguageController extends Notifier<AppLanguage?> {
+  @override
+  AppLanguage? build() => ref.read(preferencesServiceProvider).language;
+
+  Future<void> select(AppLanguage language) async {
+    state = language;
+    await ref.read(preferencesServiceProvider).setLanguage(language);
+  }
+}
+
+final NotifierProvider<LanguageController, AppLanguage?> languageProvider =
+    NotifierProvider<LanguageController, AppLanguage?>(LanguageController.new);
 
 final Provider<BackupRepository> backupRepositoryProvider =
     Provider<BackupRepository>((ref) {

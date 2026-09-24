@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/l10n.dart';
 import 'card_backgrounds.dart';
 import 'progress_card_palette.dart';
 
@@ -37,13 +38,13 @@ class BackgroundPicker extends StatelessWidget {
         children: <Widget>[
           for (var index = 0; index < options.length; index++)
             _Swatch(
-              label: options[index].label,
+              label: options[index].kind.label(context.l10n),
               palette: options[index].palette,
               selected: selectedIndex == index,
               onTap: () => onSelected(index),
             ),
           _Swatch(
-            label: 'Ma couleur',
+            label: context.l10n.myColor,
             palette: custom,
             selected: selectedIndex == null,
             onTap: onCustom,
@@ -187,7 +188,7 @@ class _CustomBackgroundSheetState extends State<_CustomBackgroundSheet> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             Text(
-              'Mon dégradé',
+              context.l10n.myGradient,
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 12),
@@ -203,7 +204,7 @@ class _CustomBackgroundSheetState extends State<_CustomBackgroundSheet> {
               ),
               alignment: Alignment.center,
               child: Text(
-                'Aperçu du texte',
+                context.l10n.textPreview,
                 style: TextStyle(
                   color: palette.foreground,
                   fontWeight: FontWeight.w600,
@@ -212,9 +213,15 @@ class _CustomBackgroundSheetState extends State<_CustomBackgroundSheet> {
             ),
             const SizedBox(height: 16),
             SegmentedButton<bool>(
-              segments: const <ButtonSegment<bool>>[
-                ButtonSegment<bool>(value: true, label: Text('Haut')),
-                ButtonSegment<bool>(value: false, label: Text('Bas')),
+              segments: <ButtonSegment<bool>>[
+                ButtonSegment<bool>(
+                  value: true,
+                  label: Text(context.l10n.gradientTop),
+                ),
+                ButtonSegment<bool>(
+                  value: false,
+                  label: Text(context.l10n.gradientBottom),
+                ),
               ],
               selected: <bool>{_editingTop},
               showSelectedIcon: false,
@@ -228,7 +235,7 @@ class _CustomBackgroundSheetState extends State<_CustomBackgroundSheet> {
                   setState(() => _edited = _edited.withHue(hue)),
             ),
             _LabelledSlider(
-              label: 'Intensité',
+              label: context.l10n.intensity,
               value: _edited.saturation,
               gradient: <Color>[
                 HSVColor.fromAHSV(1, _edited.hue, 0, _edited.value).toColor(),
@@ -239,7 +246,7 @@ class _CustomBackgroundSheetState extends State<_CustomBackgroundSheet> {
               ),
             ),
             _LabelledSlider(
-              label: 'Clarté',
+              label: context.l10n.lightness,
               value: _edited.value,
               gradient: <Color>[
                 Colors.black,
@@ -255,14 +262,14 @@ class _CustomBackgroundSheetState extends State<_CustomBackgroundSheet> {
                 Expanded(
                   child: TextButton(
                     onPressed: () => Navigator.of(context).pop(),
-                    child: const Text('Annuler'),
+                    child: Text(context.l10n.cancel),
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: FilledButton(
                     onPressed: () => Navigator.of(context).pop(_palette),
-                    child: const Text('Appliquer'),
+                    child: Text(context.l10n.apply),
                   ),
                 ),
               ],
@@ -284,7 +291,7 @@ class _HueSlider extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _LabelledSlider(
-      label: 'Teinte',
+      label: context.l10n.hue,
       value: value / 360,
       gradient: <Color>[
         for (var hue = 0; hue <= 360; hue += 60)
@@ -339,7 +346,7 @@ class _LabelledSlider extends StatelessWidget {
                 value: value.clamp(0.0, 1.0),
                 onChanged: onChanged,
                 semanticFormatterCallback: (value) =>
-                    '$label ${(value * 100).round()} %',
+                    context.l10n.sliderValue(label, (value * 100).round()),
               ),
             ),
           ],

@@ -1,0 +1,426 @@
+{
+  "@@locale": "fr",
+  "appTitle": "Mon marque-page",
+  "cancel": "Annuler",
+  "save": "Enregistrer",
+  "add": "Ajouter",
+  "delete": "Supprimer",
+  "confirm": "Valider",
+  "apply": "Appliquer",
+  "retry": "Réessayer",
+  "clear": "Effacer",
+  "share": "Partager",
+  "unknownAuthor": "Auteur inconnu",
+  "errorTitle": "Ça n'a pas marché",
+  "navLibrary": "Bibliothèque",
+  "navSearch": "Chercher",
+  "navSettings": "Réglages",
+  "percent": "{percent} %",
+  "@percent": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "pageCount": "{count, plural, =1{1 page} other{{count} pages}}",
+  "@pageCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "pageCountUnknown": "Nombre de pages inconnu",
+  "shelfToRead": "À lire",
+  "shelfReading": "En cours",
+  "shelfRead": "Lu",
+  "shelfAdded": "Ajouté à « {shelf} »",
+  "@shelfAdded": {
+    "placeholders": {
+      "shelf": {
+        "type": "String"
+      }
+    }
+  },
+  "currentShelf": "Étagère actuelle",
+  "progressPageUnknownTotal": "Page {page} · nombre de pages inconnu",
+  "@progressPageUnknownTotal": {
+    "placeholders": {
+      "page": {
+        "type": "int"
+      }
+    }
+  },
+  "progressPageOf": "Page {page} sur {total} · {percent} %",
+  "@progressPageOf": {
+    "placeholders": {
+      "page": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      },
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "notRatedYet": "Pas encore noté",
+  "ratedOutOf": "Noté {rating} sur {max}",
+  "@ratedOutOf": {
+    "placeholders": {
+      "rating": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "starCount": "{count, plural, =1{1 étoile} other{{count} étoiles}}",
+  "@starCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "libraryTitle": "Ma bibliothèque",
+  "addBookManually": "Saisir un livre",
+  "addBookManuallyTooltip": "Ajouter un livre que la recherche ne trouve pas",
+  "filterAll": "Toutes",
+  "sortTooltip": "Trier",
+  "sortTitle": "Titre",
+  "sortAuthor": "Auteur",
+  "sortAddedAt": "Date d'ajout",
+  "sortRating": "Note",
+  "readNotRated": "Lu · pas encore noté",
+  "toReadWithPages": "{count, plural, =1{À lire · 1 page} other{À lire · {count} pages}}",
+  "@toReadWithPages": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "emptyShelfTitle": "Rien dans « {shelf} »",
+  "@emptyShelfTitle": {
+    "placeholders": {
+      "shelf": {
+        "type": "String"
+      }
+    }
+  },
+  "emptyShelfMessage": "Aucun livre sur cette étagère pour le moment.",
+  "emptyLibraryTitle": "Votre bibliothèque est vide",
+  "emptyLibraryMessage": "Cherchez un livre pour commencer à suivre vos lectures.",
+  "searchABook": "Chercher un livre",
+  "searchHint": "Titre ou auteur",
+  "searchPromptTitle": "Cherchez un livre",
+  "searchPromptMessage": "Tapez un titre ou un nom d'auteur.",
+  "searchMinChars": "Encore {count} caractères minimum.",
+  "@searchMinChars": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noResultsTitle": "Aucun résultat",
+  "noResultsMessage": "Ni Open Library ni Apple Books ne connaissent ce titre. Vérifiez l'orthographe, ou saisissez le livre vous-même.",
+  "addBookByHand": "Saisir le livre à la main",
+  "alreadyInLibrary": "Déjà dans votre bibliothèque",
+  "bookDeletedTitle": "Livre supprimé",
+  "bookDeletedMessage": "Ce livre n'est plus dans votre bibliothèque.",
+  "actionsTooltip": "Actions",
+  "shareProgress": "Partager ma progression",
+  "editBookDetails": "Corriger les informations",
+  "startReread": "Commencer une relecture",
+  "removeFromLibrary": "Supprimer de ma bibliothèque",
+  "rereadStarted": "Relecture commencée. La lecture précédente reste dans l'historique.",
+  "deleteBookTitle": "Supprimer ce livre ?",
+  "deleteBookMessage": "« {title} » sera retiré de votre bibliothèque, avec sa note, son avis et tout son historique de lecture. C'est définitif.",
+  "@deleteBookMessage": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "enteredManually": "Saisi à la main",
+  "readingDates": "Dates de lecture",
+  "startedOn": "Commencé le",
+  "finishedOn": "Terminé le",
+  "readingStart": "Début de lecture",
+  "readingEnd": "Fin de lecture",
+  "endBeforeStart": "La date de fin ne peut pas précéder la date de début.",
+  "dateNotSet": "Pas renseignée",
+  "clearDate": "Effacer la date",
+  "longDate": "{date}",
+  "@longDate": {
+    "placeholders": {
+      "date": {
+        "type": "DateTime",
+        "format": "yMMMMd"
+      }
+    }
+  },
+  "historyFrom": "du {date}",
+  "@historyFrom": {
+    "placeholders": {
+      "date": {
+        "type": "DateTime",
+        "format": "yMd"
+      }
+    }
+  },
+  "historyTo": "au {date}",
+  "@historyTo": {
+    "placeholders": {
+      "date": {
+        "type": "DateTime",
+        "format": "yMd"
+      }
+    }
+  },
+  "datesNotSet": "Dates non renseignées",
+  "previousReadings": "Lectures précédentes ({count})",
+  "@previousReadings": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "summary": "Résumé",
+  "noSummaryManual": "Aucun résumé saisi. Vous pouvez en ajouter un en corrigeant les informations du livre.",
+  "noSummaryOnline": "Open Library ne fournit pas de résumé pour ce livre.",
+  "showLess": "Replier",
+  "readMore": "Tout lire",
+  "progressTitle": "Progression",
+  "currentPage": "Page en cours",
+  "ofPages": "sur {count}",
+  "@ofPages": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "lastPage": "Dernière page",
+  "pageClamped": "Ce livre fait {count} pages : la progression a été enregistrée à la page {page}.",
+  "@pageClamped": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "page": {
+        "type": "int"
+      }
+    }
+  },
+  "ratingAndReview": "Ma note et mon avis",
+  "myReview": "Mon avis",
+  "reviewHint": "Ce que vous en avez pensé, pour vous en souvenir.",
+  "saveReview": "Enregistrer l'avis",
+  "reviewSaved": "Avis enregistré",
+  "appearance": "Apparence",
+  "themeSystem": "Comme le système",
+  "themeLight": "Clair",
+  "themeDark": "Sombre",
+  "language": "Langue",
+  "languageSystem": "Langue du téléphone",
+  "languageFrench": "Français",
+  "languageEnglish": "English",
+  "myData": "Mes données",
+  "dataExplanation": "Tout est enregistré sur ce téléphone, sans compte ni serveur. L'export est le seul moyen de garder une copie de votre bibliothèque ou de la transférer sur un autre appareil.",
+  "exportLibrary": "Exporter ma bibliothèque",
+  "exportSubtitle": "Enregistre un fichier JSON",
+  "importBackup": "Importer une sauvegarde",
+  "importSubtitle": "Depuis un fichier JSON",
+  "exportedTo": "Bibliothèque exportée dans {name}",
+  "@exportedTo": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "importTitle": "Importer cette sauvegarde ?",
+  "importFileDated": "Fichier du {date} :",
+  "@importFileDated": {
+    "placeholders": {
+      "date": {
+        "type": "DateTime",
+        "format": "yMMMMd"
+      }
+    }
+  },
+  "importBookCount": "{count, plural, =0{aucun livre} =1{1 livre} other{{count} livres}}",
+  "@importBookCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "importReadingCount": "{count, plural, =0{aucune lecture} =1{1 lecture} other{{count} lectures}}",
+  "@importReadingCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "importAlreadyPresent": "{present, plural, =0{Aucun de ces livres n'est déjà dans votre bibliothèque} =1{1 de ces livres est déjà dans votre bibliothèque} other{{present} de ces livres sont déjà dans votre bibliothèque}}, qui en compte {library}.",
+  "@importAlreadyPresent": {
+    "placeholders": {
+      "present": {
+        "type": "int"
+      },
+      "library": {
+        "type": "int"
+      }
+    }
+  },
+  "importChoice": "{missing, plural, =0{Fusionner n'ajoute aucun livre} =1{Fusionner ajoute le livre absent} other{Fusionner ajoute les {missing} livres absents}} et ne touche à rien d'autre. Remplacer efface toute votre bibliothèque actuelle.",
+  "@importChoice": {
+    "placeholders": {
+      "missing": {
+        "type": "int"
+      }
+    }
+  },
+  "replaceAll": "Remplacer tout",
+  "merge": "Fusionner",
+  "libraryReplaced": "Bibliothèque remplacée",
+  "backupMerged": "Sauvegarde fusionnée",
+  "booksImported": "{count, plural, =0{aucun livre importé} =1{1 livre importé} other{{count} livres importés}}",
+  "@booksImported": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "booksSkipped": "{count, plural, =1{1 déjà présent} other{{count} déjà présents}}",
+  "@booksSkipped": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "addBookTitle": "Ajouter un livre",
+  "titleRequiredLabel": "Titre *",
+  "requiredHint": "Obligatoire",
+  "titleRequired": "Le titre est obligatoire.",
+  "authorLabel": "Auteur",
+  "pageCountLabel": "Nombre de pages",
+  "pageCountHelper": "Laissez vide si vous ne le connaissez pas.",
+  "yearLabel": "Année de parution",
+  "shelfLabel": "Étagère",
+  "pageCountInvalid": "Indiquez un nombre de pages supérieur à zéro.",
+  "yearInvalid": "Indiquez une année entre 1 et {max}.",
+  "@yearInvalid": {
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "detailsUpdated": "Informations mises à jour",
+  "bookGone": "Ce livre n'existe plus.",
+  "searchOnline": "Chercher en ligne",
+  "fromGallery": "Depuis la galerie",
+  "removeCover": "Retirer la couverture",
+  "searchCover": "Chercher une couverture",
+  "searchFailed": "La recherche a échoué.",
+  "noCoverFound": "Aucune couverture trouvée. Essayez un autre titre.",
+  "myColor": "Ma couleur",
+  "myGradient": "Mon dégradé",
+  "textPreview": "Aperçu du texte",
+  "gradientTop": "Haut",
+  "gradientBottom": "Bas",
+  "intensity": "Intensité",
+  "lightness": "Clarté",
+  "hue": "Teinte",
+  "sliderValue": "{label} {value} %",
+  "@sliderValue": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      },
+      "value": {
+        "type": "int"
+      }
+    }
+  },
+  "backgroundAuto": "Automatique",
+  "backgroundDark": "Sombre",
+  "backgroundLight": "Clair",
+  "backgroundVivid": "Vif",
+  "backgroundNight": "Nuit",
+  "backgroundPaper": "Papier",
+  "formatCompact": "Bloc",
+  "formatStory": "Moyen",
+  "cardKickerReading": "EN COURS DE LECTURE",
+  "cardKickerRead": "LECTURE TERMINÉE",
+  "cardKickerToRead": "DANS MA PILE",
+  "cardPage": "page {page}",
+  "@cardPage": {
+    "placeholders": {
+      "page": {
+        "type": "int"
+      }
+    }
+  },
+  "cardPageUnknown": "nombre de pages inconnu",
+  "cardPageOf": "page {page} sur {total}",
+  "@cardPageOf": {
+    "placeholders": {
+      "page": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "storyTooltip": "Partager en story Instagram",
+  "story": "Story",
+  "preparing": "Préparation…",
+  "saveToGallery": "Enregistrer dans la galerie",
+  "imageSaved": "Image enregistrée dans la galerie.",
+  "imageNotReady": "Impossible de préparer l'image.",
+  "welcomeTitle": "Bienvenue",
+  "welcomeChooseLanguage": "Choisissez votre langue",
+  "welcomeHint": "Vous pourrez la changer à tout moment dans les réglages.",
+  "continueButton": "Continuer",
+  "errorNetwork": "Pas de connexion. Vérifiez votre réseau et réessayez.",
+  "errorTimeout": "La recherche met trop de temps à répondre.",
+  "errorServer": "Le service de livres a renvoyé une erreur. Réessayez plus tard.",
+  "errorMalformedResponse": "Réponse illisible du service de livres.",
+  "errorCancelled": "Requête annulée.",
+  "errorDuplicateBook": "Ce livre est déjà dans votre bibliothèque.",
+  "errorSaveFailed": "Enregistrement impossible. Vérifiez la saisie.",
+  "errorBookReadFailed": "Lecture du livre impossible.",
+  "errorLibraryReadFailed": "Lecture de la bibliothèque impossible.",
+  "errorMalformedBackup": "Ce fichier n'est pas une sauvegarde valide.",
+  "errorBackupUntitledBook": "Ce fichier contient un livre sans titre.",
+  "errorBackupUnknownShelf": "Ce fichier contient une étagère inconnue.",
+  "errorBackupNotText": "Ce fichier n'est pas du texte lisible.",
+  "errorBackupTooRecent": "Cette sauvegarde vient d'une version plus récente de l'application. Mettez-la à jour pour la lire.",
+  "errorFileAccess": "Impossible d'accéder au fichier choisi.",
+  "errorFileRead": "Lecture du fichier impossible.",
+  "errorExportLocation": "Enregistrement impossible à cet emplacement.",
+  "errorImageRead": "Lecture de l'image impossible.",
+  "errorImageCopy": "Copie de l'image impossible.",
+  "errorImagePrepare": "Impossible de préparer l'image à partager.",
+  "errorShareFailed": "Le partage a échoué.",
+  "errorInstagramFailed": "Instagram n'a pas pu être ouvert.",
+  "errorPhotoAccess": "Autorisez l'accès aux photos pour enregistrer l'image.",
+  "errorNotEnoughSpace": "Plus assez de place sur le téléphone.",
+  "errorImageSaveFailed": "L'image n'a pas pu être enregistrée."
+}

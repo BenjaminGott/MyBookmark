@@ -7,6 +7,7 @@ import '../../domain/models/library_item.dart';
 import '../../domain/models/library_query.dart';
 import '../../domain/models/shelf.dart';
 import '../book_form/book_form_screen.dart';
+import '../l10n/l10n.dart';
 import '../shelf_labels.dart';
 import '../widgets/book_cover.dart';
 import '../widgets/progress_bar.dart';
@@ -47,7 +48,7 @@ class LibraryScreen extends ConsumerWidget {
               ),
             ),
             const SizedBox(width: 12),
-            const Flexible(child: Text('Ma bibliothèque')),
+            Flexible(child: Text(context.l10n.libraryTitle)),
           ],
         ),
         actions: <Widget>[_SortButton(query: query)],
@@ -56,8 +57,8 @@ class LibraryScreen extends ConsumerWidget {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => openManualBookForm(context),
         icon: const Icon(Icons.edit_outlined),
-        label: const Text('Saisir un livre'),
-        tooltip: 'Ajouter un livre qu\'Open Library ne connaît pas',
+        label: Text(context.l10n.addBookManually),
+        tooltip: context.l10n.addBookManuallyTooltip,
       ),
       body: library.when(
         // Un changement de filtre garde la liste à l'écran le temps de la
@@ -67,7 +68,7 @@ class LibraryScreen extends ConsumerWidget {
         error: (error, _) => ErrorView(
           error: error is AppException
               ? error
-              : const StorageException('Lecture de la bibliothèque impossible.'),
+              : const StorageException(AppErrorReason.libraryReadFailed),
         ),
         data: (items) => items.isEmpty
             ? _EmptyLibrary(query: query, onOpenSearch: onOpenSearch)
@@ -101,7 +102,7 @@ class _ShelfFilterBar extends ConsumerWidget implements PreferredSizeWidget {
               // Le fond jaune dit la sélection ; une coche viendrait
               // recouvrir l'icône des étagères.
               showCheckmark: false,
-              label: const Text('Toutes'),
+              label: Text(context.l10n.filterAll),
               selected: query.shelf == null,
               onSelected: (_) => controller.filterByShelf(null),
             ),
@@ -112,7 +113,7 @@ class _ShelfFilterBar extends ConsumerWidget implements PreferredSizeWidget {
               child: FilterChip(
                 showCheckmark: false,
                 avatar: Icon(shelf.icon, size: 18),
-                label: Text(shelf.label),
+                label: Text(shelf.label(context.l10n)),
                 selected: query.shelf == shelf,
                 onSelected: (selected) =>
                     controller.filterByShelf(selected ? shelf : null),
@@ -133,7 +134,7 @@ class _SortButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return PopupMenuButton<LibrarySort>(
       icon: const Icon(Icons.sort),
-      tooltip: 'Trier',
+      tooltip: context.l10n.sortTooltip,
       onSelected: ref.read(libraryQueryProvider.notifier).sortBy,
       itemBuilder: (context) => <PopupMenuEntry<LibrarySort>>[
         for (final sort in LibrarySort.values)
@@ -141,7 +142,7 @@ class _SortButton extends ConsumerWidget {
             value: sort,
             child: Row(
               children: <Widget>[
-                Expanded(child: Text(sort.label)),
+                Expanded(child: Text(sort.label(context.l10n))),
                 if (query.sort == sort)
                   Icon(
                     query.descending
@@ -198,7 +199,7 @@ class _LibraryTile extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Text(
-            book.author ?? 'Auteur inconnu',
+            book.author ?? context.l10n.unknownAuthor,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: theme.textTheme.bodySmall,
@@ -211,12 +212,15 @@ class _LibraryTile extends StatelessWidget {
                 compact: true,
               ),
             Shelf.read => item.rating == null
-                ? Text('Lu · pas encore noté', style: theme.textTheme.labelSmall)
+                ? Text(
+                    context.l10n.readNotRated,
+                    style: theme.textTheme.labelSmall,
+                  )
                 : StarRating(rating: item.rating, size: 16),
             Shelf.toRead => Text(
                 book.hasKnownPageCount
-                    ? 'À lire · ${book.pageCount} pages'
-                    : 'À lire',
+                    ? context.l10n.toReadWithPages(book.pageCount!)
+                    : context.l10n.shelfToRead,
                 style: theme.textTheme.labelSmall,
               ),
           },
@@ -242,21 +246,21 @@ class _EmptyLibrary extends StatelessWidget {
     if (shelf != null) {
       return EmptyState(
         icon: shelf.icon,
-        title: 'Rien dans « ${shelf.label} »',
-        message: 'Aucun livre sur cette étagère pour le moment.',
+        title: context.l10n.emptyShelfTitle(shelf.label(context.l10n)),
+        message: context.l10n.emptyShelfMessage,
       );
     }
 
     return EmptyState(
       icon: Icons.library_books_outlined,
-      title: 'Votre bibliothèque est vide',
-      message: 'Cherchez un livre pour commencer à suivre vos lectures.',
+      title: context.l10n.emptyLibraryTitle,
+      message: context.l10n.emptyLibraryMessage,
       action: onOpenSearch == null
           ? null
           : FilledButton.icon(
               onPressed: onOpenSearch,
               icon: const Icon(Icons.search),
-              label: const Text('Chercher un livre'),
+              label: Text(context.l10n.searchABook),
             ),
     );
   }

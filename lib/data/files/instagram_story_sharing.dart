@@ -15,7 +15,7 @@ class InstagramStorySharing implements StorySharing {
   const InstagramStorySharing();
 
   static const MethodChannel _channel = MethodChannel(
-    'com.benjamin.biblivre/instagram_story',
+    'com.libergot.mybookmark/instagram_story',
   );
 
   @override
@@ -46,11 +46,11 @@ class InstagramStorySharing implements StorySharing {
       await file.writeAsBytes(bytes, flush: true);
     } on FileSystemException {
       throw const FileAccessException(
-        'Impossible de préparer l\'image à partager.',
+        AppErrorReason.imagePrepare,
       );
     } on MissingPlatformDirectoryException {
       throw const FileAccessException(
-        'Impossible de préparer l\'image à partager.',
+        AppErrorReason.imagePrepare,
       );
     }
 
@@ -62,9 +62,9 @@ class InstagramStorySharing implements StorySharing {
         'bottomColor': _hex(bottomColor),
       });
     } on PlatformException {
-      throw const FileAccessException('Instagram n\'a pas pu être ouvert.');
+      throw const FileAccessException(AppErrorReason.instagramFailed);
     } on MissingPluginException {
-      throw const FileAccessException('Instagram n\'a pas pu être ouvert.');
+      throw const FileAccessException(AppErrorReason.instagramFailed);
     }
   }
 

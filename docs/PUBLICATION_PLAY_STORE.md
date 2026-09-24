@@ -1,4 +1,4 @@
-# Publier Biblivre sur le Play Store
+# Publier MyBookmark (Mon marque-page) sur le Play Store
 
 Tout ce qu'il faut faire, dans l'ordre, pour passer des releases GitHub à une
 publication sur Google Play. Les cases déjà faites sont cochées.
@@ -11,8 +11,13 @@ vigueur, c'est elle qui fait foi.
 
 ## 1. Déjà en place dans le projet
 
-- [x] **Identifiant de l'application** : `com.benjamin.biblivre`. Définitif
-      une fois publié, il ne pourra plus jamais changer.
+- [x] **Identifiant de l'application** : `com.libergot.mybookmark`. C'est le
+      « nom du package » demandé par la Play Console. Définitif une fois
+      publié, il ne pourra plus jamais changer. (Les releases GitHub jusqu'à
+      la v1.2.2 portaient `com.benjamin.biblivre` : ce sont pour Android une
+      autre application, qui ne se met pas à jour vers celle-ci.)
+- [x] **Nom de l'application** : « MyBookmark » en anglais, « Mon
+      marque-page » en français ; l'interface existe dans les deux langues.
 - [x] **Clé de release** commune à toutes les machines, dans les secrets GitHub
       (`ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`,
       `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD`). Le fichier `.p12` et son mot
@@ -20,15 +25,14 @@ vigueur, c'est elle qui fait foi.
 - [x] **Icône** de l'application (adaptative, thématique Android 13, et
       classique), générée par `tool/generate_icons.py`.
 - [x] **Icône du Play Store** 512 × 512 : `branding/play-store-icon-512.png`.
-- [x] **AAB** : le workflow « Release APK » produit `biblivre-vX.Y.Z.aab` à côté
+- [x] **AAB** : le workflow « Release APK » produit `mybookmark-vX.Y.Z.aab` à côté
       de l'APK. C'est ce fichier qu'on envoie au Play Store.
 
 ## 2. Avant de commencer
 
-- [ ] **Vérifier le nom.** Un logiciel libre brésilien de gestion de
-      bibliothèque s'appelle déjà « Biblivre ». Chercher sur le Play Store et
-      sur le web ; en cas de doute, choisir un nom de fiche différent (le nom
-      affiché peut différer de l'identifiant `com.benjamin.biblivre`).
+- [ ] **Vérifier le nom.** Chercher « MyBookmark » et « Mon marque-page » sur
+      le Play Store et sur le web, pour éviter une confusion avec une app
+      existante ; le nom de la fiche peut au besoin différer du nom de l'app.
 - [ ] **Préparer 12 testeurs** (amis, famille) avec un compte Google et un
       téléphone Android : ils seront nécessaires à l'étape 6.
 
@@ -84,9 +88,10 @@ inscription (25 $) permet de publier **autant d'applications qu'on veut**.
 
 Une URL publique est obligatoire, même si l'application ne collecte rien.
 
-**En ligne :** <https://benjamingott.github.io/biblivre/confidentialite/>,
+**En ligne :** <https://benjamingott.github.io/mybookmark/confidentialite/>,
 publiée depuis le dépôt public `BenjaminGott/BenjaminGott.github.io` (le site
-des applications, avec la page <https://benjamingott.github.io/biblivre/>).
+des applications, avec la page <https://benjamingott.github.io/mybookmark/>).
+Les anciennes adresses `/biblivre/…` y redirigent.
 La mettre à jour si l'app change sa façon de traiter les données. Elle dit, en
 substance :
 
@@ -103,19 +108,25 @@ substance :
 
 La même URL sert à passer l'app Meta (ID `2201363724596999`) en mode **Live**
 sur <https://developers.facebook.com>, ce qui garantit que le partage en story
-fonctionne pour tout le monde.
+fonctionne pour tout le monde. Son nom peut y devenir « MyBookmark » : seul
+l'identifiant compte pour le partage.
 
 ### Fiche du Play Store
 
 | Élément | Format | État |
 | --- | --- | --- |
-| Nom de l'application | 30 caractères max | à écrire |
-| Description courte | 80 caractères max | à écrire |
-| Description complète | 4000 caractères max | à écrire (le README est une bonne base) |
+| Nom de l'application | 30 caractères max | « Mon marque-page » (fr), « MyBookmark » (en) |
+| Description courte | 80 caractères max | à écrire, en français et en anglais |
+| Description complète | 4000 caractères max | à écrire, en français et en anglais (le README est une bonne base) |
 | Icône | PNG 512 × 512 | `branding/play-store-icon-512.png` |
 | Image de présentation | PNG ou JPEG 1024 × 500 | à créer |
 | Captures d'écran téléphone | au moins 2, format 9:16 conseillé | à faire sur le téléphone |
-| E-mail de contact | public | à choisir |
+| E-mail de contact | public | `libergot.pro@gmail.com` |
+
+La fiche se traduit dans la console (*Présence sur le Play Store → Fiche
+principale → Gérer les traductions*) : choisir le français comme langue par
+défaut, puis ajouter l'anglais. Les captures d'écran peuvent aussi être faites
+dans chaque langue (Réglages → Langue).
 
 ### Questionnaires de la console
 
@@ -151,7 +162,7 @@ Ce choix est **définitif** : le faire avant le premier envoi.
 ## 6. Test fermé (obligatoire pour un compte personnel)
 
 1. *Tester → Test fermé → Créer un canal*.
-2. Envoyer l'AAB de la dernière release GitHub (`biblivre-vX.Y.Z.aab`).
+2. Envoyer l'AAB de la dernière release GitHub (`mybookmark-vX.Y.Z.aab`).
 3. Ajouter les adresses des testeurs, leur envoyer le lien d'inscription.
 4. Garder **au moins 12 testeurs inscrits pendant 14 jours d'affilée**.
 5. Corriger ce qui remonte ; chaque nouvel envoi repasse par une release
@@ -168,10 +179,10 @@ Créer une version*, envoyer l'AAB, choisir les pays, publier.
 
 1. Dans `pubspec.yaml`, augmenter `version:`. Le nombre après le `+` doit
    **toujours augmenter** (le Play Store refuse un numéro déjà utilisé) :
-   `1.1.0+2` → `1.2.0+3`.
+   `1.3.0+6` → `1.4.0+7`.
 2. Merger dans `main`, puis lancer *Actions → Release APK* avec le tag
-   `v1.2.0`.
-3. Télécharger `biblivre-v1.2.0.aab` depuis la release et l'envoyer dans la
+   `v1.4.0`.
+3. Télécharger `mybookmark-v1.4.0.aab` depuis la release et l'envoyer dans la
    console (test fermé ou production).
 
 ### Plus tard : envoi automatique

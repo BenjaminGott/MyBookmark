@@ -1,9 +1,14 @@
-# Biblivre
+# MyBookmark — Mon marque-page
 
-Suivi de lecture personnel pour Android. Tout reste sur le téléphone : pas de
-compte, pas de serveur, pas de synchronisation. Les métadonnées des livres
-viennent de l'API publique Open Library et sont recopiées en base au moment de
+Suivi de lecture personnel pour Android, publié par libergot sous le nom
+**MyBookmark** en anglais et **Mon marque-page** en français (identifiant
+`com.libergot.mybookmark`). Tout reste sur le téléphone : pas de compte, pas de
+serveur, pas de synchronisation. Les métadonnées des livres viennent des API
+publiques Open Library et Apple Books et sont recopiées en base au moment de
 l'ajout — passé ce point, l'application fonctionne entièrement hors ligne.
+
+Le dépôt et le paquet Dart s'appellent encore `biblivre`, l'ancien nom de
+l'application : c'est interne et invisible pour les utilisateurs.
 
 ## Fonctionnalités
 
@@ -22,9 +27,27 @@ l'ajout — passé ce point, l'application fonctionne entièrement hors ligne.
    de la couverture, avec variantes claire, sombre et vive, et composition
    manuelle du dégradé ; envoi direct en story Instagram, le bloc posé en
    sticker sur son dégradé pour garder ses coins arrondis transparents ;
-   enregistrement de la carte dans la galerie, album « Biblivre »
+   enregistrement de la carte dans la galerie, album « MyBookmark »
+9. Interface en français et en anglais : la langue se choisit au premier
+   lancement (celle du téléphone est proposée d'office), puis dans les
+   réglages
 
-Thèmes clair et sombre, interface intégralement en français.
+Thèmes clair et sombre.
+
+## Traductions
+
+Les textes de l'interface sont dans `lib/l10n/app_fr.arb` (la référence) et
+`lib/l10n/app_en.arb`. Pour ajouter ou modifier un texte : l'écrire dans les
+deux fichiers, puis `flutter gen-l10n` (ou simplement `flutter pub get`)
+régénère `AppLocalizations`. Un test vérifie que les deux fichiers ont les
+mêmes clés.
+
+Les couches `data/` et `domain/` ne produisent jamais de texte affiché : une
+erreur porte une raison (`AppErrorReason`), que l'interface traduit dans
+`ui/l10n/error_text.dart`.
+
+Le nom sous l'icône suit la langue du téléphone :
+`android/app/src/main/res/values/strings.xml` (anglais) et `values-fr/`.
 
 ## Stack
 
@@ -45,10 +68,12 @@ Thèmes clair et sombre, interface intégralement en français.
 
 ```
 lib/
-├─ core/      transverse : thème, erreurs nommées, formats, annulation
+├─ core/      transverse : thème, erreurs nommées, annulation
 ├─ domain/    modèles purs, interfaces de dépôts, logique métier
 │             (aucun import de drift, http ou Flutter)
-├─ data/      drift (tables, DAO), client Open Library, préférences, fichiers
+├─ data/      drift (tables, DAO), clients Open Library et Apple Books,
+│             préférences, fichiers
+├─ l10n/      textes de l'interface (ARB) et code généré
 └─ ui/        écrans, widgets, contrôleurs riverpod
 ```
 
@@ -74,7 +99,7 @@ préférences), citations, recherche locale en FTS5, scan ISBN.
 flutter pub get                      # dépendances
 dart run build_runner build          # régénère le code drift
 flutter analyze                      # doit rester sans avertissement
-flutter test                         # 166 tests
+flutter test                         # toute la suite
 ```
 
 ## Produire l'APK

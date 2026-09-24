@@ -30,7 +30,8 @@ class JsonHttp {
       final request = http.Request('GET', uri)
         ..headers['Accept'] = 'application/json'
         // Open Library demande poliment d'identifier les clients.
-        ..headers['User-Agent'] = 'Biblivre/1.0 (application de lecture locale)';
+        ..headers['User-Agent'] =
+            'MyBookmark/1.0 (application de lecture locale)';
 
       response = await _withCancellation(
         _client.send(request).timeout(_timeout),

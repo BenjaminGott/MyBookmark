@@ -15,7 +15,7 @@ param(
 $ErrorActionPreference = 'Stop'
 $sdk = if ($env:ANDROID_HOME) { $env:ANDROID_HOME } else { "$env:LOCALAPPDATA\Android\sdk" }
 $adbExe = "$sdk\platform-tools\adb.exe"
-$package = 'com.benjamin.biblivre'
+$package = 'com.libergot.mybookmark'
 $root = Split-Path $PSScriptRoot -Parent
 
 # 1. Compile la version actuelle du code.

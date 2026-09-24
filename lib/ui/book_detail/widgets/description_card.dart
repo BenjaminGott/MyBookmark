@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../domain/models/book.dart';
+import '../../l10n/l10n.dart';
 import 'section_card.dart';
 
 /// Le résumé du livre, recopié en base à l'ajout.
@@ -28,12 +29,11 @@ class _DescriptionCardState extends State<DescriptionCard> {
 
     if (description == null || description.isEmpty) {
       return SectionCard(
-        title: 'Résumé',
+        title: context.l10n.summary,
         child: Text(
           widget.book.isManual
-              ? 'Aucun résumé saisi. Vous pouvez en ajouter un en corrigeant '
-                  'les informations du livre.'
-              : 'Open Library ne fournit pas de résumé pour ce livre.',
+              ? context.l10n.noSummaryManual
+              : context.l10n.noSummaryOnline,
           style: theme.textTheme.bodyMedium
               ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
         ),
@@ -41,7 +41,7 @@ class _DescriptionCardState extends State<DescriptionCard> {
     }
 
     return SectionCard(
-      title: 'Résumé',
+      title: context.l10n.summary,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
@@ -56,7 +56,9 @@ class _DescriptionCardState extends State<DescriptionCard> {
             alignment: Alignment.centerLeft,
             child: TextButton(
               onPressed: () => setState(() => _expanded = !_expanded),
-              child: Text(_expanded ? 'Replier' : 'Tout lire'),
+              child: Text(
+                _expanded ? context.l10n.showLess : context.l10n.readMore,
+              ),
             ),
           ),
         ],

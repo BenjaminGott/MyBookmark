@@ -5,6 +5,7 @@ import 'package:biblivre/domain/models/book.dart';
 import 'package:biblivre/domain/models/library_item.dart';
 import 'package:biblivre/domain/models/reading_entry.dart';
 import 'package:biblivre/domain/models/shelf.dart';
+import 'package:biblivre/l10n/app_localizations.dart';
 import 'package:biblivre/ui/share/card_backgrounds.dart';
 import 'package:biblivre/ui/share/progress_card_palette.dart';
 import 'package:biblivre/ui/share/progress_share_card.dart';
@@ -195,6 +196,9 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
+          locale: const Locale('fr'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           home: SizedBox.expand(
             child: ProgressShareCard(
               item: item,
@@ -528,7 +532,9 @@ void main() {
     });
 
     test('propose deux formats, du plus petit au plus grand', () {
-      expect(ShareCardFormat.values.map((format) => format.label), <String>[
+      expect(ShareCardFormat.values.map(
+          (format) => format.label(lookupAppLocalizations(const Locale('fr'))),
+        ), <String>[
         'Bloc',
         'Moyen',
       ]);

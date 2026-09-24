@@ -1,4 +1,5 @@
 import 'package:biblivre/data/prefs/preferences_service.dart';
+import 'package:biblivre/domain/models/app_language.dart';
 import 'package:biblivre/domain/models/app_theme_mode.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -15,6 +16,20 @@ void main() {
       expect(AppThemeMode.fromWire(null), AppThemeMode.system);
       expect(AppThemeMode.fromWire(''), AppThemeMode.system);
       expect(AppThemeMode.fromWire('sépia'), AppThemeMode.system);
+    });
+  });
+
+  group('AppLanguage', () {
+    test('relit la langue stockée', () {
+      expect(AppLanguage.fromWire('fr'), AppLanguage.french);
+      expect(AppLanguage.fromWire('en'), AppLanguage.english);
+      expect(AppLanguage.fromWire('system'), AppLanguage.system);
+    });
+
+    test('ne choisit rien tant que la langue n\'a pas été choisie', () {
+      // `null` déclenche l'écran d'accueil du premier lancement.
+      expect(AppLanguage.fromWire(null), isNull);
+      expect(AppLanguage.fromWire('klingon'), isNull);
     });
   });
 

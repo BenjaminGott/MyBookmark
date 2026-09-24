@@ -8,6 +8,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/failure.dart';
 import '../../domain/models/library_item.dart';
+import '../l10n/error_text.dart';
+import '../l10n/l10n.dart';
 import '../providers/share_providers.dart';
 import 'background_picker.dart';
 import 'card_backgrounds.dart';
@@ -127,7 +129,7 @@ class _ShareProgressScreenState extends ConsumerState<ShareProgressScreen> {
     final palette = _palette;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Partager ma progression')),
+      appBar: AppBar(title: Text(context.l10n.shareProgress)),
       body: palette == null
           ? const Center(child: CircularProgressIndicator())
           : Column(
@@ -159,7 +161,7 @@ class _ShareProgressScreenState extends ConsumerState<ShareProgressScreen> {
                       for (final format in ShareCardFormat.values)
                         ButtonSegment<ShareCardFormat>(
                           value: format,
-                          label: Text(format.label),
+                          label: Text(format.label(context.l10n)),
                         ),
                     ],
                     selected: <ShareCardFormat>{_format},
@@ -185,11 +187,11 @@ class _ShareProgressScreenState extends ConsumerState<ShareProgressScreen> {
                           // une ligne, même sur un téléphone étroit.
                           Expanded(
                             child: Tooltip(
-                              message: 'Partager en story Instagram',
+                              message: context.l10n.storyTooltip,
                               child: OutlinedButton.icon(
                                 onPressed: _sharing ? null : _shareToStory,
                                 icon: const Icon(Icons.add_circle_outline),
-                                label: const Text('Story'),
+                                label: Text(context.l10n.story),
                               ),
                             ),
                           ),
@@ -200,7 +202,9 @@ class _ShareProgressScreenState extends ConsumerState<ShareProgressScreen> {
                             onPressed: _sharing ? null : _share,
                             icon: const Icon(Icons.share_outlined),
                             label: Text(
-                              _sharing ? 'Préparation…' : 'Partager',
+                              _sharing
+                                  ? context.l10n.preparing
+                                  : context.l10n.share,
                             ),
                           ),
                         ),
@@ -208,7 +212,7 @@ class _ShareProgressScreenState extends ConsumerState<ShareProgressScreen> {
                         IconButton.outlined(
                           onPressed: _sharing ? null : _save,
                           icon: const Icon(Icons.download_outlined),
-                          tooltip: 'Enregistrer dans la galerie',
+                          tooltip: context.l10n.saveToGallery,
                         ),
                       ],
                     ),
@@ -228,7 +232,7 @@ class _ShareProgressScreenState extends ConsumerState<ShareProgressScreen> {
             ),
       );
 
-  /// Enregistre la carte dans la galerie, dans l'album « Biblivre ».
+  /// Enregistre la carte dans la galerie, dans l'album « MyBookmark ».
   ///
   /// L'horodatage évite qu'une nouvelle carte ne prenne le nom d'une
   /// précédente.
@@ -238,7 +242,7 @@ class _ShareProgressScreenState extends ConsumerState<ShareProgressScreen> {
               bytes: bytes,
               name: '$base-${DateTime.now().millisecondsSinceEpoch}',
             );
-        _tell('Image enregistrée dans la galerie.');
+        _tell((l10n) => l10n.imageSaved);
       });
 
   /// Partage direct en story Instagram.
@@ -266,13 +270,13 @@ class _ShareProgressScreenState extends ConsumerState<ShareProgressScreen> {
     try {
       final bytes = await _capture();
       if (bytes == null) {
-        _tell('Impossible de préparer l\'image.');
+        _tell((l10n) => l10n.imageNotReady);
         return;
       }
 
       await send(bytes);
     } on AppException catch (error) {
-      _tell(error.message);
+      _tell(error.describe);
     } finally {
       if (mounted) {
         setState(() => _sharing = false);
@@ -304,13 +308,15 @@ class _ShareProgressScreenState extends ConsumerState<ShareProgressScreen> {
     return author == null ? book.title : '${book.title} — $author';
   }
 
-  void _tell(String message) {
+  /// Affiche un message, écrit dans la langue de l'interface au moment où il
+  /// s'affiche : après une attente, l'écran a pu disparaître.
+  void _tell(String Function(AppLocalizations l10n) message) {
     if (!mounted) {
       return;
     }
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
-      ..showSnackBar(SnackBar(content: Text(message)));
+      ..showSnackBar(SnackBar(content: Text(message(context.l10n))));
   }
 }
 

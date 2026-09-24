@@ -43,8 +43,6 @@ class BackupFailed extends BackupOutcome {
   const BackupFailed(this.error);
 
   final AppException error;
-
-  String get message => error.message;
 }
 
 /// Export et import, avec un état « occupé » pour bloquer les boutons.

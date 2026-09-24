@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'book_detail/book_detail_screen.dart';
+import 'l10n/l10n.dart';
 import 'library/library_screen.dart';
 import 'search/search_screen.dart';
 import 'settings/settings_screen.dart';
@@ -42,20 +43,20 @@ class _HomeShellState extends State<HomeShell> {
       bottomNavigationBar: NavigationBar(
         selectedIndex: _index,
         onDestinationSelected: (index) => setState(() => _index = index),
-        destinations: const <Widget>[
+        destinations: <Widget>[
           NavigationDestination(
-            icon: Icon(Icons.library_books_outlined),
-            selectedIcon: Icon(Icons.library_books),
-            label: 'Bibliothèque',
+            icon: const Icon(Icons.library_books_outlined),
+            selectedIcon: const Icon(Icons.library_books),
+            label: context.l10n.navLibrary,
           ),
           NavigationDestination(
-            icon: Icon(Icons.search),
-            label: 'Chercher',
+            icon: const Icon(Icons.search),
+            label: context.l10n.navSearch,
           ),
           NavigationDestination(
-            icon: Icon(Icons.settings_outlined),
-            selectedIcon: Icon(Icons.settings),
-            label: 'Réglages',
+            icon: const Icon(Icons.settings_outlined),
+            selectedIcon: const Icon(Icons.settings),
+            label: context.l10n.navSettings,
           ),
         ],
       ),
