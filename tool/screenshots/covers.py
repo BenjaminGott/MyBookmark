@@ -14,8 +14,12 @@ SANS = '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf'
 W, H = 600, 900
 
 BOOKS = {
- 'moby-dick':  ('MOBY-DICK', 'HERMAN MELVILLE', (22, 54, 92), (236, 226, 204), 'waves'),
- 'odyssey':    ('THE\nODYSSEY', 'HOMER', (176, 74, 44), (246, 229, 197), 'sun'),
+ # Mis en avant, dans chaque langue.
+ 'knight-en':  ('THE KNIGHT\nAND THE MOTH', 'RACHEL GILLIG', (28, 30, 46), (214, 196, 148), 'moth'),
+ 'knight-fr':  ('LE CHEVALIER\nET LA PHALÈNE', 'RACHEL GILLIG', (28, 30, 46), (214, 196, 148), 'moth'),
+ 'prince-en':  ('THE LITTLE\nPRINCE', 'ANTOINE DE SAINT-EXUPÉRY', (22, 54, 92), (242, 214, 120), 'planet'),
+ 'prince-fr':  ('LE PETIT\nPRINCE', 'ANTOINE DE SAINT-EXUPÉRY', (22, 54, 92), (242, 214, 120), 'planet'),
+ # Classiques anglais.
  'pride':      ('Pride and\nPrejudice', 'JANE AUSTEN', (231, 214, 196), (94, 52, 70), 'frame'),
  'frankenstein': ('FRANKEN-\nSTEIN', 'MARY SHELLEY', (38, 44, 40), (170, 214, 120), 'bolt'),
  'dracula':    ('DRACULA', 'BRAM STOKER', (110, 18, 30), (240, 222, 210), 'moon'),
@@ -25,6 +29,16 @@ BOOKS = {
  'emma':       ('Emma', 'JANE AUSTEN', (200, 222, 214), (40, 86, 80), 'dots'),
  'persuasion': ('Persuasion', 'JANE AUSTEN', (46, 62, 96), (232, 214, 170), 'waves'),
  'sense':      ('Sense and\nSensibility', 'JANE AUSTEN', (244, 228, 200), (150, 70, 40), 'arch'),
+ # Classiques français.
+ 'miserables': ('LES\nMISÉRABLES', 'VICTOR HUGO', (120, 28, 32), (240, 226, 206), 'bolt'),
+ 'monte-cristo': ('LE COMTE DE\nMONTE-CRISTO', 'ALEXANDRE DUMAS', (18, 40, 60), (226, 196, 120), 'waves'),
+ 'bovary':     ('Madame\nBovary', 'GUSTAVE FLAUBERT', (236, 214, 218), (112, 44, 70), 'frame'),
+ 'vingt-mille': ('VINGT MILLE\nLIEUES SOUS\nLES MERS', 'JULES VERNE', (14, 70, 86), (196, 232, 226), 'dots'),
+ 'mousquetaires': ('LES TROIS\nMOUSQUETAIRES', 'ALEXANDRE DUMAS', (150, 40, 30), (244, 214, 150), 'sun'),
+ 'notre-dame': ('NOTRE-DAME\nDE PARIS', 'VICTOR HUGO', (58, 52, 70), (226, 216, 196), 'arch'),
+ 'contemplations': ('Les\nContemplations', 'VICTOR HUGO', (226, 232, 216), (54, 84, 60), 'dots'),
+ 'quatrevingt': ('QUATRE-\nVINGT-TREIZE', 'VICTOR HUGO', (96, 24, 28), (236, 206, 160), 'deco'),
+ 'homme-rit':  ('L\'HOMME\nQUI RIT', 'VICTOR HUGO', (34, 34, 38), (220, 170, 90), 'moon'),
 }
 
 OUT = Path(__file__).resolve().parents[2] / 'build' / 'screenshots' / 'covers'
@@ -58,6 +72,41 @@ def motif(d, kind, fg, bg):
         for i in range(9):
             d.line((300, 560, i * 75, H), fill=fg, width=3)
         d.ellipse((250, 510, 350, 610), fill=fg)
+    elif kind == 'moth':
+        # Une épée pointe en bas, et une phalène posée dessus, ailes ouvertes.
+        d.polygon([(292, 540), (308, 540), (300, 880)], fill=fg)
+        d.rectangle((296, 450, 304, 540), fill=fg)
+        d.rounded_rectangle((236, 522, 364, 536), radius=7, fill=fg)
+        d.ellipse((288, 438, 312, 462), fill=fg)
+
+        def wing(cx, cy, rx, ry, angle):
+            a = math.radians(angle)
+            pts = []
+            for t in range(0, 360, 6):
+                u = math.radians(t)
+                x, y = rx * math.cos(u), ry * math.sin(u)
+                pts.append((cx + x * math.cos(a) - y * math.sin(a),
+                            cy + x * math.sin(a) + y * math.cos(a)))
+            return pts
+
+        for side in (-1, 1):
+            d.polygon(wing(300 + side * 105, 610, 118, 62, side * -28), fill=fg)
+            d.polygon(wing(300 + side * 72, 690, 72, 42, side * 32), fill=fg)
+            # Un œil sur chaque grande aile.
+            d.ellipse((300 + side * 118 - 18, 596, 300 + side * 118 + 18, 632),
+                      fill=bg)
+            # Antennes.
+            d.line([(300, 600), (300 + side * 22, 560), (300 + side * 40, 548)],
+                   fill=fg, width=4)
+        d.ellipse((286, 590, 314, 730), fill=fg, outline=bg, width=4)
+    elif kind == 'planet':
+        # Une petite planète sous un ciel étoilé.
+        d.ellipse((190, 620, 410, 840), fill=fg)
+        for x, y in [(90, 480), (500, 520), (160, 560), (440, 440), (520, 700),
+                     (70, 700), (360, 500)]:
+            d.ellipse((x - 6, y - 6, x + 6, y + 6), fill=fg)
+        d.line((300, 620, 300, 560), fill=fg, width=5)
+        d.ellipse((288, 540, 312, 564), fill=fg)
     elif kind == 'dots':
         for row in range(5):
             for col in range(6):
@@ -68,8 +117,12 @@ for key, (title, author, bg, fg, kind) in BOOKS.items():
     im = Image.new('RGB', (W, H), bg)
     d = ImageDraw.Draw(im)
     motif(d, kind, fg, bg)
-    size = 72 if len(title.replace('\n', '')) < 12 else 60
-    f = ImageFont.truetype(SERIF_B, size)
+    size = 72
+    while True:
+        f = ImageFont.truetype(SERIF_B, size)
+        if max(d.textlength(line, font=f) for line in title.split('\n')) <= 520:
+            break
+        size -= 2
     y = 150
     for line in title.split('\n'):
         w = d.textlength(line, font=f)
