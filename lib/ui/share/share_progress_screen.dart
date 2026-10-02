@@ -1,3 +1,4 @@
+import 'dart:isolate';
 import 'dart:math' as math;
 import 'dart:typed_data';
 import 'dart:ui' as ui;
@@ -13,6 +14,7 @@ import '../l10n/l10n.dart';
 import '../providers/share_providers.dart';
 import 'background_picker.dart';
 import 'card_backgrounds.dart';
+import 'card_png.dart';
 import 'progress_card_palette.dart';
 import 'progress_share_card.dart';
 
@@ -45,6 +47,7 @@ class _ShareProgressScreenState extends ConsumerState<ShareProgressScreen> {
   ProgressCardPalette? _custom;
 
   ImageProvider? _cover;
+
   /// Le bloc est proposé d'abord : c'est le format le plus souvent utile.
   ShareCardFormat _format = ShareCardFormat.compact;
   bool _sharing = false;
@@ -169,7 +172,7 @@ class _ShareProgressScreenState extends ConsumerState<ShareProgressScreen> {
                     onSelectionChanged: _sharing
                         ? null
                         : (selection) =>
-                            setState(() => _format = selection.first),
+                              setState(() => _format = selection.first),
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -237,25 +240,25 @@ class _ShareProgressScreenState extends ConsumerState<ShareProgressScreen> {
 
   /// Partage par la feuille de partage du système.
   Future<void> _share() => _captureThen(
-        (bytes) => ref.read(imageSharingProvider).sharePng(
-              bytes: bytes,
-              fileName: _format.fileName,
-              text: _shareText(),
-            ),
-      );
+    (bytes) => ref
+        .read(imageSharingProvider)
+        .sharePng(bytes: bytes, fileName: _format.fileName, text: _shareText()),
+  );
 
   /// Enregistre la carte dans la galerie, dans l'album « MyBookmark ».
   ///
   /// L'horodatage évite qu'une nouvelle carte ne prenne le nom d'une
   /// précédente.
   Future<void> _save() => _captureThen((bytes) async {
-        final base = _format.fileName.replaceAll('.png', '');
-        await ref.read(imageSavingProvider).savePng(
-              bytes: bytes,
-              name: '$base-${DateTime.now().millisecondsSinceEpoch}',
-            );
-        _tell((l10n) => l10n.imageSaved);
-      });
+    final base = _format.fileName.replaceAll('.png', '');
+    await ref
+        .read(imageSavingProvider)
+        .savePng(
+          bytes: bytes,
+          name: '$base-${DateTime.now().millisecondsSinceEpoch}',
+        );
+    _tell((l10n) => l10n.imageSaved);
+  });
 
   /// Partage direct en story Instagram.
   ///
@@ -265,7 +268,9 @@ class _ShareProgressScreenState extends ConsumerState<ShareProgressScreen> {
   Future<void> _shareToStory() {
     final palette = _palette!;
     return _captureThen(
-      (bytes) => ref.read(storySharingProvider).sharePng(
+      (bytes) => ref
+          .read(storySharingProvider)
+          .sharePng(
             bytes: bytes,
             fileName: _format.fileName,
             asSticker: _format == ShareCardFormat.compact,
@@ -275,9 +280,7 @@ class _ShareProgressScreenState extends ConsumerState<ShareProgressScreen> {
     );
   }
 
-  Future<void> _captureThen(
-    Future<void> Function(Uint8List bytes) send,
-  ) async {
+  Future<void> _captureThen(Future<void> Function(Uint8List bytes) send) async {
     setState(() => _sharing = true);
     try {
       final bytes = await _capture();
@@ -304,11 +307,22 @@ class _ShareProgressScreenState extends ConsumerState<ShareProgressScreen> {
       return null;
     }
 
-    final image =
-        await boundary.toImage(pixelRatio: ProgressShareCard.captureRatio);
+    final image = await boundary.toImage(
+      pixelRatio: ProgressShareCard.captureRatio,
+    );
     try {
-      final data = await image.toByteData(format: ui.ImageByteFormat.png);
-      return data?.buffer.asUint8List();
+      // Pixels non prémultipliés : la couleur des coins transparents se
+      // garde, voir `encodeCardPng`.
+      final data = await image.toByteData(
+        format: ui.ImageByteFormat.rawStraightRgba,
+      );
+      if (data == null) {
+        return null;
+      }
+      final pixels = data.buffer.asUint8List();
+      final width = image.width;
+      final height = image.height;
+      return await Isolate.run(() => encodeCardPng(pixels, width, height));
     } finally {
       image.dispose();
     }
