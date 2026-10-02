@@ -47,8 +47,14 @@ class _FakeFileExchange implements FileExchange {
     return true;
   }
 
+  /// Les types de fichiers proposés au dernier choix.
+  List<String>? pickedExtensions;
+
   @override
-  Future<String?> pickText() async {
+  Future<String?> pickText({
+    List<String> extensions = const <String>['json'],
+  }) async {
+    pickedExtensions = extensions;
     final error = failWith;
     if (error != null) {
       throw error;
@@ -179,6 +185,40 @@ void main() {
     expect(find.text('Importer cette sauvegarde ?'), findsNothing);
     expect(await db.booksDao.watchLibrary().first, hasLength(1));
     expect(find.textContaining('1 livre importé'), findsOne);
+  });
+
+  settingsTest('importe un export Goodreads', (tester) async {
+    await db.booksDao.addBook(title: 'Zazie', shelf: Shelf.toRead);
+    files.toReturn =
+        'Book Id,Title,Author,Exclusive Shelf,My Rating,Number of Pages\n'
+        '1,"Dune (Dune, #1)",Frank Herbert,read,5,658\n';
+    await pumpSettings(tester);
+
+    await tester.tap(find.text('Importer depuis Goodreads'));
+    await settle(tester);
+
+    expect(files.pickedExtensions, <String>['csv']);
+    expect(find.textContaining('Export Goodreads : 1 livre'), findsOne);
+
+    await tester.tap(find.widgetWithText(FilledButton, 'Fusionner'));
+    await settle(tester);
+
+    final dune = (await db.booksDao.watchLibrary().first).singleWhere(
+      (item) => item.book.title == 'Dune',
+    );
+    expect(dune.currentEntry.shelf, Shelf.read);
+    expect(dune.currentEntry.rating, 5);
+  });
+
+  settingsTest('refuse un CSV qui ne vient pas de Goodreads', (tester) async {
+    files.toReturn = 'nom,prenom\nDupont,Jean\n';
+    await pumpSettings(tester);
+
+    await tester.tap(find.text('Importer depuis Goodreads'));
+    await settle(tester);
+
+    expect(find.textContaining("n'est pas un export Goodreads"), findsOne);
+    expect(await db.booksDao.watchLibrary().first, isEmpty);
   });
 
   settingsTest('demande fusion ou remplacement sur une base non vide', (

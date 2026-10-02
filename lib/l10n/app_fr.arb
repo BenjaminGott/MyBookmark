@@ -243,6 +243,10 @@
   "exportSubtitle": "Enregistre un fichier JSON",
   "importBackup": "Importer une sauvegarde",
   "importSubtitle": "Depuis un fichier JSON",
+  "importGoodreads": "Importer depuis Goodreads",
+  "importGoodreadsSubtitle": "Fichier CSV exporté depuis goodreads.com (My Books → Import and export)",
+  "importGoodreadsFile": "Export Goodreads :",
+  "errorMalformedGoodreads": "Ce fichier n'est pas un export Goodreads. Sur goodreads.com, ouvrez My Books → Import and export → Export Library.",
   "exportedTo": "Bibliothèque exportée dans {name}",
   "@exportedTo": {
     "placeholders": {

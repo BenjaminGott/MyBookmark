@@ -760,6 +760,30 @@ abstract class AppLocalizations {
   /// **'Depuis un fichier JSON'**
   String get importSubtitle;
 
+  /// No description provided for @importGoodreads.
+  ///
+  /// In fr, this message translates to:
+  /// **'Importer depuis Goodreads'**
+  String get importGoodreads;
+
+  /// No description provided for @importGoodreadsSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fichier CSV exporté depuis goodreads.com (My Books → Import and export)'**
+  String get importGoodreadsSubtitle;
+
+  /// No description provided for @importGoodreadsFile.
+  ///
+  /// In fr, this message translates to:
+  /// **'Export Goodreads :'**
+  String get importGoodreadsFile;
+
+  /// No description provided for @errorMalformedGoodreads.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ce fichier n\'est pas un export Goodreads. Sur goodreads.com, ouvrez My Books → Import and export → Export Library.'**
+  String get errorMalformedGoodreads;
+
   /// No description provided for @exportedTo.
   ///
   /// In fr, this message translates to:

@@ -402,6 +402,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get importSubtitle => 'From a JSON file';
 
   @override
+  String get importGoodreads => 'Import from Goodreads';
+
+  @override
+  String get importGoodreadsSubtitle =>
+      'CSV file exported from goodreads.com (My Books → Import and export)';
+
+  @override
+  String get importGoodreadsFile => 'Goodreads export:';
+
+  @override
+  String get errorMalformedGoodreads =>
+      'This file isn\'t a Goodreads export. On goodreads.com, open My Books → Import and export → Export Library.';
+
+  @override
   String exportedTo(String name) {
     return 'Library exported to $name';
   }

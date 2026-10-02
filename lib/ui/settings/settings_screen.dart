@@ -81,6 +81,13 @@ class SettingsScreen extends ConsumerWidget {
             enabled: !busy,
             onTap: () => _import(context, ref),
           ),
+          ListTile(
+            leading: const Icon(Icons.library_add_outlined),
+            title: Text(l10n.importGoodreads),
+            subtitle: Text(l10n.importGoodreadsSubtitle),
+            enabled: !busy,
+            onTap: () => _import(context, ref, format: BackupFormat.goodreads),
+          ),
           if (busy)
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 16),
@@ -110,8 +117,14 @@ class SettingsScreen extends ConsumerWidget {
     }
   }
 
-  Future<void> _import(BuildContext context, WidgetRef ref) async {
-    final outcome = await ref.read(backupControllerProvider.notifier).inspect();
+  Future<void> _import(
+    BuildContext context,
+    WidgetRef ref, {
+    BackupFormat format = BackupFormat.mybookmark,
+  }) async {
+    final outcome = await ref
+        .read(backupControllerProvider.notifier)
+        .inspect(format: format);
     if (!context.mounted) {
       return;
     }
@@ -128,7 +141,7 @@ class SettingsScreen extends ConsumerWidget {
         }
         final applied = await ref
             .read(backupControllerProvider.notifier)
-            .applyImport(contents, mode: mode);
+            .applyImport(contents, mode: mode, format: summary.format);
         if (!context.mounted) {
           return;
         }
@@ -170,7 +183,10 @@ class SettingsScreen extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Text(
-              '${l10n.importFileDated(summary.exportedAt)} '
+              '${switch (summary.format) {
+                BackupFormat.mybookmark => l10n.importFileDated(summary.exportedAt),
+                BackupFormat.goodreads => l10n.importGoodreadsFile,
+              }} '
               '${l10n.importBookCount(summary.bookCount)}, '
               '${l10n.importReadingCount(summary.readingCount)}.',
             ),

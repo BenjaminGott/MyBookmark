@@ -2,6 +2,7 @@ import '../../domain/models/backup.dart';
 import '../../domain/repositories/backup_repository.dart';
 import '../../domain/services/text_normalizer.dart';
 import '../backup/backup_codec.dart';
+import '../backup/goodreads_csv.dart';
 import '../local/app_database.dart';
 
 /// Export et import JSON adossés à la base drift.
@@ -33,10 +34,14 @@ class JsonBackupRepository implements BackupRepository {
   }
 
   @override
-  Future<BackupSummary> inspect(String json) async {
-    final archive = BackupCodec.decode(json);
-    final existing =
-        await database.backupDao.readBookIdentities(_manualIdentity);
+  Future<BackupSummary> inspect(
+    String contents, {
+    BackupFormat format = BackupFormat.mybookmark,
+  }) async {
+    final archive = _decode(contents, format);
+    final existing = await database.backupDao.readBookIdentities(
+      _manualIdentity,
+    );
 
     var alreadyPresent = 0;
     for (final book in archive.books) {
@@ -47,6 +52,7 @@ class JsonBackupRepository implements BackupRepository {
 
     return BackupSummary(
       version: archive.version,
+      format: format,
       exportedAt: archive.exportedAt,
       bookCount: archive.books.length,
       readingCount: archive.readingCount,
@@ -57,10 +63,11 @@ class JsonBackupRepository implements BackupRepository {
 
   @override
   Future<ImportReport> import(
-    String json, {
+    String contents, {
     required ImportMode mode,
+    BackupFormat format = BackupFormat.mybookmark,
   }) async {
-    final archive = BackupCodec.decode(json);
+    final archive = _decode(contents, format);
     final now = DateTime.now();
 
     if (mode == ImportMode.replace) {
@@ -69,7 +76,9 @@ class JsonBackupRepository implements BackupRepository {
 
     // Recalculé après l'éventuelle suppression, et tenu à jour au fil de
     // l'import pour dédoublonner aussi à l'intérieur du fichier.
-    final existing = await database.backupDao.readBookIdentities(_manualIdentity);
+    final existing = await database.backupDao.readBookIdentities(
+      _manualIdentity,
+    );
 
     var imported = 0;
     var skipped = 0;
@@ -101,6 +110,12 @@ class JsonBackupRepository implements BackupRepository {
       tagsImported: (await database.backupDao.readAllTagNames()).length,
     );
   }
+
+  static BackupArchive _decode(String contents, BackupFormat format) =>
+      switch (format) {
+        BackupFormat.mybookmark => BackupCodec.decode(contents),
+        BackupFormat.goodreads => GoodreadsCsv.decode(contents),
+      };
 
   /// L'identité d'un livre pour le dédoublonnage.
   ///
