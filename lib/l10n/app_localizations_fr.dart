@@ -770,4 +770,73 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get errorImageSaveFailed => 'L\'image n\'a pas pu être enregistrée.';
+
+  @override
+  String get aboutTitle => 'À propos';
+
+  @override
+  String get aboutSubtitle => 'Qui je suis, l\'esprit de l\'app, me contacter';
+
+  @override
+  String get aboutBy => 'par libergot';
+
+  @override
+  String get aboutWhoTitle => 'Qui je suis';
+
+  @override
+  String get aboutWhoBody =>
+      'Je suis libergot, un développeur indépendant. J\'ai créé Mon marque-page parce que je voulais une façon simple de suivre mes lectures : savoir où j\'en suis, me souvenir de ce que j\'en ai pensé, et partager mes coups de cœur.';
+
+  @override
+  String get aboutSpiritTitle => 'L\'esprit de l\'application';
+
+  @override
+  String get aboutSpiritFree => 'Gratuite et sans publicité';
+
+  @override
+  String get aboutSpiritNoAccount => 'Pas de compte à créer';
+
+  @override
+  String get aboutSpiritLocal => 'Vos livres restent sur votre téléphone';
+
+  @override
+  String get aboutSpiritNoTracking =>
+      'Aucun pistage, aucune statistique d\'usage';
+
+  @override
+  String get aboutFeedbackTitle => 'Une idée, un bug ?';
+
+  @override
+  String get aboutFeedbackBody =>
+      'Mon marque-page grandit avec vos retours. Une fonction qui vous manque, quelque chose qui ne marche pas : écrivez-moi.';
+
+  @override
+  String get aboutFeedbackButton => 'M\'écrire';
+
+  @override
+  String get aboutFeedbackSubject => 'Mon marque-page : une suggestion';
+
+  @override
+  String aboutNoMailApp(String email) {
+    return 'Aucune application de messagerie. Mon adresse est copiée : $email';
+  }
+
+  @override
+  String get aboutRateTitle => 'Vous aimez Mon marque-page ?';
+
+  @override
+  String get aboutRateBody =>
+      'Une note sur Google Play aide d\'autres lecteurs à découvrir l\'application. Merci !';
+
+  @override
+  String get aboutRateButton => 'Noter sur Google Play';
+
+  @override
+  String get aboutWebsite => 'Site web';
+
+  @override
+  String get aboutPrivacy => 'Politique de confidentialité';
+
+  @override
+  String get aboutLinkFailed => 'Impossible d\'ouvrir le lien.';
 }

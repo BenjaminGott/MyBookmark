@@ -766,4 +766,73 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get errorImageSaveFailed => 'Impossibile salvare l\'immagine.';
+
+  @override
+  String get aboutTitle => 'Informazioni';
+
+  @override
+  String get aboutSubtitle => 'Chi sono, lo spirito dell\'app, contatti';
+
+  @override
+  String get aboutBy => 'di libergot';
+
+  @override
+  String get aboutWhoTitle => 'Chi sono';
+
+  @override
+  String get aboutWhoBody =>
+      'Sono libergot, uno sviluppatore indipendente. Ho creato MyBookmark perché volevo un modo semplice per seguire le mie letture: sapere a che punto sono, ricordare cosa ne ho pensato e condividere i libri che amo.';
+
+  @override
+  String get aboutSpiritTitle => 'Lo spirito dell\'app';
+
+  @override
+  String get aboutSpiritFree => 'Gratuita e senza pubblicità';
+
+  @override
+  String get aboutSpiritNoAccount => 'Nessun account da creare';
+
+  @override
+  String get aboutSpiritLocal => 'I tuoi libri restano sul tuo telefono';
+
+  @override
+  String get aboutSpiritNoTracking =>
+      'Nessun tracciamento, nessuna statistica d\'uso';
+
+  @override
+  String get aboutFeedbackTitle => 'Un\'idea, un bug?';
+
+  @override
+  String get aboutFeedbackBody =>
+      'MyBookmark cresce con i tuoi suggerimenti. Una funzione che ti manca, qualcosa che non va: scrivimi.';
+
+  @override
+  String get aboutFeedbackButton => 'Scrivimi';
+
+  @override
+  String get aboutFeedbackSubject => 'MyBookmark: un suggerimento';
+
+  @override
+  String aboutNoMailApp(String email) {
+    return 'Nessuna app di posta trovata. Il mio indirizzo è stato copiato: $email';
+  }
+
+  @override
+  String get aboutRateTitle => 'Ti piace MyBookmark?';
+
+  @override
+  String get aboutRateBody =>
+      'Una valutazione su Google Play aiuta altri lettori a scoprire l\'app. Grazie!';
+
+  @override
+  String get aboutRateButton => 'Valuta su Google Play';
+
+  @override
+  String get aboutWebsite => 'Sito web';
+
+  @override
+  String get aboutPrivacy => 'Informativa sulla privacy';
+
+  @override
+  String get aboutLinkFailed => 'Impossibile aprire il link.';
 }

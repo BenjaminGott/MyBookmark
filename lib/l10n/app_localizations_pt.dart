@@ -764,4 +764,73 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get errorImageSaveFailed => 'Não foi possível salvar a imagem.';
+
+  @override
+  String get aboutTitle => 'Sobre';
+
+  @override
+  String get aboutSubtitle => 'Quem sou, o espírito do app, contato';
+
+  @override
+  String get aboutBy => 'por libergot';
+
+  @override
+  String get aboutWhoTitle => 'Quem sou';
+
+  @override
+  String get aboutWhoBody =>
+      'Sou libergot, um desenvolvedor independente. Criei o MyBookmark porque queria um jeito simples de acompanhar minhas leituras: saber onde parei, lembrar o que achei de cada livro e compartilhar os meus favoritos.';
+
+  @override
+  String get aboutSpiritTitle => 'O espírito do app';
+
+  @override
+  String get aboutSpiritFree => 'Gratuito e sem anúncios';
+
+  @override
+  String get aboutSpiritNoAccount => 'Nenhuma conta para criar';
+
+  @override
+  String get aboutSpiritLocal => 'Seus livros ficam no seu celular';
+
+  @override
+  String get aboutSpiritNoTracking =>
+      'Sem rastreamento, sem estatísticas de uso';
+
+  @override
+  String get aboutFeedbackTitle => 'Uma ideia, um bug?';
+
+  @override
+  String get aboutFeedbackBody =>
+      'O MyBookmark cresce com o seu retorno. Uma função que faz falta, algo que não funciona: me escreva.';
+
+  @override
+  String get aboutFeedbackButton => 'Me escrever';
+
+  @override
+  String get aboutFeedbackSubject => 'MyBookmark: uma sugestão';
+
+  @override
+  String aboutNoMailApp(String email) {
+    return 'Nenhum app de e-mail encontrado. Meu endereço foi copiado: $email';
+  }
+
+  @override
+  String get aboutRateTitle => 'Gostou do MyBookmark?';
+
+  @override
+  String get aboutRateBody =>
+      'Uma avaliação no Google Play ajuda outros leitores a descobrir o app. Obrigado!';
+
+  @override
+  String get aboutRateButton => 'Avaliar no Google Play';
+
+  @override
+  String get aboutWebsite => 'Site';
+
+  @override
+  String get aboutPrivacy => 'Política de privacidade';
+
+  @override
+  String get aboutLinkFailed => 'Não foi possível abrir o link.';
 }

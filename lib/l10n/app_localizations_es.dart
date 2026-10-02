@@ -767,4 +767,72 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get errorImageSaveFailed => 'No se ha podido guardar la imagen.';
+
+  @override
+  String get aboutTitle => 'Acerca de';
+
+  @override
+  String get aboutSubtitle => 'Quién soy, el espíritu de la app, contacto';
+
+  @override
+  String get aboutBy => 'por libergot';
+
+  @override
+  String get aboutWhoTitle => 'Quién soy';
+
+  @override
+  String get aboutWhoBody =>
+      'Soy libergot, un desarrollador independiente. Creé MyBookmark porque quería una forma sencilla de seguir mis lecturas: saber por dónde voy, recordar qué me pareció cada libro y compartir mis favoritos.';
+
+  @override
+  String get aboutSpiritTitle => 'El espíritu de la app';
+
+  @override
+  String get aboutSpiritFree => 'Gratis y sin publicidad';
+
+  @override
+  String get aboutSpiritNoAccount => 'Sin cuenta que crear';
+
+  @override
+  String get aboutSpiritLocal => 'Tus libros se quedan en tu teléfono';
+
+  @override
+  String get aboutSpiritNoTracking => 'Sin rastreo ni estadísticas de uso';
+
+  @override
+  String get aboutFeedbackTitle => '¿Una idea, un error?';
+
+  @override
+  String get aboutFeedbackBody =>
+      'MyBookmark crece con tus comentarios. Una función que echas en falta, algo que no funciona: escríbeme.';
+
+  @override
+  String get aboutFeedbackButton => 'Escribirme';
+
+  @override
+  String get aboutFeedbackSubject => 'MyBookmark: una sugerencia';
+
+  @override
+  String aboutNoMailApp(String email) {
+    return 'No hay ninguna app de correo. Mi dirección se ha copiado: $email';
+  }
+
+  @override
+  String get aboutRateTitle => '¿Te gusta MyBookmark?';
+
+  @override
+  String get aboutRateBody =>
+      'Una valoración en Google Play ayuda a otros lectores a descubrir la app. ¡Gracias!';
+
+  @override
+  String get aboutRateButton => 'Valorar en Google Play';
+
+  @override
+  String get aboutWebsite => 'Sitio web';
+
+  @override
+  String get aboutPrivacy => 'Política de privacidad';
+
+  @override
+  String get aboutLinkFailed => 'No se pudo abrir el enlace.';
 }

@@ -8,6 +8,7 @@ import '../l10n/error_text.dart';
 import '../l10n/l10n.dart';
 import '../l10n/language_dropdown.dart';
 import '../providers/settings_providers.dart';
+import 'about_screen.dart';
 import 'backup_controller.dart';
 
 /// Réglages : apparence, langue, et sauvegarde de la bibliothèque.
@@ -93,6 +94,16 @@ class SettingsScreen extends ConsumerWidget {
               padding: EdgeInsets.symmetric(horizontal: 16),
               child: LinearProgressIndicator(),
             ),
+          const Divider(),
+          ListTile(
+            leading: const Icon(Icons.info_outline),
+            title: Text(l10n.aboutTitle),
+            subtitle: Text(l10n.aboutSubtitle),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(builder: (_) => const AboutScreen()),
+            ),
+          ),
         ],
       ),
     );

@@ -430,5 +430,33 @@
   "errorInstagramFailed": "Instagram n'a pas pu être ouvert.",
   "errorPhotoAccess": "Autorisez l'accès aux photos pour enregistrer l'image.",
   "errorNotEnoughSpace": "Plus assez de place sur le téléphone.",
-  "errorImageSaveFailed": "L'image n'a pas pu être enregistrée."
+  "errorImageSaveFailed": "L'image n'a pas pu être enregistrée.",
+  "aboutTitle": "À propos",
+  "aboutSubtitle": "Qui je suis, l'esprit de l'app, me contacter",
+  "aboutBy": "par libergot",
+  "aboutWhoTitle": "Qui je suis",
+  "aboutWhoBody": "Je suis libergot, un développeur indépendant. J'ai créé Mon marque-page parce que je voulais une façon simple de suivre mes lectures : savoir où j'en suis, me souvenir de ce que j'en ai pensé, et partager mes coups de cœur.",
+  "aboutSpiritTitle": "L'esprit de l'application",
+  "aboutSpiritFree": "Gratuite et sans publicité",
+  "aboutSpiritNoAccount": "Pas de compte à créer",
+  "aboutSpiritLocal": "Vos livres restent sur votre téléphone",
+  "aboutSpiritNoTracking": "Aucun pistage, aucune statistique d'usage",
+  "aboutFeedbackTitle": "Une idée, un bug ?",
+  "aboutFeedbackBody": "Mon marque-page grandit avec vos retours. Une fonction qui vous manque, quelque chose qui ne marche pas : écrivez-moi.",
+  "aboutFeedbackButton": "M'écrire",
+  "aboutFeedbackSubject": "Mon marque-page : une suggestion",
+  "aboutNoMailApp": "Aucune application de messagerie. Mon adresse est copiée : {email}",
+  "@aboutNoMailApp": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "aboutRateTitle": "Vous aimez Mon marque-page ?",
+  "aboutRateBody": "Une note sur Google Play aide d'autres lecteurs à découvrir l'application. Merci !",
+  "aboutRateButton": "Noter sur Google Play",
+  "aboutWebsite": "Site web",
+  "aboutPrivacy": "Politique de confidentialité",
+  "aboutLinkFailed": "Impossible d'ouvrir le lien."
 }

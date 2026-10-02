@@ -756,4 +756,72 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errorImageSaveFailed => 'The image couldn\'t be saved.';
+
+  @override
+  String get aboutTitle => 'About';
+
+  @override
+  String get aboutSubtitle => 'Who I am, the app\'s spirit, get in touch';
+
+  @override
+  String get aboutBy => 'by libergot';
+
+  @override
+  String get aboutWhoTitle => 'Who I am';
+
+  @override
+  String get aboutWhoBody =>
+      'I\'m libergot, an independent developer. I built MyBookmark because I wanted a simple way to keep track of my reading: where I\'m at, what I thought of it, and the books I love enough to share.';
+
+  @override
+  String get aboutSpiritTitle => 'The app\'s spirit';
+
+  @override
+  String get aboutSpiritFree => 'Free, with no ads';
+
+  @override
+  String get aboutSpiritNoAccount => 'No account to create';
+
+  @override
+  String get aboutSpiritLocal => 'Your books stay on your phone';
+
+  @override
+  String get aboutSpiritNoTracking => 'No tracking, no usage statistics';
+
+  @override
+  String get aboutFeedbackTitle => 'An idea, a bug?';
+
+  @override
+  String get aboutFeedbackBody =>
+      'MyBookmark grows with your feedback. A feature you miss, something that doesn\'t work: write to me.';
+
+  @override
+  String get aboutFeedbackButton => 'Write to me';
+
+  @override
+  String get aboutFeedbackSubject => 'MyBookmark: a suggestion';
+
+  @override
+  String aboutNoMailApp(String email) {
+    return 'No email app found. My address has been copied: $email';
+  }
+
+  @override
+  String get aboutRateTitle => 'Enjoying MyBookmark?';
+
+  @override
+  String get aboutRateBody =>
+      'A rating on Google Play helps other readers discover the app. Thank you!';
+
+  @override
+  String get aboutRateButton => 'Rate on Google Play';
+
+  @override
+  String get aboutWebsite => 'Website';
+
+  @override
+  String get aboutPrivacy => 'Privacy policy';
+
+  @override
+  String get aboutLinkFailed => 'Couldn\'t open the link.';
 }

@@ -1,11 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/files/file_picker_exchange.dart';
+import '../../data/links/url_launcher_links.dart';
 import '../../data/prefs/preferences_service.dart';
 import '../../data/repositories/backup_repository_json.dart';
 import '../../domain/models/app_language.dart';
 import '../../domain/models/app_theme_mode.dart';
 import '../../domain/repositories/backup_repository.dart';
+import '../../domain/repositories/external_links.dart';
 import '../../domain/repositories/file_exchange.dart';
 import 'database_providers.dart';
 import 'search_providers.dart';
@@ -16,10 +18,10 @@ import 'search_providers.dart';
 /// oubli de câblage, pas un cas à gérer à l'exécution.
 final Provider<PreferencesService> preferencesServiceProvider =
     Provider<PreferencesService>((ref) {
-  throw UnimplementedError(
-    'preferencesServiceProvider doit être fourni au démarrage.',
-  );
-});
+      throw UnimplementedError(
+        'preferencesServiceProvider doit être fourni au démarrage.',
+      );
+    });
 
 /// Le thème choisi, lu au lancement puis conservé en mémoire.
 class ThemeModeController extends Notifier<AppThemeMode> {
@@ -33,7 +35,9 @@ class ThemeModeController extends Notifier<AppThemeMode> {
 }
 
 final NotifierProvider<ThemeModeController, AppThemeMode> themeModeProvider =
-    NotifierProvider<ThemeModeController, AppThemeMode>(ThemeModeController.new);
+    NotifierProvider<ThemeModeController, AppThemeMode>(
+      ThemeModeController.new,
+    );
 
 /// La langue choisie, ou `null` tant que l'écran d'accueil n'a pas été passé.
 class LanguageController extends Notifier<AppLanguage?> {
@@ -51,11 +55,16 @@ final NotifierProvider<LanguageController, AppLanguage?> languageProvider =
 
 final Provider<BackupRepository> backupRepositoryProvider =
     Provider<BackupRepository>((ref) {
-  return JsonBackupRepository(
-    database: ref.watch(databaseProvider),
-    normalizer: ref.watch(textNormalizerProvider),
-  );
-});
+      return JsonBackupRepository(
+        database: ref.watch(databaseProvider),
+        normalizer: ref.watch(textNormalizerProvider),
+      );
+    });
 
-final Provider<FileExchange> fileExchangeProvider =
-    Provider<FileExchange>((ref) => const FilePickerExchange());
+final Provider<FileExchange> fileExchangeProvider = Provider<FileExchange>(
+  (ref) => const FilePickerExchange(),
+);
+
+final Provider<ExternalLinks> externalLinksProvider = Provider<ExternalLinks>(
+  (ref) => const UrlLauncherLinks(),
+);

@@ -1323,6 +1323,132 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'L\'image n\'a pas pu être enregistrée.'**
   String get errorImageSaveFailed;
+
+  /// No description provided for @aboutTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'À propos'**
+  String get aboutTitle;
+
+  /// No description provided for @aboutSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Qui je suis, l\'esprit de l\'app, me contacter'**
+  String get aboutSubtitle;
+
+  /// No description provided for @aboutBy.
+  ///
+  /// In fr, this message translates to:
+  /// **'par libergot'**
+  String get aboutBy;
+
+  /// No description provided for @aboutWhoTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Qui je suis'**
+  String get aboutWhoTitle;
+
+  /// No description provided for @aboutWhoBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'Je suis libergot, un développeur indépendant. J\'ai créé Mon marque-page parce que je voulais une façon simple de suivre mes lectures : savoir où j\'en suis, me souvenir de ce que j\'en ai pensé, et partager mes coups de cœur.'**
+  String get aboutWhoBody;
+
+  /// No description provided for @aboutSpiritTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'L\'esprit de l\'application'**
+  String get aboutSpiritTitle;
+
+  /// No description provided for @aboutSpiritFree.
+  ///
+  /// In fr, this message translates to:
+  /// **'Gratuite et sans publicité'**
+  String get aboutSpiritFree;
+
+  /// No description provided for @aboutSpiritNoAccount.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pas de compte à créer'**
+  String get aboutSpiritNoAccount;
+
+  /// No description provided for @aboutSpiritLocal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vos livres restent sur votre téléphone'**
+  String get aboutSpiritLocal;
+
+  /// No description provided for @aboutSpiritNoTracking.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun pistage, aucune statistique d\'usage'**
+  String get aboutSpiritNoTracking;
+
+  /// No description provided for @aboutFeedbackTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Une idée, un bug ?'**
+  String get aboutFeedbackTitle;
+
+  /// No description provided for @aboutFeedbackBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mon marque-page grandit avec vos retours. Une fonction qui vous manque, quelque chose qui ne marche pas : écrivez-moi.'**
+  String get aboutFeedbackBody;
+
+  /// No description provided for @aboutFeedbackButton.
+  ///
+  /// In fr, this message translates to:
+  /// **'M\'écrire'**
+  String get aboutFeedbackButton;
+
+  /// No description provided for @aboutFeedbackSubject.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mon marque-page : une suggestion'**
+  String get aboutFeedbackSubject;
+
+  /// No description provided for @aboutNoMailApp.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune application de messagerie. Mon adresse est copiée : {email}'**
+  String aboutNoMailApp(String email);
+
+  /// No description provided for @aboutRateTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous aimez Mon marque-page ?'**
+  String get aboutRateTitle;
+
+  /// No description provided for @aboutRateBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'Une note sur Google Play aide d\'autres lecteurs à découvrir l\'application. Merci !'**
+  String get aboutRateBody;
+
+  /// No description provided for @aboutRateButton.
+  ///
+  /// In fr, this message translates to:
+  /// **'Noter sur Google Play'**
+  String get aboutRateButton;
+
+  /// No description provided for @aboutWebsite.
+  ///
+  /// In fr, this message translates to:
+  /// **'Site web'**
+  String get aboutWebsite;
+
+  /// No description provided for @aboutPrivacy.
+  ///
+  /// In fr, this message translates to:
+  /// **'Politique de confidentialité'**
+  String get aboutPrivacy;
+
+  /// No description provided for @aboutLinkFailed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Impossible d\'ouvrir le lien.'**
+  String get aboutLinkFailed;
 }
 
 class _AppLocalizationsDelegate
