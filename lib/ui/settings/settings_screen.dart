@@ -10,6 +10,7 @@ import '../l10n/language_dropdown.dart';
 import '../providers/settings_providers.dart';
 import 'about_screen.dart';
 import 'backup_controller.dart';
+import 'feedback_actions.dart';
 
 /// Réglages : apparence, langue, et sauvegarde de la bibliothèque.
 class SettingsScreen extends ConsumerWidget {
@@ -95,6 +96,18 @@ class SettingsScreen extends ConsumerWidget {
               child: LinearProgressIndicator(),
             ),
           const Divider(),
+          ListTile(
+            leading: const Icon(Icons.mail_outline),
+            title: Text(l10n.aboutFeedbackButton),
+            subtitle: Text(l10n.aboutFeedbackTitle),
+            onTap: () => FeedbackActions.writeToMe(context, ref),
+          ),
+          ListTile(
+            leading: const Icon(Icons.star_outline),
+            title: Text(l10n.aboutRateButton),
+            subtitle: Text(l10n.aboutRateTitle),
+            onTap: () => FeedbackActions.rate(context, ref),
+          ),
           ListTile(
             leading: const Icon(Icons.info_outline),
             title: Text(l10n.aboutTitle),

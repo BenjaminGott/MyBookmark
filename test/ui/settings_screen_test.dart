@@ -4,6 +4,7 @@ import 'package:biblivre/data/prefs/preferences_service.dart';
 import 'package:biblivre/domain/models/app_language.dart';
 import 'package:biblivre/domain/models/app_theme_mode.dart';
 import 'package:biblivre/domain/models/shelf.dart';
+import 'package:biblivre/domain/repositories/external_links.dart';
 import 'package:biblivre/domain/repositories/file_exchange.dart';
 import 'package:biblivre/l10n/app_localizations.dart';
 import 'package:biblivre/ui/l10n/language_dropdown.dart';
@@ -63,9 +64,21 @@ class _FakeFileExchange implements FileExchange {
   }
 }
 
+/// Note les liens ouverts, sans rien ouvrir.
+class _FakeLinks implements ExternalLinks {
+  final List<Uri> opened = <Uri>[];
+
+  @override
+  Future<bool> open(Uri uri) async {
+    opened.add(uri);
+    return true;
+  }
+}
+
 void main() {
   late AppDatabase db;
   late _FakeFileExchange files;
+  late _FakeLinks links;
 
   setUpAll(() {
     initializeDateFormatting('fr_FR');
@@ -74,6 +87,7 @@ void main() {
   setUp(() {
     db = createTestDatabase();
     files = _FakeFileExchange();
+    links = _FakeLinks();
   });
 
   tearDown(() async {
@@ -96,6 +110,7 @@ void main() {
         overrides: [
           databaseProvider.overrideWithValue(db),
           fileExchangeProvider.overrideWithValue(files),
+          externalLinksProvider.overrideWithValue(links),
           // Le thème n'est pas l'objet de ces tests : on court-circuite les
           // préférences, qui exigeraient un canal de plateforme.
           themeModeProvider.overrideWith(_FixedThemeMode.new),
@@ -185,6 +200,19 @@ void main() {
     expect(find.text('Importer cette sauvegarde ?'), findsNothing);
     expect(await db.booksDao.watchLibrary().first, hasLength(1));
     expect(find.textContaining('1 livre importé'), findsOne);
+  });
+
+  settingsTest('permet d\'écrire au développeur et de noter l\'app', (
+    tester,
+  ) async {
+    await pumpSettings(tester);
+
+    await tester.tap(find.text("M'écrire"));
+    await settle(tester);
+    await tester.tap(find.text('Noter sur Google Play'));
+    await settle(tester);
+
+    expect(links.opened.map((uri) => uri.scheme), <String>['mailto', 'market']);
   });
 
   settingsTest('importe un export Goodreads', (tester) async {

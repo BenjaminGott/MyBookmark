@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/app_links.dart';
 import '../../core/theme/app_theme.dart';
 import '../l10n/l10n.dart';
-import '../providers/settings_providers.dart';
+import 'feedback_actions.dart';
 
 /// « À propos » : qui fait l'application, son esprit, et deux façons d'aider,
 /// écrire au développeur ou noter l'application.
@@ -74,7 +73,7 @@ class AboutScreen extends ConsumerWidget {
                 Text(l10n.aboutFeedbackBody),
                 const SizedBox(height: 12),
                 FilledButton.icon(
-                  onPressed: () => _writeToMe(context, ref),
+                  onPressed: () => FeedbackActions.writeToMe(context, ref),
                   icon: const Icon(Icons.mail_outline),
                   label: Text(l10n.aboutFeedbackButton),
                 ),
@@ -89,7 +88,7 @@ class AboutScreen extends ConsumerWidget {
                 Text(l10n.aboutRateBody),
                 const SizedBox(height: 12),
                 OutlinedButton.icon(
-                  onPressed: () => _rate(context, ref),
+                  onPressed: () => FeedbackActions.rate(context, ref),
                   icon: const Icon(Icons.star_outline),
                   label: Text(l10n.aboutRateButton),
                 ),
@@ -101,58 +100,25 @@ class AboutScreen extends ConsumerWidget {
             contentPadding: EdgeInsets.zero,
             leading: const Icon(Icons.public),
             title: Text(l10n.aboutWebsite),
-            onTap: () => _open(context, ref, AppLinks.website(french: french)),
+            onTap: () => FeedbackActions.open(
+              context,
+              ref,
+              AppLinks.website(french: french),
+            ),
           ),
           ListTile(
             contentPadding: EdgeInsets.zero,
             leading: const Icon(Icons.privacy_tip_outlined),
             title: Text(l10n.aboutPrivacy),
-            onTap: () => _open(context, ref, AppLinks.privacy(french: french)),
+            onTap: () => FeedbackActions.open(
+              context,
+              ref,
+              AppLinks.privacy(french: french),
+            ),
           ),
         ],
       ),
     );
-  }
-
-  /// Ouvre la messagerie. Sans messagerie, l'adresse est copiée pour pouvoir
-  /// écrire d'ailleurs.
-  Future<void> _writeToMe(BuildContext context, WidgetRef ref) async {
-    final l10n = context.l10n;
-    final opened = await ref
-        .read(externalLinksProvider)
-        .open(AppLinks.feedbackEmail(subject: l10n.aboutFeedbackSubject));
-    if (opened || !context.mounted) {
-      return;
-    }
-    await Clipboard.setData(const ClipboardData(text: AppLinks.contactEmail));
-    if (context.mounted) {
-      _tell(context, l10n.aboutNoMailApp(AppLinks.contactEmail));
-    }
-  }
-
-  /// L'application Play Store si elle est là, sinon la fiche dans le
-  /// navigateur.
-  Future<void> _rate(BuildContext context, WidgetRef ref) async {
-    final links = ref.read(externalLinksProvider);
-    if (await links.open(AppLinks.playStoreApp)) {
-      return;
-    }
-    if (context.mounted) {
-      await _open(context, ref, AppLinks.playStoreWeb);
-    }
-  }
-
-  Future<void> _open(BuildContext context, WidgetRef ref, Uri uri) async {
-    final opened = await ref.read(externalLinksProvider).open(uri);
-    if (!opened && context.mounted) {
-      _tell(context, context.l10n.aboutLinkFailed);
-    }
-  }
-
-  static void _tell(BuildContext context, String message) {
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(SnackBar(content: Text(message)));
   }
 }
 
