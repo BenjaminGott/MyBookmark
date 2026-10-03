@@ -81,6 +81,26 @@ void main() {
     expect(item.shelf, Shelf.reading);
   });
 
+  formTest('le bouton reste au-dessus de la barre de navigation', (
+    tester,
+  ) async {
+    // Un téléphone étroit, dessiné jusqu'au bord, avec une barre de
+    // navigation de 48 points en bas.
+    await pumpForm(tester, const BookFormScreen.create());
+    tester.view.physicalSize = const Size(400, 700);
+    tester.view.padding = const FakeViewPadding(bottom: 48);
+    tester.view.viewPadding = const FakeViewPadding(bottom: 48);
+    await settle(tester);
+
+    // Tout en bas du formulaire.
+    await tester.drag(find.byType(ListView), const Offset(0, -3000));
+    await settle(tester);
+
+    final button = find.widgetWithText(FilledButton, 'Ajouter');
+
+    expect(tester.getBottomLeft(button).dy, lessThanOrEqualTo(700 - 48));
+  });
+
   formTest('refuse un titre vide', (tester) async {
     await pumpForm(tester, const BookFormScreen.create());
 
@@ -183,8 +203,10 @@ void main() {
   });
 
   formTest('ne propose pas d\'étagère en correction', (tester) async {
-    final bookId =
-        await db.booksDao.addBook(title: 'Dune', shelf: Shelf.reading);
+    final bookId = await db.booksDao.addBook(
+      title: 'Dune',
+      shelf: Shelf.reading,
+    );
     final container = ProviderContainer(
       overrides: [databaseProvider.overrideWithValue(db)],
     );

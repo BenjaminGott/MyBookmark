@@ -41,18 +41,21 @@ class BookFormScreen extends ConsumerStatefulWidget {
 class _BookFormScreenState extends ConsumerState<BookFormScreen> {
   final GlobalKey<FormState> _form = GlobalKey<FormState>();
 
-  late final TextEditingController _title =
-      TextEditingController(text: widget.existing?.title ?? '');
-  late final TextEditingController _author =
-      TextEditingController(text: widget.existing?.author ?? '');
+  late final TextEditingController _title = TextEditingController(
+    text: widget.existing?.title ?? '',
+  );
+  late final TextEditingController _author = TextEditingController(
+    text: widget.existing?.author ?? '',
+  );
   late final TextEditingController _pageCount = TextEditingController(
     text: widget.existing?.pageCount?.toString() ?? '',
   );
   late final TextEditingController _year = TextEditingController(
     text: widget.existing?.firstPublishYear?.toString() ?? '',
   );
-  late final TextEditingController _description =
-      TextEditingController(text: widget.existing?.description ?? '');
+  late final TextEditingController _description = TextEditingController(
+    text: widget.existing?.description ?? '',
+  );
 
   Shelf _shelf = Shelf.toRead;
 
@@ -102,7 +105,15 @@ class _BookFormScreenState extends ConsumerState<BookFormScreen> {
       body: Form(
         key: _form,
         child: ListView(
-          padding: const EdgeInsets.all(16),
+          // La marge du bas laisse passer la barre de navigation du
+          // téléphone : sans elle, le bouton d'enregistrement finit dessous
+          // sur les Android qui dessinent l'application jusqu'au bord.
+          padding: EdgeInsets.fromLTRB(
+            16,
+            16,
+            16,
+            16 + MediaQuery.paddingOf(context).bottom,
+          ),
           children: <Widget>[
             _CoverField(
               url: _coverUrl,
@@ -111,9 +122,9 @@ class _BookFormScreenState extends ConsumerState<BookFormScreen> {
               onRemove: busy || _coverUrl == null
                   ? null
                   : () => setState(() {
-                        _coverUrl = null;
-                        _coverId = null;
-                      }),
+                      _coverUrl = null;
+                      _coverId = null;
+                    }),
             ),
             const SizedBox(height: 24),
             TextFormField(
@@ -202,9 +213,10 @@ class _BookFormScreenState extends ConsumerState<BookFormScreen> {
   }
 
   Future<void> _searchCover() async {
-    final query = <String>[_title.text.trim(), _author.text.trim()]
-        .where((part) => part.isNotEmpty)
-        .join(' ');
+    final query = <String>[
+      _title.text.trim(),
+      _author.text.trim(),
+    ].where((part) => part.isNotEmpty).join(' ');
     final picked = await showCoverSearchSheet(context, query: query);
     if (picked == null || !mounted) {
       return;
@@ -228,9 +240,9 @@ class _BookFormScreenState extends ConsumerState<BookFormScreen> {
       });
     } on AppException catch (error) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(error.describe(context.l10n))),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(error.describe(context.l10n))));
       }
     }
   }
@@ -335,9 +347,9 @@ Future<void> openBookEditor(
   }
 
   if (book == null) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(context.l10n.bookGone)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(context.l10n.bookGone)));
     return;
   }
 

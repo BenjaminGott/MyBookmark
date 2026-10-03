@@ -32,8 +32,9 @@ class _CoverSearchSheet extends ConsumerStatefulWidget {
 }
 
 class _CoverSearchSheetState extends ConsumerState<_CoverSearchSheet> {
-  late final TextEditingController _field =
-      TextEditingController(text: widget.initialQuery);
+  late final TextEditingController _field = TextEditingController(
+    text: widget.initialQuery,
+  );
   late Stream<List<BookSearchResult>> _results = _search(widget.initialQuery);
 
   @override
@@ -83,8 +84,7 @@ class _CoverSearchSheetState extends ConsumerState<_CoverSearchSheet> {
                     );
                   }
                   final results = snapshot.data;
-                  final done =
-                      snapshot.connectionState == ConnectionState.done;
+                  final done = snapshot.connectionState == ConnectionState.done;
                   if (results == null || (results.isEmpty && !done)) {
                     return const Center(child: CircularProgressIndicator());
                   }
@@ -92,14 +92,20 @@ class _CoverSearchSheetState extends ConsumerState<_CoverSearchSheet> {
                     return _Message(context.l10n.noCoverFound);
                   }
                   return GridView.builder(
-                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                    // Au-dessus de la barre de navigation du téléphone.
+                    padding: EdgeInsets.fromLTRB(
+                      16,
+                      0,
+                      16,
+                      16 + MediaQuery.paddingOf(context).bottom,
+                    ),
                     gridDelegate:
                         const SliverGridDelegateWithMaxCrossAxisExtent(
-                      maxCrossAxisExtent: 120,
-                      childAspectRatio: 2 / 3,
-                      mainAxisSpacing: 12,
-                      crossAxisSpacing: 12,
-                    ),
+                          maxCrossAxisExtent: 120,
+                          childAspectRatio: 2 / 3,
+                          mainAxisSpacing: 12,
+                          crossAxisSpacing: 12,
+                        ),
                     itemCount: results.length,
                     itemBuilder: (context, index) {
                       final result = results[index];

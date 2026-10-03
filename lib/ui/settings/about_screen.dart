@@ -20,7 +20,13 @@ class AboutScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: Text(l10n.aboutTitle)),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
+        // Au-dessus de la barre de navigation du téléphone.
+        padding: EdgeInsets.fromLTRB(
+          20,
+          12,
+          20,
+          32 + MediaQuery.paddingOf(context).bottom,
+        ),
         children: <Widget>[
           Center(
             child: ExcludeSemantics(

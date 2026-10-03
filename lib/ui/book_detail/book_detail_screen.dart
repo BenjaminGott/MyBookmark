@@ -66,7 +66,13 @@ class _BookDetail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView(
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 32),
+      // Au-dessus de la barre de navigation du téléphone.
+      padding: EdgeInsets.fromLTRB(
+        16,
+        0,
+        16,
+        32 + MediaQuery.paddingOf(context).bottom,
+      ),
       children: <Widget>[
         BookHeader(item: item),
         const SizedBox(height: 24),
@@ -141,19 +147,18 @@ class _BookMenu extends ConsumerWidget {
   }
 
   Future<void> _startReread(BuildContext context, WidgetRef ref) async {
-    final outcome =
-        await ref.read(bookActionsProvider.notifier).startReread(item.book.id);
+    final outcome = await ref
+        .read(bookActionsProvider.notifier)
+        .startReread(item.book.id);
     if (!context.mounted) {
       return;
     }
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(
-          switch (outcome) {
-            ActionSuccess() => context.l10n.rereadStarted,
-            ActionFailure(:final error) => error.describe(context.l10n),
-          },
-        ),
+        content: Text(switch (outcome) {
+          ActionSuccess() => context.l10n.rereadStarted,
+          ActionFailure(:final error) => error.describe(context.l10n),
+        }),
       ),
     );
   }
@@ -181,8 +186,9 @@ class _BookMenu extends ConsumerWidget {
       return;
     }
 
-    final outcome =
-        await ref.read(bookActionsProvider.notifier).deleteBook(item.book.id);
+    final outcome = await ref
+        .read(bookActionsProvider.notifier)
+        .deleteBook(item.book.id);
     if (!context.mounted) {
       return;
     }
@@ -192,9 +198,9 @@ class _BookMenu extends ConsumerWidget {
         // La fiche n'a plus de sujet : on revient à la bibliothèque.
         Navigator.of(context).pop();
       case ActionFailure(:final error):
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(error.describe(context.l10n))),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(error.describe(context.l10n))));
     }
   }
 }
