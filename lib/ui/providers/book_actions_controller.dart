@@ -1,10 +1,15 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/failure.dart';
 import '../../domain/models/book_search_result.dart';
+import '../../domain/models/library_query.dart';
 import '../../domain/models/shelf.dart';
 import '../../domain/repositories/book_repository.dart';
+import '../../domain/services/review_policy.dart';
 import 'book_providers.dart';
+import 'settings_providers.dart';
 
 /// Résultat d'une action d'écriture, tel que l'écran a besoin de le connaître.
 sealed class ActionResult {
@@ -67,8 +72,33 @@ class BookActionsController extends Notifier<bool> {
   }) {
     return _run(() async {
       await _repository.moveToShelf(entryId: entryId, shelf: shelf);
+      if (shelf == Shelf.read) {
+        // Un livre terminé : le bon moment pour demander un avis.
+        unawaited(_maybeAskReview());
+      }
       return null;
     });
+  }
+
+  Future<void> _maybeAskReview() async {
+    try {
+      final preferences = ref.read(preferencesServiceProvider);
+      final finished = await _repository
+          .watchLibrary(const LibraryQuery(shelf: Shelf.read))
+          .first;
+      final now = DateTime.now();
+      if (!ReviewPolicy.shouldAsk(
+        finishedBooks: finished.length,
+        lastAsked: preferences.reviewAskedAt,
+        now: now,
+      )) {
+        return;
+      }
+      await preferences.setReviewAskedAt(now);
+      await ref.read(reviewPromptProvider).request();
+    } on Object {
+      // Une demande d'avis manquée n'a aucune importance.
+    }
   }
 
   Future<ActionResult> updateProgress({

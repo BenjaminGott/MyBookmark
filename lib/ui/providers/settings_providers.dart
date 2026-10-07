@@ -4,11 +4,13 @@ import '../../data/files/file_picker_exchange.dart';
 import '../../data/links/url_launcher_links.dart';
 import '../../data/prefs/preferences_service.dart';
 import '../../data/repositories/backup_repository_json.dart';
+import '../../data/review/in_app_review_prompt.dart';
 import '../../domain/models/app_language.dart';
 import '../../domain/models/app_theme_mode.dart';
 import '../../domain/repositories/backup_repository.dart';
 import '../../domain/repositories/external_links.dart';
 import '../../domain/repositories/file_exchange.dart';
+import '../../domain/repositories/review_prompt.dart';
 import 'database_providers.dart';
 import 'search_providers.dart';
 
@@ -67,4 +69,8 @@ final Provider<FileExchange> fileExchangeProvider = Provider<FileExchange>(
 
 final Provider<ExternalLinks> externalLinksProvider = Provider<ExternalLinks>(
   (ref) => const UrlLauncherLinks(),
+);
+
+final Provider<ReviewPrompt> reviewPromptProvider = Provider<ReviewPrompt>(
+  (ref) => const InAppReviewPrompt(),
 );
