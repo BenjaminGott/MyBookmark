@@ -12,6 +12,7 @@ import '../../domain/models/library_item.dart';
 import '../l10n/error_text.dart';
 import '../l10n/l10n.dart';
 import '../providers/share_providers.dart';
+import '../widgets/readable_width.dart';
 import 'background_picker.dart';
 import 'card_backgrounds.dart';
 import 'card_png.dart';
@@ -133,108 +134,113 @@ class _ShareProgressScreenState extends ConsumerState<ShareProgressScreen> {
 
     return Scaffold(
       appBar: AppBar(title: Text(context.l10n.shareProgress)),
-      body: palette == null
-          ? const Center(child: CircularProgressIndicator())
-          : Column(
-              children: <Widget>[
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: _CardPreview(
-                      cardKey: _cardKey,
-                      item: widget.item,
-                      palette: palette,
-                      cover: _cover,
-                      format: _format,
+      body: ReadableWidth(
+        child: palette == null
+            ? const Center(child: CircularProgressIndicator())
+            : Column(
+                children: <Widget>[
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: _CardPreview(
+                        cardKey: _cardKey,
+                        item: widget.item,
+                        palette: palette,
+                        cover: _cover,
+                        format: _format,
+                      ),
                     ),
                   ),
-                ),
-                BackgroundPicker(
-                  options: _backgrounds!,
-                  selectedIndex: _selected,
-                  customPalette: _custom,
-                  onSelected: (index) => setState(() => _selected = index),
-                  onCustom: _editCustom,
-                ),
-                const SizedBox(height: 4),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: SegmentedButton<ShareCardFormat>(
-                    segments: <ButtonSegment<ShareCardFormat>>[
-                      for (final format in ShareCardFormat.values)
-                        ButtonSegment<ShareCardFormat>(
-                          value: format,
-                          label: Text(format.label(context.l10n)),
-                        ),
-                    ],
-                    selected: <ShareCardFormat>{_format},
-                    showSelectedIcon: false,
-                    onSelectionChanged: _sharing
-                        ? null
-                        : (selection) =>
-                              setState(() => _format = selection.first),
+                  BackgroundPicker(
+                    options: _backgrounds!,
+                    selectedIndex: _selected,
+                    customPalette: _custom,
+                    onSelected: (index) => setState(() => _selected = index),
+                    onCustom: _editCustom,
                   ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  _format.pixels,
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-                SafeArea(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-                    child: Row(
-                      children: <Widget>[
-                        if (_instagram) ...<Widget>[
-                          // Libellé court : trois actions tiennent ainsi sur
-                          // une ligne, même sur un téléphone étroit.
+                  const SizedBox(height: 4),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: SegmentedButton<ShareCardFormat>(
+                      segments: <ButtonSegment<ShareCardFormat>>[
+                        for (final format in ShareCardFormat.values)
+                          ButtonSegment<ShareCardFormat>(
+                            value: format,
+                            label: Text(format.label(context.l10n)),
+                          ),
+                      ],
+                      selected: <ShareCardFormat>{_format},
+                      showSelectedIcon: false,
+                      onSelectionChanged: _sharing
+                          ? null
+                          : (selection) =>
+                                setState(() => _format = selection.first),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    _format.pixels,
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                  SafeArea(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+                      child: Row(
+                        children: <Widget>[
+                          if (_instagram) ...<Widget>[
+                            // Libellé court : trois actions tiennent ainsi sur
+                            // une ligne, même sur un téléphone étroit.
+                            Expanded(
+                              flex: 2,
+                              child: Tooltip(
+                                message: context.l10n.storyTooltip,
+                                child: OutlinedButton.icon(
+                                  onPressed: _sharing ? null : _shareToStory,
+                                  icon: const Icon(Icons.add_circle_outline),
+                                  label: FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    child: Text(
+                                      context.l10n.story,
+                                      maxLines: 1,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                          ],
+                          // Plus large que « Story » : « Partager » est le mot le
+                          // plus long selon les langues (« Compartilhar »). Il
+                          // rétrécit un peu plutôt que de passer à la ligne.
                           Expanded(
-                            flex: 2,
-                            child: Tooltip(
-                              message: context.l10n.storyTooltip,
-                              child: OutlinedButton.icon(
-                                onPressed: _sharing ? null : _shareToStory,
-                                icon: const Icon(Icons.add_circle_outline),
-                                label: FittedBox(
-                                  fit: BoxFit.scaleDown,
-                                  child: Text(context.l10n.story, maxLines: 1),
+                            flex: 3,
+                            child: FilledButton.icon(
+                              onPressed: _sharing ? null : _share,
+                              icon: const Icon(Icons.share_outlined),
+                              label: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(
+                                  _sharing
+                                      ? context.l10n.preparing
+                                      : context.l10n.share,
+                                  maxLines: 1,
                                 ),
                               ),
                             ),
                           ),
-                          const SizedBox(width: 12),
-                        ],
-                        // Plus large que « Story » : « Partager » est le mot le
-                        // plus long selon les langues (« Compartilhar »). Il
-                        // rétrécit un peu plutôt que de passer à la ligne.
-                        Expanded(
-                          flex: 3,
-                          child: FilledButton.icon(
-                            onPressed: _sharing ? null : _share,
-                            icon: const Icon(Icons.share_outlined),
-                            label: FittedBox(
-                              fit: BoxFit.scaleDown,
-                              child: Text(
-                                _sharing
-                                    ? context.l10n.preparing
-                                    : context.l10n.share,
-                                maxLines: 1,
-                              ),
-                            ),
+                          const SizedBox(width: 8),
+                          IconButton.outlined(
+                            onPressed: _sharing ? null : _save,
+                            icon: const Icon(Icons.download_outlined),
+                            tooltip: context.l10n.saveToGallery,
                           ),
-                        ),
-                        const SizedBox(width: 8),
-                        IconButton.outlined(
-                          onPressed: _sharing ? null : _save,
-                          icon: const Icon(Icons.download_outlined),
-                          tooltip: context.l10n.saveToGallery,
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ),
+                ],
+              ),
+      ),
     );
   }
 

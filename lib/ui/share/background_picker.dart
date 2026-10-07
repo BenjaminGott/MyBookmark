@@ -30,27 +30,32 @@ class BackgroundPicker extends StatelessWidget {
   Widget build(BuildContext context) {
     final custom = customPalette;
 
-    return SizedBox(
-      height: 76,
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        children: <Widget>[
-          for (var index = 0; index < options.length; index++)
+    // Les libellés sous les pastilles restent lisibles sans faire déborder la
+    // rangée : leur grossissement est plafonné.
+    return MediaQuery.withClampedTextScaling(
+      maxScaleFactor: 1.3,
+      child: SizedBox(
+        height: 84,
+        child: ListView(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          children: <Widget>[
+            for (var index = 0; index < options.length; index++)
+              _Swatch(
+                label: options[index].kind.label(context.l10n),
+                palette: options[index].palette,
+                selected: selectedIndex == index,
+                onTap: () => onSelected(index),
+              ),
             _Swatch(
-              label: options[index].kind.label(context.l10n),
-              palette: options[index].palette,
-              selected: selectedIndex == index,
-              onTap: () => onSelected(index),
+              label: context.l10n.myColor,
+              palette: custom,
+              selected: selectedIndex == null,
+              onTap: onCustom,
+              icon: Icons.palette_outlined,
             ),
-          _Swatch(
-            label: context.l10n.myColor,
-            palette: custom,
-            selected: selectedIndex == null,
-            onTap: onCustom,
-            icon: Icons.palette_outlined,
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -172,9 +177,9 @@ class _CustomBackgroundSheetState extends State<_CustomBackgroundSheet> {
   }
 
   ProgressCardPalette get _palette => ProgressCardPalette.custom(
-        top: _top.toColor(),
-        bottom: _bottom.toColor(),
-      );
+    top: _top.toColor(),
+    bottom: _bottom.toColor(),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -241,17 +246,20 @@ class _CustomBackgroundSheetState extends State<_CustomBackgroundSheet> {
                 HSVColor.fromAHSV(1, _edited.hue, 0, _edited.value).toColor(),
                 HSVColor.fromAHSV(1, _edited.hue, 1, _edited.value).toColor(),
               ],
-              onChanged: (saturation) => setState(
-                () => _edited = _edited.withSaturation(saturation),
-              ),
+              onChanged: (saturation) =>
+                  setState(() => _edited = _edited.withSaturation(saturation)),
             ),
             _LabelledSlider(
               label: context.l10n.lightness,
               value: _edited.value,
               gradient: <Color>[
                 Colors.black,
-                HSVColor.fromAHSV(1, _edited.hue, _edited.saturation, 1)
-                    .toColor(),
+                HSVColor.fromAHSV(
+                  1,
+                  _edited.hue,
+                  _edited.saturation,
+                  1,
+                ).toColor(),
               ],
               onChanged: (value) =>
                   setState(() => _edited = _edited.withValue(value)),

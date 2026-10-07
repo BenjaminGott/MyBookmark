@@ -10,6 +10,7 @@ import '../l10n/l10n.dart';
 import '../providers/book_actions_controller.dart';
 import '../providers/book_providers.dart';
 import '../share/open_progress_sharing.dart';
+import '../widgets/readable_width.dart';
 import '../widgets/status_views.dart';
 import 'widgets/book_header.dart';
 import 'widgets/dates_card.dart';
@@ -34,25 +35,27 @@ class BookDetailScreen extends ConsumerWidget {
       appBar: AppBar(
         actions: <Widget>[if (item != null) _BookMenu(item: item)],
       ),
-      body: book.when(
-        skipLoadingOnReload: true,
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) => ErrorView(
-          error: error is AppException
-              ? error
-              : const StorageException(AppErrorReason.bookReadFailed),
+      body: ReadableWidth(
+        child: book.when(
+          skipLoadingOnReload: true,
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (error, _) => ErrorView(
+            error: error is AppException
+                ? error
+                : const StorageException(AppErrorReason.bookReadFailed),
+          ),
+          data: (item) {
+            if (item == null) {
+              // Le livre vient d'être supprimé, ici ou depuis un autre écran.
+              return EmptyState(
+                icon: Icons.delete_outline,
+                title: context.l10n.bookDeletedTitle,
+                message: context.l10n.bookDeletedMessage,
+              );
+            }
+            return _BookDetail(item: item);
+          },
         ),
-        data: (item) {
-          if (item == null) {
-            // Le livre vient d'être supprimé, ici ou depuis un autre écran.
-            return EmptyState(
-              icon: Icons.delete_outline,
-              title: context.l10n.bookDeletedTitle,
-              message: context.l10n.bookDeletedMessage,
-            );
-          }
-          return _BookDetail(item: item);
-        },
       ),
     );
   }

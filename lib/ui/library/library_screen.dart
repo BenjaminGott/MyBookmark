@@ -11,6 +11,7 @@ import '../l10n/l10n.dart';
 import '../shelf_labels.dart';
 import '../widgets/book_cover.dart';
 import '../widgets/progress_bar.dart';
+import '../widgets/readable_width.dart';
 import '../widgets/star_rating.dart';
 import '../widgets/status_views.dart';
 import 'library_query_controller.dart';
@@ -60,19 +61,21 @@ class LibraryScreen extends ConsumerWidget {
         label: Text(context.l10n.addBookManually),
         tooltip: context.l10n.addBookManuallyTooltip,
       ),
-      body: library.when(
-        // Un changement de filtre garde la liste à l'écran le temps de la
-        // nouvelle requête.
-        skipLoadingOnReload: true,
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) => ErrorView(
-          error: error is AppException
-              ? error
-              : const StorageException(AppErrorReason.libraryReadFailed),
+      body: ReadableWidth(
+        child: library.when(
+          // Un changement de filtre garde la liste à l'écran le temps de la
+          // nouvelle requête.
+          skipLoadingOnReload: true,
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (error, _) => ErrorView(
+            error: error is AppException
+                ? error
+                : const StorageException(AppErrorReason.libraryReadFailed),
+          ),
+          data: (items) => items.isEmpty
+              ? _EmptyLibrary(query: query, onOpenSearch: onOpenSearch)
+              : _LibraryList(items: items, onOpenBook: onOpenBook),
         ),
-        data: (items) => items.isEmpty
-            ? _EmptyLibrary(query: query, onOpenSearch: onOpenSearch)
-            : _LibraryList(items: items, onOpenBook: onOpenBook),
       ),
     );
   }
@@ -207,22 +210,23 @@ class _LibraryTile extends StatelessWidget {
           const SizedBox(height: 4),
           switch (item.shelf) {
             Shelf.reading => ReadingProgressBar(
-                currentPage: item.currentEntry.currentPage,
-                pageCount: book.pageCount,
-                compact: true,
-              ),
-            Shelf.read => item.rating == null
-                ? Text(
-                    context.l10n.readNotRated,
-                    style: theme.textTheme.labelSmall,
-                  )
-                : StarRating(rating: item.rating, size: 16),
+              currentPage: item.currentEntry.currentPage,
+              pageCount: book.pageCount,
+              compact: true,
+            ),
+            Shelf.read =>
+              item.rating == null
+                  ? Text(
+                      context.l10n.readNotRated,
+                      style: theme.textTheme.labelSmall,
+                    )
+                  : StarRating(rating: item.rating, size: 16),
             Shelf.toRead => Text(
-                book.hasKnownPageCount
-                    ? context.l10n.toReadWithPages(book.pageCount!)
-                    : context.l10n.shelfToRead,
-                style: theme.textTheme.labelSmall,
-              ),
+              book.hasKnownPageCount
+                  ? context.l10n.toReadWithPages(book.pageCount!)
+                  : context.l10n.shelfToRead,
+              style: theme.textTheme.labelSmall,
+            ),
           },
         ],
       ),

@@ -11,6 +11,7 @@ import '../providers/book_providers.dart';
 import '../scan/isbn_scanner_screen.dart';
 import '../shelf_labels.dart';
 import '../widgets/book_cover.dart';
+import '../widgets/readable_width.dart';
 import '../widgets/shelf_picker.dart';
 import '../widgets/status_views.dart';
 import 'search_controller.dart';
@@ -51,40 +52,42 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
     return Scaffold(
       appBar: AppBar(title: Text(context.l10n.searchABook)),
-      body: Column(
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
-            child: TextField(
-              controller: _field,
-              autofocus: true,
-              textInputAction: TextInputAction.search,
-              onChanged: controller.onQueryChanged,
-              decoration: InputDecoration(
-                hintText: context.l10n.searchHint,
-                prefixIcon: const Icon(Icons.search),
-                // Champ vide : le scanner de code-barres ; sinon, effacer.
-                suffixIcon: _field.text.isEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.barcode_reader),
-                        tooltip: context.l10n.scanBarcode,
-                        onPressed: _scan,
-                      )
-                    : IconButton(
-                        icon: const Icon(Icons.clear),
-                        tooltip: context.l10n.clear,
-                        onPressed: () {
-                          _field.clear();
-                          controller.clear();
-                          setState(() {});
-                        },
-                      ),
+      body: ReadableWidth(
+        child: Column(
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+              child: TextField(
+                controller: _field,
+                autofocus: true,
+                textInputAction: TextInputAction.search,
+                onChanged: controller.onQueryChanged,
+                decoration: InputDecoration(
+                  hintText: context.l10n.searchHint,
+                  prefixIcon: const Icon(Icons.search),
+                  // Champ vide : le scanner de code-barres ; sinon, effacer.
+                  suffixIcon: _field.text.isEmpty
+                      ? IconButton(
+                          icon: const Icon(Icons.barcode_reader),
+                          tooltip: context.l10n.scanBarcode,
+                          onPressed: _scan,
+                        )
+                      : IconButton(
+                          icon: const Icon(Icons.clear),
+                          tooltip: context.l10n.clear,
+                          onPressed: () {
+                            _field.clear();
+                            controller.clear();
+                            setState(() {});
+                          },
+                        ),
+                ),
               ),
             ),
-          ),
-          if (state.isLoading) const LinearProgressIndicator(minHeight: 2),
-          Expanded(child: _Results(state: state)),
-        ],
+            if (state.isLoading) const LinearProgressIndicator(minHeight: 2),
+            Expanded(child: _Results(state: state)),
+          ],
+        ),
       ),
     );
   }
