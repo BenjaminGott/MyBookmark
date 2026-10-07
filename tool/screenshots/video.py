@@ -48,6 +48,7 @@ TEXT = {
         'values': ['No account', 'No ads', 'No tracking'],
         'promise': 'Your books stay on your phone.',
         'cta': 'Available on Google Play',
+        'by': 'by libergot',
     },
     'fr': {
         'name': 'Mon marque-page',
@@ -67,10 +68,9 @@ TEXT = {
         'values': ['Sans compte', 'Sans pub', 'Sans pistage'],
         'promise': 'Vos livres restent sur votre téléphone.',
         'cta': 'Disponible sur Google Play',
+        'by': 'par libergot',
     },
 }
-
-SITE = 'benjamingott.github.io/mybookmark'
 
 # Le découpage dans le temps, en secondes.
 INTRO = 3.0
@@ -263,7 +263,7 @@ def render(lang, preview=None):
     ], 1600, center=True)
     cta = text_block([
         (spec['cta'], font('Bold', 44), yellow, 6),
-        (SITE, font('Regular', 32), soft, 0),
+        (spec['by'], font('Regular', 32), soft, 0),
     ], 1000, center=True)
     card = share_card(lang)
     card = card.resize((560, round(560 * card.height / card.width)),
