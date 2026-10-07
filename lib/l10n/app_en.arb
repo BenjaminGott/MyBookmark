@@ -226,5 +226,9 @@
   "aboutRateButton": "Rate on Google Play",
   "aboutWebsite": "Website",
   "aboutPrivacy": "Privacy policy",
-  "aboutLinkFailed": "Couldn't open the link."
+  "aboutLinkFailed": "Couldn't open the link.",
+  "scanBarcode": "Scan a barcode",
+  "scanTitle": "Scan a book",
+  "scanHint": "Point at the barcode on the back of the book.",
+  "scanNotIsbn": "This barcode isn't a book's (ISBN)."
 }

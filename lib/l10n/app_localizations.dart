@@ -1467,6 +1467,30 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Impossible d\'ouvrir le lien.'**
   String get aboutLinkFailed;
+
+  /// No description provided for @scanBarcode.
+  ///
+  /// In fr, this message translates to:
+  /// **'Scanner un code-barres'**
+  String get scanBarcode;
+
+  /// No description provided for @scanTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Scanner un livre'**
+  String get scanTitle;
+
+  /// No description provided for @scanHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Visez le code-barres au dos du livre.'**
+  String get scanHint;
+
+  /// No description provided for @scanNotIsbn.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ce code-barres n\'est pas celui d\'un livre (ISBN).'**
+  String get scanNotIsbn;
 }
 
 class _AppLocalizationsDelegate

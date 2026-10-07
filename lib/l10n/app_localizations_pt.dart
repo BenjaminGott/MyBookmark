@@ -843,4 +843,16 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get aboutLinkFailed => 'Não foi possível abrir o link.';
+
+  @override
+  String get scanBarcode => 'Escanear código de barras';
+
+  @override
+  String get scanTitle => 'Escanear um livro';
+
+  @override
+  String get scanHint => 'Aponte para o código de barras no verso do livro.';
+
+  @override
+  String get scanNotIsbn => 'Este código de barras não é de um livro (ISBN).';
 }

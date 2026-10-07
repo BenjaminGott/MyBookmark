@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import '../../core/cancellation.dart';
 import '../../core/failure.dart';
 import '../../domain/models/book_search_result.dart';
+import '../../domain/services/isbn.dart';
 import 'dto/ol_search_response.dart';
 import 'json_http.dart';
 
@@ -12,7 +13,7 @@ import 'json_http.dart';
 /// des [AppException] déjà rédigées en français.
 class OpenLibraryClient {
   OpenLibraryClient({http.Client? httpClient, Duration? timeout})
-      : _http = JsonHttp(httpClient: httpClient, timeout: timeout);
+    : _http = JsonHttp(httpClient: httpClient, timeout: timeout);
 
   static const String _host = 'openlibrary.org';
 
@@ -36,8 +37,11 @@ class OpenLibraryClient {
       return const <BookSearchResult>[];
     }
 
+    // Un ISBN (tapé ou scanné) se cherche tel quel : la recherche plein
+    // texte le trouverait moins sûrement.
+    final isbn = Isbn.fromQuery(normalizedQuery);
     final uri = Uri.https(_host, '/search.json', <String, String>{
-      'q': normalizedQuery,
+      if (isbn != null) 'isbn': isbn else 'q': normalizedQuery,
       'fields': _searchFields,
       'limit': '$limit',
     });

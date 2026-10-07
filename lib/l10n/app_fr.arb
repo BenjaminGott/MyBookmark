@@ -461,5 +461,9 @@
   "aboutRateButton": "Noter sur Google Play",
   "aboutWebsite": "Site web",
   "aboutPrivacy": "Politique de confidentialité",
-  "aboutLinkFailed": "Impossible d'ouvrir le lien."
+  "aboutLinkFailed": "Impossible d'ouvrir le lien.",
+  "scanBarcode": "Scanner un code-barres",
+  "scanTitle": "Scanner un livre",
+  "scanHint": "Visez le code-barres au dos du livre.",
+  "scanNotIsbn": "Ce code-barres n'est pas celui d'un livre (ISBN)."
 }

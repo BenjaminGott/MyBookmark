@@ -1,4 +1,5 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
     <!-- Seul accès réseau de l'application : l'API Open Library et les
          couvertures. Toutes les données de lecture restent sur le téléphone. -->
     <uses-permission android:name="android.permission.INTERNET"/>
@@ -6,7 +7,21 @@
          antérieurs demandent une permission pour cela. -->
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        android:maxSdkVersion="29"/>
+        android:maxSdkVersion="29"
+        tools:replace="android:maxSdkVersion"/>
+    <!-- Scanner le code-barres d'un livre. L'image est décodée sur le
+         téléphone et n'est jamais enregistrée ni envoyée. -->
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <!-- Le paquet de l'appareil photo demande aussi le micro, inutile ici. -->
+    <uses-permission
+        android:name="android.permission.RECORD_AUDIO"
+        tools:node="remove"/>
+    <!-- Sans appareil photo, l'application s'installe quand même : seul le
+         scanner manque. -->
+    <uses-feature
+        android:name="android.hardware.camera.any"
+        android:required="false"
+        tools:replace="android:required"/>
 
     <application
         android:label="@string/app_name"

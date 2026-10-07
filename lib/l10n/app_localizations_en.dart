@@ -833,4 +833,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get aboutLinkFailed => 'Couldn\'t open the link.';
+
+  @override
+  String get scanBarcode => 'Scan a barcode';
+
+  @override
+  String get scanTitle => 'Scan a book';
+
+  @override
+  String get scanHint => 'Point at the barcode on the back of the book.';
+
+  @override
+  String get scanNotIsbn => 'This barcode isn\'t a book\'s (ISBN).';
 }
