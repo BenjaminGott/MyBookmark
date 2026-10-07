@@ -29,6 +29,8 @@ import 'package:biblivre/ui/providers/settings_providers.dart';
 import 'package:biblivre/ui/providers/share_providers.dart';
 import 'package:biblivre/ui/search/search_screen.dart';
 import 'package:biblivre/ui/settings/settings_screen.dart';
+import 'package:biblivre/ui/share/card_backgrounds.dart';
+import 'package:biblivre/ui/share/progress_share_card.dart';
 import 'package:drift/drift.dart' show Value;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -499,6 +501,99 @@ void main() {
         await settle(tester);
         await settle(tester);
         await capture(tester, '4-share');
+      });
+
+      // La carte de partage seule, au format bloc, coins transparents : celle
+      // qu'Instagram reçoit en sticker. Ses deux couleurs de fond (le haut et
+      // le bas de la story) sont écrites à côté, pour dessiner la story.
+      testWidgets('6-card', (tester) async {
+        // Un livre à la couverture vive, pour une story colorée : Le Petit
+        // Prince en anglais (bleu), Madame Bovary en français, passé « en
+        // cours » pour l'occasion (la couverture française du Petit Prince
+        // est blanche).
+        final (key, page) = series.lang == 'fr'
+            ? ('bovary', 312)
+            : ('prince-en', null);
+        if (page != null) {
+          await tester.runAsync(() async {
+            final entry = await db.readingEntriesDao.findCurrentEntry(
+              ids[key]!,
+            );
+            await db.readingEntriesDao.moveToShelf(
+              entryId: entry!.id,
+              shelf: Shelf.reading,
+            );
+            await db.readingEntriesDao.updateCurrentPage(
+              entryId: entry.id,
+              page: page,
+            );
+          });
+        }
+        final library = await tester.runAsync(
+          () => db.booksDao.watchLibrary().first,
+        );
+        final item = library!.singleWhere((item) => item.book.id == ids[key]);
+        final cover = FileImage(File('${_build.path}/covers/$key.png'));
+        final colors = await tester.runAsync(
+          () => CoverColors.fromCover(cover),
+        );
+        // Parmi les fonds que l'app propose pour cette couverture, le plus
+        // coloré : c'est une image de vitrine.
+        double saturation(BackgroundOption option) =>
+            HSVColor.fromColor(option.palette.top).saturation +
+            HSVColor.fromColor(option.palette.bottom).saturation;
+        final palette =
+            (CardBackgrounds.forCover(colors!).toList()
+                  ..sort((a, b) => saturation(b).compareTo(saturation(a))))
+                .first
+                .palette;
+        final card = GlobalKey();
+
+        debugDisableShadows = false;
+        tester.view.physicalSize = const Size(400, 300) * _ratio;
+        tester.view.devicePixelRatio = _ratio;
+        addTearDown(tester.view.reset);
+        await tester.pumpWidget(
+          MaterialApp(
+            debugShowCheckedModeBanner: false,
+            locale: Locale(series.lang),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            theme: AppTheme.light,
+            home: Material(
+              type: MaterialType.transparency,
+              child: ProgressShareCard(
+                item: item,
+                palette: palette,
+                cover: cover,
+                captureKey: card,
+              ),
+            ),
+          ),
+        );
+        await tester.runAsync(() => precacheImage(cover, card.currentContext!));
+        await settle(tester);
+
+        final boundary =
+            card.currentContext!.findRenderObject()! as RenderRepaintBoundary;
+        await tester.runAsync(() async {
+          final image = await boundary.toImage(pixelRatio: _ratio);
+          final data = await image.toByteData(format: ui.ImageByteFormat.png);
+          image.dispose();
+          await File(
+            '${_build.path}/raw/${series.lang}-6-card.png',
+          ).writeAsBytes(data!.buffer.asUint8List());
+          String hex(Color c) =>
+              '#${c.toARGB32().toRadixString(16).padLeft(8, '0').substring(2)}';
+          await File(
+            '${_build.path}/raw/${series.lang}-6-card.json',
+          ).writeAsString(
+            '{"top": "${hex(palette.top)}", "bottom": "${hex(palette.bottom)}"}',
+          );
+        });
+        debugDisableShadows = true;
+        await tester.pumpWidget(const SizedBox.shrink());
+        await tester.pump(const Duration(milliseconds: 10));
       });
 
       // Pour la vidéo : les réglages, défilés jusqu'à l'import Goodreads.

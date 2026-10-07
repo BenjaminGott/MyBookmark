@@ -22,7 +22,8 @@ from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from compose import (  # noqa: E402
-    GREEN, GREEN_DARK, GREEN_LIGHT, RAW, ROOT, YELLOW, material_font, phone)
+    GREEN, GREEN_DARK, GREEN_LIGHT, RAW, ROOT, YELLOW, material_font, phone,
+    story_screen)
 import music  # noqa: E402
 
 W, H = 1920, 1080
@@ -41,7 +42,9 @@ TEXT = {
             ('3-search', 'Find any book in seconds',
              'Open Library and Apple Books, covers included.'),
             ('4-share', 'Share your progress',
-             "A card in your book's colours, ready for Instagram."),
+             "A card in your book's colours, with the background you like."),
+            ('5-story', 'Straight to your Instagram story',
+             'One tap, and your progress card lands in your story.'),
             ('5-settings', 'Bring your Goodreads library',
              'Import it in one tap. And the app speaks 6 languages.'),
         ],
@@ -61,7 +64,9 @@ TEXT = {
             ('3-search', 'Trouvez un livre en un instant',
              'Open Library et Apple Books, couvertures comprises.'),
             ('4-share', 'Partagez votre progression',
-             'Une carte aux couleurs du livre, prête pour Instagram.'),
+             'Une carte aux couleurs du livre, sur le fond de votre choix.'),
+            ('5-story', 'Direct dans votre story Instagram',
+             'Un geste, et votre carte arrive dans votre story.'),
             ('5-settings', 'Importez votre Goodreads',
              "En un geste. Et l'app parle 6 langues."),
         ],
@@ -77,6 +82,16 @@ INTRO = 3.0
 SCENE = 4.6
 OUTRO = 4.4
 SWIPE = 0.55  # durée du glissement d'un écran à l'autre
+
+# Dans la scène de la story, le sticker apparaît entre ces deux instants.
+STORY_POP = (0.35, 1.05)
+
+
+def ease_back(t):
+    """Arrivée avec un léger rebond, comme un sticker qu'on pose."""
+    t = max(0.0, min(1.0, t))
+    c = 1.4
+    return 1 + (c + 1) * (t - 1) ** 3 + c * (t - 1) ** 2
 
 
 def ease(t):
@@ -163,10 +178,14 @@ def background_strip():
 class Phone:
     """Le téléphone, dont l'écran peut glisser d'une capture à l'autre."""
 
-    def __init__(self, screens, width):
+    def __init__(self, screens, width, light=()):
         self.width = width
-        # Le cadre complet de chaque écran, et le masque de la vitre.
-        self.frames = {name: phone(img, width) for name, img in screens.items()}
+        # Le cadre complet de chaque écran, et le masque de la vitre. Les
+        # écrans de `light` sont sombres : barre d'état en blanc.
+        self.frames = {
+            name: phone(img, width, light_status=name in light)
+            for name, img in screens.items()
+        }
         sample = next(iter(self.frames.values()))
         self.size = sample.size
         bezel = round(width * 0.028)
@@ -232,8 +251,16 @@ def render(lang, preview=None):
     spec = TEXT[lang]
     scenes = spec['scenes']
     screens = {name: Image.open(RAW / f'{lang}-{name}.png')
-               for name, _, _ in scenes}
-    device = Phone(screens, 470)
+               for name, _, _ in scenes if name != '5-story'}
+    # La story : vide à l'arrivée, puis le sticker se pose image par image.
+    screens['5-story-empty'] = story_screen(lang, pop=0)
+    screens['5-story'] = story_screen(lang, pop=1)
+    pop_frames = round((STORY_POP[1] - STORY_POP[0]) * FPS)
+    for k in range(pop_frames):
+        screens[f'5-story@{k}'] = story_screen(
+            lang, pop=ease_back(k / pop_frames))
+    story_keys = [key for key in screens if key.startswith('5-story')]
+    device = Phone(screens, 470, light=story_keys)
     strip = background_strip()
     icon = Image.open(ROOT / 'branding' / 'play-store-icon-512.png').convert('RGBA')
     icon_mask = Image.new('L', icon.size, 0)
@@ -300,6 +327,12 @@ def render(lang, preview=None):
             index_scene = int(local // SCENE)
             s = local - index_scene * SCENE
             name = scenes[index_scene][0]
+            shown = name
+            if name == '5-story':
+                if s < STORY_POP[0]:
+                    shown = '5-story-empty'
+                elif s < STORY_POP[1]:
+                    shown = f'5-story@{int((s - STORY_POP[0]) * FPS)}'
 
             # Le téléphone monte à l'écran au début, puis ne bouge plus ; à la
             # fin de chaque scène, son écran glisse vers le suivant.
@@ -312,9 +345,11 @@ def render(lang, preview=None):
             progress = 0.0
             if s > SCENE - SWIPE and index_scene + 1 < len(scenes):
                 following = scenes[index_scene + 1][0]
+                if following == '5-story':
+                    following = '5-story-empty'
                 progress = (s - (SCENE - SWIPE)) / SWIPE
             img.alpha_composite(device.shadow, (phone_x - 100, y - 100))
-            img.alpha_composite(device.render(name, following, progress),
+            img.alpha_composite(device.render(shown, following, progress),
                                 (phone_x, y))
 
             # Le texte entre par le bas et sort par le haut.
