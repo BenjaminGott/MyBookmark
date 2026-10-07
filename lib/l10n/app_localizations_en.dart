@@ -530,13 +530,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authorLabel => 'Author';
 
   @override
-  String get pageCountLabel => 'Number of pages';
+  String get formSectionCover => 'Cover';
 
   @override
-  String get pageCountHelper => 'Leave empty if you don\'t know it.';
+  String get formSectionBook => 'The book';
 
   @override
-  String get yearLabel => 'Publication year';
+  String get formSectionDetails => 'Details';
+
+  @override
+  String get formDetailsHint => 'Optional: leave blank what you don\'t know.';
+
+  @override
+  String get pagesShortLabel => 'Pages';
+
+  @override
+  String get yearShortLabel => 'Year';
 
   @override
   String get shelfLabel => 'Shelf';

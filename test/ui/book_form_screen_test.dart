@@ -63,8 +63,8 @@ void main() {
 
     await fill(tester, 'Titre *', 'Carnet de bord');
     await fill(tester, 'Auteur', 'Moi');
-    await fill(tester, 'Nombre de pages', '120');
-    await fill(tester, 'Année de parution', '2026');
+    await fill(tester, 'Pages', '120');
+    await fill(tester, 'Année', '2026');
     await tester.tap(find.text('En cours'));
     await settle(tester);
     await tester.tap(find.widgetWithText(FilledButton, 'Ajouter'));
@@ -115,7 +115,7 @@ void main() {
     await pumpForm(tester, const BookFormScreen.create());
 
     await fill(tester, 'Titre *', 'Carnet');
-    await fill(tester, 'Nombre de pages', '0');
+    await fill(tester, 'Pages', '0');
     await tester.tap(find.widgetWithText(FilledButton, 'Ajouter'));
     await settle(tester);
 
@@ -130,7 +130,7 @@ void main() {
     await pumpForm(tester, const BookFormScreen.create());
 
     await fill(tester, 'Titre *', 'Carnet');
-    await fill(tester, 'Année de parution', '9999');
+    await fill(tester, 'Année', '9999');
     await tester.tap(find.widgetWithText(FilledButton, 'Ajouter'));
     await settle(tester);
 
@@ -171,7 +171,7 @@ void main() {
     expect(find.text('Dune'), findsOne);
     expect(find.text('12'), findsOne);
 
-    await fill(tester, 'Nombre de pages', '658');
+    await fill(tester, 'Pages', '658');
     await tester.tap(find.widgetWithText(FilledButton, 'Enregistrer'));
     await settle(tester);
 

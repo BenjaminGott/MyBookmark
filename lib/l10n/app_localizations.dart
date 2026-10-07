@@ -892,23 +892,41 @@ abstract class AppLocalizations {
   /// **'Auteur'**
   String get authorLabel;
 
-  /// No description provided for @pageCountLabel.
+  /// No description provided for @formSectionCover.
   ///
   /// In fr, this message translates to:
-  /// **'Nombre de pages'**
-  String get pageCountLabel;
+  /// **'Couverture'**
+  String get formSectionCover;
 
-  /// No description provided for @pageCountHelper.
+  /// No description provided for @formSectionBook.
   ///
   /// In fr, this message translates to:
-  /// **'Laissez vide si vous ne le connaissez pas.'**
-  String get pageCountHelper;
+  /// **'Le livre'**
+  String get formSectionBook;
 
-  /// No description provided for @yearLabel.
+  /// No description provided for @formSectionDetails.
   ///
   /// In fr, this message translates to:
-  /// **'Année de parution'**
-  String get yearLabel;
+  /// **'Détails'**
+  String get formSectionDetails;
+
+  /// No description provided for @formDetailsHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Facultatif : laissez vide ce que vous ne connaissez pas.'**
+  String get formDetailsHint;
+
+  /// No description provided for @pagesShortLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pages'**
+  String get pagesShortLabel;
+
+  /// No description provided for @yearShortLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Année'**
+  String get yearShortLabel;
 
   /// No description provided for @shelfLabel.
   ///
