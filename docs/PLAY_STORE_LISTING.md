@@ -9,6 +9,12 @@ Visuels : `python3 tool/screenshots/compose.py <dossier> --lang en --store`
 (et `--lang fr`) produit les 4 captures 1080 × 1920 et l'image de présentation
 1024 × 500. Icône : `branding/play-store-icon-512.png`.
 
+Vidéo : `python3 tool/screenshots/video.py` (après les captures) produit
+`build/screenshots/video/mybookmark-en.mp4` et `-fr.mp4`, 1920 × 1080, 30 s.
+Le Play Store n'accepte qu'un **lien YouTube** : mettre la vidéo sur YouTube
+(publique ou non répertoriée, publicités désactivées), puis coller le lien dans
+*Fiche principale → Vidéo*. Une vidéo par langue de fiche.
+
 ---
 
 ## English (en-US)

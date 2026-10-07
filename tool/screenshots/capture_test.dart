@@ -1,4 +1,4 @@
-// Captures d'écran de l'app pour le site (et plus tard le Play Store).
+// Captures d'écran de l'app pour le site, le Play Store et la vidéo.
 //
 // Ce n'est pas un test : c'est un script qui passe par `flutter test` pour
 // dessiner les vrais écrans, avec les vraies polices, sans téléphone.
@@ -28,6 +28,7 @@ import 'package:biblivre/ui/providers/search_providers.dart';
 import 'package:biblivre/ui/providers/settings_providers.dart';
 import 'package:biblivre/ui/providers/share_providers.dart';
 import 'package:biblivre/ui/search/search_screen.dart';
+import 'package:biblivre/ui/settings/settings_screen.dart';
 import 'package:drift/drift.dart' show Value;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -498,6 +499,13 @@ void main() {
         await settle(tester);
         await settle(tester);
         await capture(tester, '4-share');
+      });
+
+      // Pour la vidéo : les réglages, défilés jusqu'à l'import Goodreads.
+      testWidgets('5-settings', (tester) async {
+        await pumpApp(tester, const SettingsScreen());
+        await tester.drag(find.byType(ListView), const Offset(0, -260));
+        await capture(tester, '5-settings');
       });
     });
   }
