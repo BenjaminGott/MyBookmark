@@ -12,6 +12,7 @@ import '../scan/isbn_scanner_screen.dart';
 import '../shelf_labels.dart';
 import '../widgets/book_cover.dart';
 import '../widgets/readable_width.dart';
+import '../widgets/scan_barcode_icon.dart';
 import '../widgets/shelf_picker.dart';
 import '../widgets/status_views.dart';
 import 'search_controller.dart';
@@ -68,7 +69,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                   // Champ vide : le scanner de code-barres ; sinon, effacer.
                   suffixIcon: _field.text.isEmpty
                       ? IconButton(
-                          icon: const Icon(Icons.barcode_reader),
+                          icon: const ScanBarcodeIcon(),
                           tooltip: context.l10n.scanBarcode,
                           onPressed: _scan,
                         )
