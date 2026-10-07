@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Widget d'écran d'accueil (voir ReadingWidgetProvider). -->
+    <string name="widget_name">Lectura actual</string>
+    <string name="widget_description">Tu libro actual y tu progreso, en la pantalla de inicio.</string>
+    <string name="widget_kicker">LEYENDO AHORA</string>
+    <string name="widget_sample_title">El principito</string>
+    <string name="widget_sample_author">Antoine de Saint-Exupéry</string>
+    <string name="widget_sample_progress">Página 60 de 96 · 62 %</string>
+    <string name="widget_empty_title">Ningún libro en curso</string>
+    <string name="widget_empty_hint">Toca para empezar uno.</string>
+</resources>

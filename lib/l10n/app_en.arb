@@ -230,5 +230,7 @@
   "scanBarcode": "Scan a barcode",
   "scanTitle": "Scan a book",
   "scanHint": "Point at the barcode on the back of the book.",
-  "scanNotIsbn": "This barcode isn't a book's (ISBN)."
+  "scanNotIsbn": "This barcode isn't a book's (ISBN).",
+  "widgetEmptyTitle": "No book in progress",
+  "widgetEmptyHint": "Tap to start one."
 }

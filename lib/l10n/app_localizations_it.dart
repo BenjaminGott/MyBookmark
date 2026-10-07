@@ -857,4 +857,10 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get scanNotIsbn =>
       'Questo codice a barre non è quello di un libro (ISBN).';
+
+  @override
+  String get widgetEmptyTitle => 'Nessun libro in corso';
+
+  @override
+  String get widgetEmptyHint => 'Tocca per iniziarne uno.';
 }

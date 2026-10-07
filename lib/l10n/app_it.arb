@@ -230,5 +230,7 @@
   "scanBarcode": "Scansiona un codice a barre",
   "scanTitle": "Scansiona un libro",
   "scanHint": "Inquadra il codice a barre sul retro del libro.",
-  "scanNotIsbn": "Questo codice a barre non è quello di un libro (ISBN)."
+  "scanNotIsbn": "Questo codice a barre non è quello di un libro (ISBN).",
+  "widgetEmptyTitle": "Nessun libro in corso",
+  "widgetEmptyHint": "Tocca per iniziarne uno."
 }

@@ -1491,6 +1491,18 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Ce code-barres n\'est pas celui d\'un livre (ISBN).'**
   String get scanNotIsbn;
+
+  /// No description provided for @widgetEmptyTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun livre en cours'**
+  String get widgetEmptyTitle;
+
+  /// No description provided for @widgetEmptyHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Touchez pour en commencer un.'**
+  String get widgetEmptyHint;
 }
 
 class _AppLocalizationsDelegate

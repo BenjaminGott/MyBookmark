@@ -863,4 +863,10 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get scanNotIsbn => 'Dieser Barcode gehört zu keinem Buch (ISBN).';
+
+  @override
+  String get widgetEmptyTitle => 'Kein Buch in Arbeit';
+
+  @override
+  String get widgetEmptyHint => 'Tippe, um eines anzufangen.';
 }

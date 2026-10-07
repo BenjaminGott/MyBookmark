@@ -845,4 +845,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get scanNotIsbn => 'This barcode isn\'t a book\'s (ISBN).';
+
+  @override
+  String get widgetEmptyTitle => 'No book in progress';
+
+  @override
+  String get widgetEmptyHint => 'Tap to start one.';
 }

@@ -1,4 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Mon marque-page</string>
+
+    <!-- Widget d'écran d'accueil (voir ReadingWidgetProvider). -->
+    <string name="widget_name">Lecture en cours</string>
+    <string name="widget_description">Votre livre en cours et sa progression, sur l\'écran d\'accueil.</string>
+    <string name="widget_kicker">EN COURS DE LECTURE</string>
+    <string name="widget_sample_title">Le Petit Prince</string>
+    <string name="widget_sample_author">Antoine de Saint-Exupéry</string>
+    <string name="widget_sample_progress">Page 60 sur 96 · 62 %</string>
+    <string name="widget_empty_title">Aucun livre en cours</string>
+    <string name="widget_empty_hint">Touchez pour en commencer un.</string>
 </resources>

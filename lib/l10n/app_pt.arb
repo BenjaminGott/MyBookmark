@@ -230,5 +230,7 @@
   "scanBarcode": "Escanear código de barras",
   "scanTitle": "Escanear um livro",
   "scanHint": "Aponte para o código de barras no verso do livro.",
-  "scanNotIsbn": "Este código de barras não é de um livro (ISBN)."
+  "scanNotIsbn": "Este código de barras não é de um livro (ISBN).",
+  "widgetEmptyTitle": "Nenhum livro em andamento",
+  "widgetEmptyHint": "Toque para começar um."
 }

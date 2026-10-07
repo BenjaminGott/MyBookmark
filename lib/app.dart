@@ -8,11 +8,16 @@ import 'l10n/app_localizations.dart';
 import 'ui/home_shell.dart';
 import 'ui/providers/settings_providers.dart';
 import 'ui/welcome/welcome_screen.dart';
+import 'ui/widget/reading_widget_sync.dart';
 
 /// Racine de l'application : thèmes clair et sombre, interface en français,
 /// anglais, espagnol, allemand, italien ou portugais.
 class MyBookmarkApp extends ConsumerWidget {
   const MyBookmarkApp({super.key});
+
+  /// Pour ouvrir un livre touché dans le widget d'écran d'accueil.
+  static final GlobalKey<NavigatorState> navigatorKey =
+      GlobalKey<NavigatorState>();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -21,6 +26,11 @@ class MyBookmarkApp extends ConsumerWidget {
     final code = language?.languageCode;
 
     return MaterialApp(
+      navigatorKey: navigatorKey,
+      builder: (context, child) => ReadingWidgetSync(
+        navigatorKey: navigatorKey,
+        child: child ?? const SizedBox.shrink(),
+      ),
       onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,

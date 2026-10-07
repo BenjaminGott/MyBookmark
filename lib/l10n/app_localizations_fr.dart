@@ -862,4 +862,10 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get scanNotIsbn =>
       'Ce code-barres n\'est pas celui d\'un livre (ISBN).';
+
+  @override
+  String get widgetEmptyTitle => 'Aucun livre en cours';
+
+  @override
+  String get widgetEmptyHint => 'Touchez pour en commencer un.';
 }

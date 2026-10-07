@@ -465,5 +465,7 @@
   "scanBarcode": "Scanner un code-barres",
   "scanTitle": "Scanner un livre",
   "scanHint": "Visez le code-barres au dos du livre.",
-  "scanNotIsbn": "Ce code-barres n'est pas celui d'un livre (ISBN)."
+  "scanNotIsbn": "Ce code-barres n'est pas celui d'un livre (ISBN).",
+  "widgetEmptyTitle": "Aucun livre en cours",
+  "widgetEmptyHint": "Touchez pour en commencer un."
 }

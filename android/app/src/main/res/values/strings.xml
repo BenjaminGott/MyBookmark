@@ -2,4 +2,14 @@
 <resources>
     <!-- Nom sous l'icône : suit la langue du téléphone. -->
     <string name="app_name">MyBookmark</string>
+
+    <!-- Widget d'écran d'accueil (voir ReadingWidgetProvider). -->
+    <string name="widget_name">Reading now</string>
+    <string name="widget_description">Your current book and its progress, on your home screen.</string>
+    <string name="widget_kicker">CURRENTLY READING</string>
+    <string name="widget_sample_title">The Little Prince</string>
+    <string name="widget_sample_author">Antoine de Saint-Exupéry</string>
+    <string name="widget_sample_progress">Page 60 of 96 · 62%</string>
+    <string name="widget_empty_title">No book in progress</string>
+    <string name="widget_empty_hint">Tap to start one.</string>
 </resources>

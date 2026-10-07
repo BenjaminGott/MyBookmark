@@ -230,5 +230,7 @@
   "scanBarcode": "Barcode scannen",
   "scanTitle": "Buch scannen",
   "scanHint": "Richte die Kamera auf den Barcode auf der Rückseite des Buchs.",
-  "scanNotIsbn": "Dieser Barcode gehört zu keinem Buch (ISBN)."
+  "scanNotIsbn": "Dieser Barcode gehört zu keinem Buch (ISBN).",
+  "widgetEmptyTitle": "Kein Buch in Arbeit",
+  "widgetEmptyHint": "Tippe, um eines anzufangen."
 }
