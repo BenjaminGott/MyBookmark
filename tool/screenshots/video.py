@@ -1,6 +1,7 @@
 """Monte la vidéo de présentation (Play Store, site) à partir des captures.
 
-Paysage 1920 × 1080, 30 images par seconde, environ 30 secondes, sans son.
+Paysage 1920 × 1080, 30 images par seconde, environ 30 secondes, avec la
+musique originale de music.py.
 Même univers que les visuels de compose.py : fond vert, ruban jaune de
 marque-page, téléphone. Le téléphone reste à l'écran et ses écrans défilent
 comme sous le doigt ; le texte change à côté.
@@ -22,6 +23,7 @@ from PIL import Image, ImageDraw, ImageFilter, ImageFont
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from compose import (  # noqa: E402
     GREEN, GREEN_DARK, GREEN_LIGHT, RAW, ROOT, YELLOW, material_font, phone)
+import music  # noqa: E402
 
 W, H = 1920, 1080
 FPS = 30
@@ -45,7 +47,7 @@ TEXT = {
         ],
         'values': ['No account', 'No ads', 'No tracking'],
         'promise': 'Your books stay on your phone.',
-        'cta': 'Coming soon to Google Play',
+        'cta': 'Available on Google Play',
     },
     'fr': {
         'name': 'Mon marque-page',
@@ -64,7 +66,7 @@ TEXT = {
         ],
         'values': ['Sans compte', 'Sans pub', 'Sans pistage'],
         'promise': 'Vos livres restent sur votre téléphone.',
-        'cta': 'Bientôt sur Google Play',
+        'cta': 'Disponible sur Google Play',
     },
 }
 
@@ -361,12 +363,17 @@ def render(lang, preview=None):
                 OUT / f'preview-{lang}-{second:05.2f}.png')
         return
 
+    total_seconds = frame_count / FPS
+    soundtrack = OUT / 'music.wav'
+    music.write(music.compose(total_seconds), soundtrack)
+
     mp4 = OUT / f'mybookmark-{lang}.mp4'
+    silent = OUT / f'silent-{lang}.mp4'
     encoder = subprocess.Popen(
         ['ffmpeg', '-y', '-loglevel', 'error', '-f', 'rawvideo',
          '-pix_fmt', 'rgb24', '-s', f'{W}x{H}', '-r', str(FPS), '-i', '-',
          '-c:v', 'libx264', '-preset', 'slow', '-crf', '20',
-         '-pix_fmt', 'yuv420p', '-movflags', '+faststart', str(mp4)],
+         '-pix_fmt', 'yuv420p', str(silent)],
         stdin=subprocess.PIPE)
     poster_at = round((INTRO + SCENE * 0.6) * FPS)
     for index in range(frame_count):
@@ -377,9 +384,18 @@ def render(lang, preview=None):
     encoder.stdin.close()
     encoder.wait()
 
+    # La musique est ajoutée sans réencoder l'image.
+    subprocess.run(
+        ['ffmpeg', '-y', '-loglevel', 'error', '-i', str(silent),
+         '-i', str(soundtrack), '-map', '0:v', '-map', '1:a', '-c:v', 'copy',
+         '-c:a', 'aac', '-b:a', '160k', '-shortest', '-movflags', '+faststart',
+         str(mp4)], check=True)
+    silent.unlink()
+
     subprocess.run(
         ['ffmpeg', '-y', '-loglevel', 'error', '-i', str(mp4),
          '-c:v', 'libvpx-vp9', '-b:v', '0', '-crf', '36', '-row-mt', '1',
+         '-c:a', 'libopus', '-b:a', '128k',
          str(OUT / f'mybookmark-{lang}.webm')], check=True)
     print(f'{lang} : {mp4} ({frame_count / FPS:.1f} s)')
 
