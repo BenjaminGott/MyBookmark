@@ -8,8 +8,11 @@ import '../l10n/error_text.dart';
 import '../l10n/l10n.dart';
 import '../providers/book_actions_controller.dart';
 import '../providers/book_providers.dart';
+import '../scan/isbn_scanner_screen.dart';
 import '../shelf_labels.dart';
 import '../widgets/book_cover.dart';
+import '../widgets/readable_width.dart';
+import '../widgets/scan_barcode_icon.dart';
 import '../widgets/shelf_picker.dart';
 import '../widgets/status_views.dart';
 import 'search_controller.dart';
@@ -32,6 +35,17 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     super.dispose();
   }
 
+  /// Lit l'ISBN au dos d'un livre et le cherche aussitôt.
+  Future<void> _scan() async {
+    final isbn = await ref.read(isbnScannerProvider)(context);
+    if (isbn == null || !mounted) {
+      return;
+    }
+    _field.text = isbn;
+    setState(() {});
+    ref.read(searchControllerProvider.notifier).onQueryChanged(isbn);
+  }
+
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(searchControllerProvider);
@@ -39,35 +53,42 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
     return Scaffold(
       appBar: AppBar(title: Text(context.l10n.searchABook)),
-      body: Column(
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
-            child: TextField(
-              controller: _field,
-              autofocus: true,
-              textInputAction: TextInputAction.search,
-              onChanged: controller.onQueryChanged,
-              decoration: InputDecoration(
-                hintText: context.l10n.searchHint,
-                prefixIcon: const Icon(Icons.search),
-                suffixIcon: _field.text.isEmpty
-                    ? null
-                    : IconButton(
-                        icon: const Icon(Icons.clear),
-                        tooltip: context.l10n.clear,
-                        onPressed: () {
-                          _field.clear();
-                          controller.clear();
-                          setState(() {});
-                        },
-                      ),
+      body: ReadableWidth(
+        child: Column(
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+              child: TextField(
+                controller: _field,
+                autofocus: true,
+                textInputAction: TextInputAction.search,
+                onChanged: controller.onQueryChanged,
+                decoration: InputDecoration(
+                  hintText: context.l10n.searchHint,
+                  prefixIcon: const Icon(Icons.search),
+                  // Champ vide : le scanner de code-barres ; sinon, effacer.
+                  suffixIcon: _field.text.isEmpty
+                      ? IconButton(
+                          icon: const ScanBarcodeIcon(),
+                          tooltip: context.l10n.scanBarcode,
+                          onPressed: _scan,
+                        )
+                      : IconButton(
+                          icon: const Icon(Icons.clear),
+                          tooltip: context.l10n.clear,
+                          onPressed: () {
+                            _field.clear();
+                            controller.clear();
+                            setState(() {});
+                          },
+                        ),
+                ),
               ),
             ),
-          ),
-          if (state.isLoading) const LinearProgressIndicator(minHeight: 2),
-          Expanded(child: _Results(state: state)),
-        ],
+            if (state.isLoading) const LinearProgressIndicator(minHeight: 2),
+            Expanded(child: _Results(state: state)),
+          ],
+        ),
       ),
     );
   }
@@ -182,12 +203,10 @@ class _ResultTile extends ConsumerWidget {
     messenger.hideCurrentSnackBar();
     messenger.showSnackBar(
       SnackBar(
-        content: Text(
-          switch (outcome) {
-            ActionSuccess() => shelf.addedMessage(l10n),
-            ActionFailure(:final error) => error.describe(l10n),
-          },
-        ),
+        content: Text(switch (outcome) {
+          ActionSuccess() => shelf.addedMessage(l10n),
+          ActionFailure(:final error) => error.describe(l10n),
+        }),
       ),
     );
   }

@@ -27,20 +27,19 @@ class FilePickerExchange implements FileExchange {
       );
       return saved != null;
     } on PlatformException {
-      throw const FileAccessException(
-        AppErrorReason.exportLocation,
-      );
+      throw const FileAccessException(AppErrorReason.exportLocation);
     }
   }
 
   @override
-  Future<String?> pickText() async {
+  Future<String?> pickText({
+    List<String> extensions = const <String>['json'],
+  }) async {
     final PlatformFile? file;
     try {
       file = await FilePicker.pickFile(
-        dialogTitle: 'Choisir une sauvegarde',
         type: FileType.custom,
-        allowedExtensions: <String>['json'],
+        allowedExtensions: extensions,
       );
     } on PlatformException {
       throw const FileAccessException();
@@ -55,9 +54,7 @@ class FilePickerExchange implements FileExchange {
     } on PlatformException {
       throw const FileAccessException(AppErrorReason.fileRead);
     } on FormatException {
-      throw const MalformedBackupException(
-        AppErrorReason.backupNotText,
-      );
+      throw const MalformedBackupException(AppErrorReason.backupNotText);
     }
   }
 }

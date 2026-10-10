@@ -405,6 +405,20 @@ class AppLocalizationsPt extends AppLocalizations {
   String get importSubtitle => 'De um arquivo JSON';
 
   @override
+  String get importGoodreads => 'Importar do Goodreads';
+
+  @override
+  String get importGoodreadsSubtitle =>
+      'Arquivo CSV exportado do goodreads.com (My Books → Import and export)';
+
+  @override
+  String get importGoodreadsFile => 'Exportação do Goodreads:';
+
+  @override
+  String get errorMalformedGoodreads =>
+      'Este arquivo não é uma exportação do Goodreads. No goodreads.com, abra My Books → Import and export → Export Library.';
+
+  @override
   String exportedTo(String name) {
     return 'Biblioteca exportada em $name';
   }
@@ -519,13 +533,23 @@ class AppLocalizationsPt extends AppLocalizations {
   String get authorLabel => 'Autor';
 
   @override
-  String get pageCountLabel => 'Número de páginas';
+  String get formSectionCover => 'Capa';
 
   @override
-  String get pageCountHelper => 'Deixe em branco se não souber.';
+  String get formSectionBook => 'O livro';
 
   @override
-  String get yearLabel => 'Ano de publicação';
+  String get formSectionDetails => 'Detalhes';
+
+  @override
+  String get formDetailsHint =>
+      'Opcional: deixe em branco o que você não souber.';
+
+  @override
+  String get pagesShortLabel => 'Páginas';
+
+  @override
+  String get yearShortLabel => 'Ano';
 
   @override
   String get shelfLabel => 'Estante';
@@ -750,4 +774,91 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get errorImageSaveFailed => 'Não foi possível salvar a imagem.';
+
+  @override
+  String get aboutTitle => 'Sobre';
+
+  @override
+  String get aboutSubtitle => 'Quem sou, o espírito do app, contato';
+
+  @override
+  String get aboutBy => 'por libergot';
+
+  @override
+  String get aboutWhoTitle => 'Quem sou';
+
+  @override
+  String get aboutWhoBody =>
+      'Sou libergot, um desenvolvedor independente. Criei o MyBookmark porque queria um jeito simples de acompanhar minhas leituras: saber onde parei, lembrar o que achei de cada livro e compartilhar os meus favoritos.';
+
+  @override
+  String get aboutSpiritTitle => 'O espírito do app';
+
+  @override
+  String get aboutSpiritFree => 'Gratuito e sem anúncios';
+
+  @override
+  String get aboutSpiritNoAccount => 'Nenhuma conta para criar';
+
+  @override
+  String get aboutSpiritLocal => 'Seus livros ficam no seu celular';
+
+  @override
+  String get aboutSpiritNoTracking =>
+      'Sem rastreamento, sem estatísticas de uso';
+
+  @override
+  String get aboutFeedbackTitle => 'Uma ideia, um bug?';
+
+  @override
+  String get aboutFeedbackBody =>
+      'O MyBookmark cresce com o seu retorno. Uma função que faz falta, algo que não funciona: me escreva.';
+
+  @override
+  String get aboutFeedbackButton => 'Me escrever';
+
+  @override
+  String get aboutFeedbackSubject => 'MyBookmark: uma sugestão';
+
+  @override
+  String aboutNoMailApp(String email) {
+    return 'Nenhum app de e-mail encontrado. Meu endereço foi copiado: $email';
+  }
+
+  @override
+  String get aboutRateTitle => 'Gostou do MyBookmark?';
+
+  @override
+  String get aboutRateBody =>
+      'Uma avaliação no Google Play ajuda outros leitores a descobrir o app. Obrigado!';
+
+  @override
+  String get aboutRateButton => 'Avaliar no Google Play';
+
+  @override
+  String get aboutWebsite => 'Site';
+
+  @override
+  String get aboutPrivacy => 'Política de privacidade';
+
+  @override
+  String get aboutLinkFailed => 'Não foi possível abrir o link.';
+
+  @override
+  String get scanBarcode => 'Escanear código de barras';
+
+  @override
+  String get scanTitle => 'Escanear um livro';
+
+  @override
+  String get scanHint => 'Aponte para o código de barras no verso do livro.';
+
+  @override
+  String get scanNotIsbn => 'Este código de barras não é de um livro (ISBN).';
+
+  @override
+  String get widgetEmptyTitle => 'Nenhum livro em andamento';
+
+  @override
+  String get widgetEmptyHint => 'Toque para começar um.';
 }

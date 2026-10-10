@@ -407,6 +407,20 @@ class AppLocalizationsFr extends AppLocalizations {
   String get importSubtitle => 'Depuis un fichier JSON';
 
   @override
+  String get importGoodreads => 'Importer depuis Goodreads';
+
+  @override
+  String get importGoodreadsSubtitle =>
+      'Fichier CSV exporté depuis goodreads.com (My Books → Import and export)';
+
+  @override
+  String get importGoodreadsFile => 'Export Goodreads :';
+
+  @override
+  String get errorMalformedGoodreads =>
+      'Ce fichier n\'est pas un export Goodreads. Sur goodreads.com, ouvrez My Books → Import and export → Export Library.';
+
+  @override
   String exportedTo(String name) {
     return 'Bibliothèque exportée dans $name';
   }
@@ -521,13 +535,23 @@ class AppLocalizationsFr extends AppLocalizations {
   String get authorLabel => 'Auteur';
 
   @override
-  String get pageCountLabel => 'Nombre de pages';
+  String get formSectionCover => 'Couverture';
 
   @override
-  String get pageCountHelper => 'Laissez vide si vous ne le connaissez pas.';
+  String get formSectionBook => 'Le livre';
 
   @override
-  String get yearLabel => 'Année de parution';
+  String get formSectionDetails => 'Détails';
+
+  @override
+  String get formDetailsHint =>
+      'Facultatif : laissez vide ce que vous ne connaissez pas.';
+
+  @override
+  String get pagesShortLabel => 'Pages';
+
+  @override
+  String get yearShortLabel => 'Année';
 
   @override
   String get shelfLabel => 'Étagère';
@@ -756,4 +780,92 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get errorImageSaveFailed => 'L\'image n\'a pas pu être enregistrée.';
+
+  @override
+  String get aboutTitle => 'À propos';
+
+  @override
+  String get aboutSubtitle => 'Qui je suis, l\'esprit de l\'app, me contacter';
+
+  @override
+  String get aboutBy => 'par libergot';
+
+  @override
+  String get aboutWhoTitle => 'Qui je suis';
+
+  @override
+  String get aboutWhoBody =>
+      'Je suis libergot, un développeur indépendant. J\'ai créé Mon marque-page parce que je voulais une façon simple de suivre mes lectures : savoir où j\'en suis, me souvenir de ce que j\'en ai pensé, et partager mes coups de cœur.';
+
+  @override
+  String get aboutSpiritTitle => 'L\'esprit de l\'application';
+
+  @override
+  String get aboutSpiritFree => 'Gratuite et sans publicité';
+
+  @override
+  String get aboutSpiritNoAccount => 'Pas de compte à créer';
+
+  @override
+  String get aboutSpiritLocal => 'Vos livres restent sur votre téléphone';
+
+  @override
+  String get aboutSpiritNoTracking =>
+      'Aucun pistage, aucune statistique d\'usage';
+
+  @override
+  String get aboutFeedbackTitle => 'Une idée, un bug ?';
+
+  @override
+  String get aboutFeedbackBody =>
+      'Mon marque-page grandit avec vos retours. Une fonction qui vous manque, quelque chose qui ne marche pas : écrivez-moi.';
+
+  @override
+  String get aboutFeedbackButton => 'M\'écrire';
+
+  @override
+  String get aboutFeedbackSubject => 'Mon marque-page : une suggestion';
+
+  @override
+  String aboutNoMailApp(String email) {
+    return 'Aucune application de messagerie. Mon adresse est copiée : $email';
+  }
+
+  @override
+  String get aboutRateTitle => 'Vous aimez Mon marque-page ?';
+
+  @override
+  String get aboutRateBody =>
+      'Une note sur Google Play aide d\'autres lecteurs à découvrir l\'application. Merci !';
+
+  @override
+  String get aboutRateButton => 'Noter sur Google Play';
+
+  @override
+  String get aboutWebsite => 'Site web';
+
+  @override
+  String get aboutPrivacy => 'Politique de confidentialité';
+
+  @override
+  String get aboutLinkFailed => 'Impossible d\'ouvrir le lien.';
+
+  @override
+  String get scanBarcode => 'Scanner un code-barres';
+
+  @override
+  String get scanTitle => 'Scanner un livre';
+
+  @override
+  String get scanHint => 'Visez le code-barres au dos du livre.';
+
+  @override
+  String get scanNotIsbn =>
+      'Ce code-barres n\'est pas celui d\'un livre (ISBN).';
+
+  @override
+  String get widgetEmptyTitle => 'Aucun livre en cours';
+
+  @override
+  String get widgetEmptyHint => 'Touchez pour en commencer un.';
 }

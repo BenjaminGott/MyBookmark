@@ -5,6 +5,7 @@ import 'package:biblivre/app.dart';
 import 'package:biblivre/data/prefs/preferences_service.dart';
 import 'package:biblivre/domain/models/app_language.dart';
 import 'package:biblivre/l10n/app_localizations.dart';
+import 'package:biblivre/ui/l10n/language_dropdown.dart';
 import 'package:biblivre/ui/providers/settings_providers.dart';
 import 'package:biblivre/ui/welcome/welcome_screen.dart';
 import 'package:flutter/material.dart';
@@ -161,8 +162,20 @@ void main() {
       return container;
     }
 
+    Future<void> openLanguages(WidgetTester tester) async {
+      await tester.tap(find.byType(LanguageDropdown));
+      await tester.pumpAndSettle();
+    }
+
+    Future<void> chooseLanguage(WidgetTester tester, String name) async {
+      await openLanguages(tester);
+      await tester.tap(find.text(name).last);
+      await tester.pumpAndSettle();
+    }
+
     testWidgets('propose toutes les langues', (tester) async {
       await pumpWelcome(tester);
+      await openLanguages(tester);
 
       for (final name in <String>[
         'Français',
@@ -172,15 +185,14 @@ void main() {
         'Italiano',
         'Português',
       ]) {
-        expect(find.text(name), findsOne, reason: name);
+        expect(find.text(name), findsWidgets, reason: name);
       }
     });
 
     testWidgets('se traduit aussi en allemand', (tester) async {
       await pumpWelcome(tester);
 
-      await tester.tap(find.text('Deutsch'));
-      await tester.pump();
+      await chooseLanguage(tester, 'Deutsch');
 
       expect(find.text('Wähle deine Sprache'), findsOne);
       expect(find.text('Weiter'), findsOne);
@@ -189,8 +201,7 @@ void main() {
     testWidgets('se traduit dès qu\'on choisit une langue', (tester) async {
       final container = await pumpWelcome(tester);
 
-      await tester.tap(find.text('English'));
-      await tester.pump();
+      await chooseLanguage(tester, 'English');
 
       expect(find.text('Choose your language'), findsOne);
       expect(find.text('Continue'), findsOne);
@@ -206,8 +217,7 @@ void main() {
     testWidgets('enregistre le français', (tester) async {
       final container = await pumpWelcome(tester);
 
-      await tester.tap(find.text('Français'));
-      await tester.pump();
+      await chooseLanguage(tester, 'Français');
       await tester.tap(find.text('Continuer'));
       await tester.pump();
 

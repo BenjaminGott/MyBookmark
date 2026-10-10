@@ -15,6 +15,7 @@ import '../providers/book_actions_controller.dart';
 import '../providers/book_providers.dart';
 import '../shelf_labels.dart';
 import '../widgets/book_cover.dart';
+import '../widgets/readable_width.dart';
 import 'cover_search_sheet.dart';
 
 /// Saisie manuelle d'un livre, et correction d'un livre existant.
@@ -41,18 +42,21 @@ class BookFormScreen extends ConsumerStatefulWidget {
 class _BookFormScreenState extends ConsumerState<BookFormScreen> {
   final GlobalKey<FormState> _form = GlobalKey<FormState>();
 
-  late final TextEditingController _title =
-      TextEditingController(text: widget.existing?.title ?? '');
-  late final TextEditingController _author =
-      TextEditingController(text: widget.existing?.author ?? '');
+  late final TextEditingController _title = TextEditingController(
+    text: widget.existing?.title ?? '',
+  );
+  late final TextEditingController _author = TextEditingController(
+    text: widget.existing?.author ?? '',
+  );
   late final TextEditingController _pageCount = TextEditingController(
     text: widget.existing?.pageCount?.toString() ?? '',
   );
   late final TextEditingController _year = TextEditingController(
     text: widget.existing?.firstPublishYear?.toString() ?? '',
   );
-  late final TextEditingController _description =
-      TextEditingController(text: widget.existing?.description ?? '');
+  late final TextEditingController _description = TextEditingController(
+    text: widget.existing?.description ?? '',
+  );
 
   Shelf _shelf = Shelf.toRead;
 
@@ -99,112 +103,230 @@ class _BookFormScreenState extends ConsumerState<BookFormScreen> {
           widget.isEditing ? l10n.editBookDetails : l10n.addBookTitle,
         ),
       ),
-      body: Form(
-        key: _form,
-        child: ListView(
-          padding: const EdgeInsets.all(16),
-          children: <Widget>[
-            _CoverField(
-              url: _coverUrl,
-              onSearch: busy ? null : _searchCover,
-              onPick: busy ? null : _pickCover,
-              onRemove: busy || _coverUrl == null
-                  ? null
-                  : () => setState(() {
-                        _coverUrl = null;
-                        _coverId = null;
-                      }),
+      // Le bouton reste en bas de l'écran, toujours visible, au-dessus de la
+      // barre de navigation du téléphone.
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+          child: FilledButton.icon(
+            onPressed: busy ? null : _submit,
+            icon: Icon(widget.isEditing ? Icons.check : Icons.add),
+            label: Text(widget.isEditing ? l10n.save : l10n.add),
+            style: FilledButton.styleFrom(
+              minimumSize: const Size.fromHeight(52),
             ),
-            const SizedBox(height: 24),
-            TextFormField(
-              controller: _title,
-              autofocus: !widget.isEditing,
-              textCapitalization: TextCapitalization.sentences,
-              decoration: InputDecoration(
-                labelText: l10n.titleRequiredLabel,
-                hintText: l10n.requiredHint,
+          ),
+        ),
+      ),
+      body: ReadableWidth(
+        child: Form(
+          key: _form,
+          child: ListView(
+            // La marge du bas laisse passer la barre de navigation du
+            // téléphone, pour les écrans sans barre en bas.
+            padding: EdgeInsets.fromLTRB(
+              16,
+              8,
+              16,
+              16 + MediaQuery.paddingOf(context).bottom,
+            ),
+            children: <Widget>[
+              _Section(
+                icon: Icons.image_outlined,
+                title: l10n.formSectionCover,
+                child: _CoverField(
+                  url: _coverUrl,
+                  onSearch: busy ? null : _searchCover,
+                  onPick: busy ? null : _pickCover,
+                  onRemove: busy || _coverUrl == null
+                      ? null
+                      : () => setState(() {
+                          _coverUrl = null;
+                          _coverId = null;
+                        }),
+                ),
               ),
-              validator: (value) =>
-                  (value ?? '').trim().isEmpty ? l10n.titleRequired : null,
-            ),
-            const SizedBox(height: 16),
-            TextFormField(
-              controller: _author,
-              textCapitalization: TextCapitalization.words,
-              decoration: InputDecoration(labelText: l10n.authorLabel),
-            ),
-            const SizedBox(height: 16),
-            TextFormField(
-              controller: _pageCount,
-              keyboardType: TextInputType.number,
-              inputFormatters: <TextInputFormatter>[
-                FilteringTextInputFormatter.digitsOnly,
-              ],
-              decoration: InputDecoration(
-                labelText: l10n.pageCountLabel,
-                helperText: l10n.pageCountHelper,
-              ),
-              validator: _validatePageCount,
-            ),
-            const SizedBox(height: 16),
-            TextFormField(
-              controller: _year,
-              keyboardType: TextInputType.number,
-              inputFormatters: <TextInputFormatter>[
-                FilteringTextInputFormatter.digitsOnly,
-              ],
-              decoration: InputDecoration(labelText: l10n.yearLabel),
-              validator: _validateYear,
-            ),
-            const SizedBox(height: 16),
-            TextFormField(
-              controller: _description,
-              minLines: 3,
-              maxLines: 10,
-              keyboardType: TextInputType.multiline,
-              textCapitalization: TextCapitalization.sentences,
-              decoration: InputDecoration(
-                labelText: l10n.summary,
-                alignLabelWithHint: true,
-              ),
-            ),
-            if (!widget.isEditing) ...<Widget>[
-              const SizedBox(height: 24),
-              Text(
-                l10n.shelfLabel,
-                style: Theme.of(context).textTheme.titleSmall,
-              ),
-              const SizedBox(height: 8),
-              SegmentedButton<Shelf>(
-                segments: <ButtonSegment<Shelf>>[
-                  for (final shelf in Shelf.values)
-                    ButtonSegment<Shelf>(
-                      value: shelf,
-                      icon: Icon(shelf.icon),
-                      label: Text(shelf.label(l10n)),
+              _Section(
+                icon: Icons.menu_book_outlined,
+                title: l10n.formSectionBook,
+                child: Column(
+                  children: <Widget>[
+                    TextFormField(
+                      controller: _title,
+                      autofocus: !widget.isEditing,
+                      textCapitalization: TextCapitalization.sentences,
+                      // Le titre est l'information principale : il est écrit
+                      // plus gros que le reste.
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                      decoration: _field(
+                        context,
+                        label: l10n.titleRequiredLabel,
+                        icon: Icons.title,
+                        hint: l10n.requiredHint,
+                      ),
+                      validator: (value) => (value ?? '').trim().isEmpty
+                          ? l10n.titleRequired
+                          : null,
                     ),
-                ],
-                selected: <Shelf>{_shelf},
-                showSelectedIcon: false,
-                onSelectionChanged: (selection) =>
-                    setState(() => _shelf = selection.first),
+                    const SizedBox(height: 12),
+                    TextFormField(
+                      controller: _author,
+                      textCapitalization: TextCapitalization.words,
+                      decoration: _field(
+                        context,
+                        label: l10n.authorLabel,
+                        icon: Icons.person_outline,
+                      ),
+                    ),
+                  ],
+                ),
               ),
+              _Section(
+                icon: Icons.tune,
+                title: l10n.formSectionDetails,
+                subtitle: l10n.formDetailsHint,
+                child: Column(
+                  children: <Widget>[
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Expanded(
+                          child: TextFormField(
+                            controller: _pageCount,
+                            keyboardType: TextInputType.number,
+                            inputFormatters: <TextInputFormatter>[
+                              FilteringTextInputFormatter.digitsOnly,
+                            ],
+                            decoration: _field(
+                              context,
+                              label: l10n.pagesShortLabel,
+                              icon: Icons.auto_stories_outlined,
+                            ),
+                            validator: _validatePageCount,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: TextFormField(
+                            controller: _year,
+                            keyboardType: TextInputType.number,
+                            inputFormatters: <TextInputFormatter>[
+                              FilteringTextInputFormatter.digitsOnly,
+                            ],
+                            decoration: _field(
+                              context,
+                              label: l10n.yearShortLabel,
+                              icon: Icons.event_outlined,
+                            ),
+                            validator: _validateYear,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    TextFormField(
+                      controller: _description,
+                      minLines: 3,
+                      maxLines: 10,
+                      keyboardType: TextInputType.multiline,
+                      textCapitalization: TextCapitalization.sentences,
+                      decoration: _field(
+                        context,
+                        label: l10n.summary,
+                        icon: Icons.notes,
+                      ).copyWith(alignLabelWithHint: true),
+                    ),
+                  ],
+                ),
+              ),
+              if (!widget.isEditing)
+                _Section(
+                  icon: Icons.shelves,
+                  title: l10n.shelfLabel,
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: SegmentedButton<Shelf>(
+                      segments: <ButtonSegment<Shelf>>[
+                        for (final shelf in Shelf.values)
+                          ButtonSegment<Shelf>(
+                            value: shelf,
+                            // L'icône au-dessus du nom, comme un onglet : le
+                            // texte a toute la largeur, « En cours » tient sur
+                            // une ligne.
+                            label: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 6),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: <Widget>[
+                                  Icon(shelf.icon, size: 20),
+                                  const SizedBox(height: 4),
+                                  Text(shelf.label(l10n), maxLines: 1),
+                                ],
+                              ),
+                            ),
+                          ),
+                      ],
+                      selected: <Shelf>{_shelf},
+                      showSelectedIcon: false,
+                      onSelectionChanged: (selection) =>
+                          setState(() => _shelf = selection.first),
+                    ),
+                  ),
+                ),
             ],
-            const SizedBox(height: 32),
-            FilledButton(
-              onPressed: busy ? null : _submit,
-              child: Text(widget.isEditing ? l10n.save : l10n.add),
-            ),
-          ],
+          ),
         ),
       ),
     );
   }
 
+  /// Un champ du formulaire : fond teinté, coins arrondis et une icône qui
+  /// dit ce qu'on y écrit, pour que les champs ne se ressemblent plus tous.
+  static InputDecoration _field(
+    BuildContext context, {
+    required String label,
+    required IconData icon,
+    String? hint,
+  }) {
+    final scheme = Theme.of(context).colorScheme;
+    final radius = BorderRadius.circular(12);
+    return InputDecoration(
+      labelText: label,
+      hintText: hint,
+      prefixIcon: Icon(icon),
+      filled: true,
+      fillColor: scheme.surfaceContainerHighest.withValues(alpha: 0.6),
+      errorMaxLines: 3,
+      border: OutlineInputBorder(
+        borderRadius: radius,
+        borderSide: BorderSide.none,
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: radius,
+        borderSide: BorderSide.none,
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: radius,
+        borderSide: BorderSide(color: scheme.primary, width: 2),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: radius,
+        borderSide: BorderSide(color: scheme.error),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: radius,
+        borderSide: BorderSide(color: scheme.error, width: 2),
+      ),
+    );
+  }
+
   Future<void> _searchCover() async {
-    final query = <String>[_title.text.trim(), _author.text.trim()]
-        .where((part) => part.isNotEmpty)
-        .join(' ');
+    final query = <String>[
+      _title.text.trim(),
+      _author.text.trim(),
+    ].where((part) => part.isNotEmpty).join(' ');
     final picked = await showCoverSearchSheet(context, query: query);
     if (picked == null || !mounted) {
       return;
@@ -228,9 +350,9 @@ class _BookFormScreenState extends ConsumerState<BookFormScreen> {
       });
     } on AppException catch (error) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(error.describe(context.l10n))),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(error.describe(context.l10n))));
       }
     }
   }
@@ -335,9 +457,9 @@ Future<void> openBookEditor(
   }
 
   if (book == null) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(context.l10n.bookGone)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(context.l10n.bookGone)));
     return;
   }
 
@@ -405,6 +527,73 @@ class _CoverField extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// Un groupe de champs, posé sur une carte avec son titre.
+class _Section extends StatelessWidget {
+  const _Section({
+    required this.icon,
+    required this.title,
+    required this.child,
+    this.subtitle,
+  });
+
+  final IconData icon;
+  final String title;
+  final String? subtitle;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    return Padding(
+      padding: const EdgeInsets.only(top: 12),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: scheme.surfaceContainerLow,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: scheme.outlineVariant.withValues(alpha: 0.5),
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Row(
+                children: <Widget>[
+                  Icon(icon, size: 20, color: scheme.primary),
+                  const SizedBox(width: 8),
+                  Flexible(
+                    child: Text(
+                      title,
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        color: scheme.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              if (subtitle != null) ...<Widget>[
+                const SizedBox(height: 4),
+                Text(
+                  subtitle!,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: scheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+              const SizedBox(height: 14),
+              child,
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

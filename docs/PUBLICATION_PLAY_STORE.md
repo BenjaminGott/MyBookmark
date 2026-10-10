@@ -179,25 +179,39 @@ Créer une version*, envoyer l'AAB, choisir les pays, publier.
 
 ## 8. À chaque nouvelle version
 
-1. Dans `pubspec.yaml`, augmenter `version:`. Le nombre après le `+` doit
-   **toujours augmenter** (le Play Store refuse un numéro déjà utilisé) :
-   `1.3.0+6` → `1.4.0+7`.
-2. Merger dans `main`, puis lancer *Actions → Release APK* avec le tag
-   `v1.4.0`.
-3. Télécharger `mybookmark-v1.4.0.aab` depuis la release et l'envoyer dans la
-   console (test fermé ou production).
+Les envois au Play Store sont automatiques (compte de service Google dont la
+clé est dans le secret GitHub `PLAY_SERVICE_ACCOUNT_JSON`) :
 
-### Plus tard : envoi automatique
+| Branche | Workflow | Piste Play Console |
+| --- | --- | --- |
+| `dev` | *Test interne* (`internal.yml`), à chaque push | Test interne |
+| `main` | *Production* (`release.yml`), à chaque push | Production |
 
-Le workflow peut envoyer l'AAB directement au Play Store. Il faudra :
+1. Travailler sur `dev` : chaque push part sur la piste **Test interne**, avec
+   un nom de version du type `1.4.0-dev.12`.
+2. Quand c'est prêt, augmenter `version:` dans `pubspec.yaml` (seul le nom
+   avant le `+` compte), puis merger `dev` dans `main`. La release GitHub
+   (tag `v1.5.0`) est créée et l'AAB part en **Production**, où Google
+   l'examine avant de la publier. Si le tag existe déjà, le numéro de
+   compilation est ajouté (`v1.5.0-123456`).
 
-1. créer un compte de service dans Google Cloud et l'inviter dans la Play
-   Console avec le droit de publier ;
-2. mettre sa clé JSON dans un secret GitHub `PLAY_SERVICE_ACCOUNT_JSON` ;
-3. ajouter une étape d'envoi au workflow.
+Le numéro de version Android (`versionCode`) est calculé à la compilation par
+`tool/ci/build_number.sh` (minutes écoulées depuis 2026) : il augmente tout
+seul, Google ne refuse donc jamais un envoi pour un numéro déjà utilisé.
 
-Google impose que le **tout premier** AAB soit envoyé à la main : l'envoi
-automatique ne peut servir qu'à partir de la deuxième version.
+Réglages, dans *Settings → Secrets and variables → Actions → Variables* :
+
+- `PLAY_TRACK` : la piste des envois de `main`, `production` par défaut.
+  Mettre `alpha` pour repasser par le test fermé.
+- `PLAY_RELEASE_STATUS` : `completed` par défaut. Si l'envoi échoue avec
+  « Only releases with status draft may be created on draft app », mettre
+  `draft` tant que l'app n'a jamais été publiée : la version arrive alors en
+  brouillon dans la console, à publier d'un clic.
+
+Autres erreurs possibles : « The caller does not have permission » (droits du
+compte de service pas encore actifs, jusqu'à 24 h, ou app non cochée dans ses
+autorisations) ; « Package not found » (aucun AAB envoyé à la main
+auparavant).
 
 ## Récapitulatif
 

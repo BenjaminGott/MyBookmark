@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Widget d'écran d'accueil (voir ReadingWidgetProvider). -->
+    <string name="widget_name">Lettura in corso</string>
+    <string name="widget_description">Il tuo libro attuale e i tuoi progressi, nella schermata Home.</string>
+    <string name="widget_kicker">IN LETTURA</string>
+    <string name="widget_sample_title">Il Piccolo Principe</string>
+    <string name="widget_sample_author">Antoine de Saint-Exupéry</string>
+    <string name="widget_sample_progress">Pagina 60 di 96 · 62%</string>
+    <string name="widget_empty_title">Nessun libro in corso</string>
+    <string name="widget_empty_hint">Tocca per iniziarne uno.</string>
+</resources>

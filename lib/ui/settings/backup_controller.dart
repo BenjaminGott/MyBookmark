@@ -27,6 +27,7 @@ class BackupExported extends BackupOutcome {
 class BackupInspected extends BackupOutcome {
   const BackupInspected({required this.summary, required this.contents});
 
+  /// Le format lu est dans `summary.format`.
   final BackupSummary summary;
 
   /// Le contenu déjà lu, pour ne pas redemander le fichier à la confirmation.
@@ -67,14 +68,25 @@ class BackupController extends Notifier<bool> {
     });
   }
 
-  Future<BackupOutcome> inspect() async {
+  Future<BackupOutcome> inspect({
+    BackupFormat format = BackupFormat.mybookmark,
+  }) async {
     return _run(() async {
-      final contents = await ref.read(fileExchangeProvider).pickText();
+      final contents = await ref
+          .read(fileExchangeProvider)
+          .pickText(
+            extensions: switch (format) {
+              BackupFormat.mybookmark => const <String>['json'],
+              BackupFormat.goodreads => const <String>['csv'],
+            },
+          );
       if (contents == null) {
         return const BackupCancelled();
       }
 
-      final summary = await ref.read(backupRepositoryProvider).inspect(contents);
+      final summary = await ref
+          .read(backupRepositoryProvider)
+          .inspect(contents, format: format);
       return BackupInspected(summary: summary, contents: contents);
     });
   }
@@ -82,11 +94,12 @@ class BackupController extends Notifier<bool> {
   Future<BackupOutcome> applyImport(
     String contents, {
     required ImportMode mode,
+    BackupFormat format = BackupFormat.mybookmark,
   }) {
     return _run(() async {
       final report = await ref
           .read(backupRepositoryProvider)
-          .import(contents, mode: mode);
+          .import(contents, mode: mode, format: format);
       return BackupImported(report);
     });
   }

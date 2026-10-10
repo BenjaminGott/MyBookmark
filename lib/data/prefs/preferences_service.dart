@@ -14,6 +14,7 @@ class PreferencesService {
   static const String _themeKey = 'theme_mode';
   static const String _languageKey = 'language';
   static const String _goalPrefix = 'reading_goal_';
+  static const String _reviewKey = 'review_asked_at';
 
   /// Nul quand les préférences n'ont pas pu être chargées.
   final SharedPreferences? _preferences;
@@ -66,5 +67,15 @@ class PreferencesService {
       return;
     }
     await preferences.setInt(key, books);
+  }
+
+  /// La dernière fois que l'avis Google Play a été demandé.
+  DateTime? get reviewAskedAt {
+    final millis = _preferences?.getInt(_reviewKey);
+    return millis == null ? null : DateTime.fromMillisecondsSinceEpoch(millis);
+  }
+
+  Future<void> setReviewAskedAt(DateTime when) async {
+    await _preferences?.setInt(_reviewKey, when.millisecondsSinceEpoch);
   }
 }

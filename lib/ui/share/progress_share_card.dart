@@ -95,36 +95,40 @@ class ProgressShareCard extends StatelessWidget {
     // Le `Center` desserre les contraintes reçues : sans lui, un parent au
     // dimensionnement serré étirerait la carte et la capture ne ferait plus la
     // taille annoncée.
-    return Center(
-      child: RepaintBoundary(
-        key: captureKey,
-        child: SizedBox(
-          width: format.width,
-          height: format.height,
-          child: DecoratedBox(
-            key: const Key('card-background'),
-            decoration: BoxDecoration(
-              // Hors des coins, l'image partagée est transparente : le PNG
-              // conserve son canal alpha à la capture.
-              borderRadius: BorderRadius.circular(format.cornerRadius),
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: <Color>[palette.top, palette.bottom],
+    // La carte est une image de taille fixe : la taille de police choisie
+    // dans le téléphone ne doit pas la déformer.
+    return MediaQuery.withNoTextScaling(
+      child: Center(
+        child: RepaintBoundary(
+          key: captureKey,
+          child: SizedBox(
+            width: format.width,
+            height: format.height,
+            child: DecoratedBox(
+              key: const Key('card-background'),
+              decoration: BoxDecoration(
+                // Hors des coins, l'image partagée est transparente : le PNG
+                // conserve son canal alpha à la capture.
+                borderRadius: BorderRadius.circular(format.cornerRadius),
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: <Color>[palette.top, palette.bottom],
+                ),
               ),
+              child: switch (format) {
+                ShareCardFormat.compact => _CompactLayout(
+                  item: item,
+                  palette: palette,
+                  cover: cover,
+                ),
+                ShareCardFormat.story => _LargeLayout(
+                  item: item,
+                  palette: palette,
+                  cover: cover,
+                ),
+              },
             ),
-            child: switch (format) {
-              ShareCardFormat.compact => _CompactLayout(
-                item: item,
-                palette: palette,
-                cover: cover,
-              ),
-              ShareCardFormat.story => _LargeLayout(
-                item: item,
-                palette: palette,
-                cover: cover,
-              ),
-            },
           ),
         ),
       ),

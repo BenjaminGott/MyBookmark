@@ -1,4 +1,5 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
     <!-- Seul accès réseau de l'application : l'API Open Library et les
          couvertures. Toutes les données de lecture restent sur le téléphone. -->
     <uses-permission android:name="android.permission.INTERNET"/>
@@ -6,7 +7,21 @@
          antérieurs demandent une permission pour cela. -->
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        android:maxSdkVersion="29"/>
+        android:maxSdkVersion="29"
+        tools:replace="android:maxSdkVersion"/>
+    <!-- Scanner le code-barres d'un livre. L'image est décodée sur le
+         téléphone et n'est jamais enregistrée ni envoyée. -->
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <!-- Le paquet de l'appareil photo demande aussi le micro, inutile ici. -->
+    <uses-permission
+        android:name="android.permission.RECORD_AUDIO"
+        tools:node="remove"/>
+    <!-- Sans appareil photo, l'application s'installe quand même : seul le
+         scanner manque. -->
+    <uses-feature
+        android:name="android.hardware.camera.any"
+        android:required="false"
+        tools:replace="android:required"/>
 
     <application
         android:label="@string/app_name"
@@ -50,6 +65,18 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+        <!-- Widget d'écran d'accueil : le livre en cours. -->
+        <receiver
+            android:name=".ReadingWidgetProvider"
+            android:exported="false"
+            android:label="@string/widget_name">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/reading_widget_info"/>
+        </receiver>
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and
@@ -62,6 +89,19 @@
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT"/>
             <data android:mimeType="text/plain"/>
+        </intent>
+        <!-- Écran « À propos » : écrire au développeur, noter l'app, ouvrir le site. -->
+        <intent>
+            <action android:name="android.intent.action.SENDTO"/>
+            <data android:scheme="mailto"/>
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW"/>
+            <data android:scheme="market"/>
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW"/>
+            <data android:scheme="https"/>
         </intent>
     </queries>
 </manifest>

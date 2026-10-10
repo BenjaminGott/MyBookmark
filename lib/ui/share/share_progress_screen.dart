@@ -1,3 +1,4 @@
+import 'dart:isolate';
 import 'dart:math' as math;
 import 'dart:typed_data';
 import 'dart:ui' as ui;
@@ -11,8 +12,10 @@ import '../../domain/models/library_item.dart';
 import '../l10n/error_text.dart';
 import '../l10n/l10n.dart';
 import '../providers/share_providers.dart';
+import '../widgets/readable_width.dart';
 import 'background_picker.dart';
 import 'card_backgrounds.dart';
+import 'card_png.dart';
 import 'progress_card_palette.dart';
 import 'progress_share_card.dart';
 
@@ -45,6 +48,7 @@ class _ShareProgressScreenState extends ConsumerState<ShareProgressScreen> {
   ProgressCardPalette? _custom;
 
   ImageProvider? _cover;
+
   /// Le bloc est proposé d'abord : c'est le format le plus souvent utile.
   ShareCardFormat _format = ShareCardFormat.compact;
   bool _sharing = false;
@@ -130,132 +134,137 @@ class _ShareProgressScreenState extends ConsumerState<ShareProgressScreen> {
 
     return Scaffold(
       appBar: AppBar(title: Text(context.l10n.shareProgress)),
-      body: palette == null
-          ? const Center(child: CircularProgressIndicator())
-          : Column(
-              children: <Widget>[
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: _CardPreview(
-                      cardKey: _cardKey,
-                      item: widget.item,
-                      palette: palette,
-                      cover: _cover,
-                      format: _format,
+      body: ReadableWidth(
+        child: palette == null
+            ? const Center(child: CircularProgressIndicator())
+            : Column(
+                children: <Widget>[
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: _CardPreview(
+                        cardKey: _cardKey,
+                        item: widget.item,
+                        palette: palette,
+                        cover: _cover,
+                        format: _format,
+                      ),
                     ),
                   ),
-                ),
-                BackgroundPicker(
-                  options: _backgrounds!,
-                  selectedIndex: _selected,
-                  customPalette: _custom,
-                  onSelected: (index) => setState(() => _selected = index),
-                  onCustom: _editCustom,
-                ),
-                const SizedBox(height: 4),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: SegmentedButton<ShareCardFormat>(
-                    segments: <ButtonSegment<ShareCardFormat>>[
-                      for (final format in ShareCardFormat.values)
-                        ButtonSegment<ShareCardFormat>(
-                          value: format,
-                          label: Text(format.label(context.l10n)),
-                        ),
-                    ],
-                    selected: <ShareCardFormat>{_format},
-                    showSelectedIcon: false,
-                    onSelectionChanged: _sharing
-                        ? null
-                        : (selection) =>
-                            setState(() => _format = selection.first),
+                  BackgroundPicker(
+                    options: _backgrounds!,
+                    selectedIndex: _selected,
+                    customPalette: _custom,
+                    onSelected: (index) => setState(() => _selected = index),
+                    onCustom: _editCustom,
                   ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  _format.pixels,
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-                SafeArea(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-                    child: Row(
-                      children: <Widget>[
-                        if (_instagram) ...<Widget>[
-                          // Libellé court : trois actions tiennent ainsi sur
-                          // une ligne, même sur un téléphone étroit.
+                  const SizedBox(height: 4),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: SegmentedButton<ShareCardFormat>(
+                      segments: <ButtonSegment<ShareCardFormat>>[
+                        for (final format in ShareCardFormat.values)
+                          ButtonSegment<ShareCardFormat>(
+                            value: format,
+                            label: Text(format.label(context.l10n)),
+                          ),
+                      ],
+                      selected: <ShareCardFormat>{_format},
+                      showSelectedIcon: false,
+                      onSelectionChanged: _sharing
+                          ? null
+                          : (selection) =>
+                                setState(() => _format = selection.first),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    _format.pixels,
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                  SafeArea(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+                      child: Row(
+                        children: <Widget>[
+                          if (_instagram) ...<Widget>[
+                            // Libellé court : trois actions tiennent ainsi sur
+                            // une ligne, même sur un téléphone étroit.
+                            Expanded(
+                              flex: 2,
+                              child: Tooltip(
+                                message: context.l10n.storyTooltip,
+                                child: OutlinedButton.icon(
+                                  onPressed: _sharing ? null : _shareToStory,
+                                  icon: const Icon(Icons.add_circle_outline),
+                                  label: FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    child: Text(
+                                      context.l10n.story,
+                                      maxLines: 1,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                          ],
+                          // Plus large que « Story » : « Partager » est le mot le
+                          // plus long selon les langues (« Compartilhar »). Il
+                          // rétrécit un peu plutôt que de passer à la ligne.
                           Expanded(
-                            flex: 2,
-                            child: Tooltip(
-                              message: context.l10n.storyTooltip,
-                              child: OutlinedButton.icon(
-                                onPressed: _sharing ? null : _shareToStory,
-                                icon: const Icon(Icons.add_circle_outline),
-                                label: FittedBox(
-                                  fit: BoxFit.scaleDown,
-                                  child: Text(context.l10n.story, maxLines: 1),
+                            flex: 3,
+                            child: FilledButton.icon(
+                              onPressed: _sharing ? null : _share,
+                              icon: const Icon(Icons.share_outlined),
+                              label: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(
+                                  _sharing
+                                      ? context.l10n.preparing
+                                      : context.l10n.share,
+                                  maxLines: 1,
                                 ),
                               ),
                             ),
                           ),
-                          const SizedBox(width: 12),
-                        ],
-                        // Plus large que « Story » : « Partager » est le mot le
-                        // plus long selon les langues (« Compartilhar »). Il
-                        // rétrécit un peu plutôt que de passer à la ligne.
-                        Expanded(
-                          flex: 3,
-                          child: FilledButton.icon(
-                            onPressed: _sharing ? null : _share,
-                            icon: const Icon(Icons.share_outlined),
-                            label: FittedBox(
-                              fit: BoxFit.scaleDown,
-                              child: Text(
-                                _sharing
-                                    ? context.l10n.preparing
-                                    : context.l10n.share,
-                                maxLines: 1,
-                              ),
-                            ),
+                          const SizedBox(width: 8),
+                          IconButton.outlined(
+                            onPressed: _sharing ? null : _save,
+                            icon: const Icon(Icons.download_outlined),
+                            tooltip: context.l10n.saveToGallery,
                           ),
-                        ),
-                        const SizedBox(width: 8),
-                        IconButton.outlined(
-                          onPressed: _sharing ? null : _save,
-                          icon: const Icon(Icons.download_outlined),
-                          tooltip: context.l10n.saveToGallery,
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ),
+                ],
+              ),
+      ),
     );
   }
 
   /// Partage par la feuille de partage du système.
   Future<void> _share() => _captureThen(
-        (bytes) => ref.read(imageSharingProvider).sharePng(
-              bytes: bytes,
-              fileName: _format.fileName,
-              text: _shareText(),
-            ),
-      );
+    (bytes) => ref
+        .read(imageSharingProvider)
+        .sharePng(bytes: bytes, fileName: _format.fileName, text: _shareText()),
+  );
 
   /// Enregistre la carte dans la galerie, dans l'album « MyBookmark ».
   ///
   /// L'horodatage évite qu'une nouvelle carte ne prenne le nom d'une
   /// précédente.
   Future<void> _save() => _captureThen((bytes) async {
-        final base = _format.fileName.replaceAll('.png', '');
-        await ref.read(imageSavingProvider).savePng(
-              bytes: bytes,
-              name: '$base-${DateTime.now().millisecondsSinceEpoch}',
-            );
-        _tell((l10n) => l10n.imageSaved);
-      });
+    final base = _format.fileName.replaceAll('.png', '');
+    await ref
+        .read(imageSavingProvider)
+        .savePng(
+          bytes: bytes,
+          name: '$base-${DateTime.now().millisecondsSinceEpoch}',
+        );
+    _tell((l10n) => l10n.imageSaved);
+  });
 
   /// Partage direct en story Instagram.
   ///
@@ -265,7 +274,9 @@ class _ShareProgressScreenState extends ConsumerState<ShareProgressScreen> {
   Future<void> _shareToStory() {
     final palette = _palette!;
     return _captureThen(
-      (bytes) => ref.read(storySharingProvider).sharePng(
+      (bytes) => ref
+          .read(storySharingProvider)
+          .sharePng(
             bytes: bytes,
             fileName: _format.fileName,
             asSticker: _format == ShareCardFormat.compact,
@@ -275,9 +286,7 @@ class _ShareProgressScreenState extends ConsumerState<ShareProgressScreen> {
     );
   }
 
-  Future<void> _captureThen(
-    Future<void> Function(Uint8List bytes) send,
-  ) async {
+  Future<void> _captureThen(Future<void> Function(Uint8List bytes) send) async {
     setState(() => _sharing = true);
     try {
       final bytes = await _capture();
@@ -304,11 +313,22 @@ class _ShareProgressScreenState extends ConsumerState<ShareProgressScreen> {
       return null;
     }
 
-    final image =
-        await boundary.toImage(pixelRatio: ProgressShareCard.captureRatio);
+    final image = await boundary.toImage(
+      pixelRatio: ProgressShareCard.captureRatio,
+    );
     try {
-      final data = await image.toByteData(format: ui.ImageByteFormat.png);
-      return data?.buffer.asUint8List();
+      // Pixels non prémultipliés : la couleur des coins transparents se
+      // garde, voir `encodeCardPng`.
+      final data = await image.toByteData(
+        format: ui.ImageByteFormat.rawStraightRgba,
+      );
+      if (data == null) {
+        return null;
+      }
+      final pixels = data.buffer.asUint8List();
+      final width = image.width;
+      final height = image.height;
+      return await Isolate.run(() => encodeCardPng(pixels, width, height));
     } finally {
       image.dispose();
     }

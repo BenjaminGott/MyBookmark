@@ -4,8 +4,10 @@ import 'package:biblivre/data/prefs/preferences_service.dart';
 import 'package:biblivre/domain/models/app_language.dart';
 import 'package:biblivre/domain/models/app_theme_mode.dart';
 import 'package:biblivre/domain/models/shelf.dart';
+import 'package:biblivre/domain/repositories/external_links.dart';
 import 'package:biblivre/domain/repositories/file_exchange.dart';
 import 'package:biblivre/l10n/app_localizations.dart';
+import 'package:biblivre/ui/l10n/language_dropdown.dart';
 import 'package:biblivre/ui/providers/database_providers.dart';
 import 'package:biblivre/ui/providers/settings_providers.dart';
 import 'package:biblivre/ui/settings/settings_screen.dart';
@@ -46,8 +48,14 @@ class _FakeFileExchange implements FileExchange {
     return true;
   }
 
+  /// Les types de fichiers proposés au dernier choix.
+  List<String>? pickedExtensions;
+
   @override
-  Future<String?> pickText() async {
+  Future<String?> pickText({
+    List<String> extensions = const <String>['json'],
+  }) async {
+    pickedExtensions = extensions;
     final error = failWith;
     if (error != null) {
       throw error;
@@ -56,9 +64,21 @@ class _FakeFileExchange implements FileExchange {
   }
 }
 
+/// Note les liens ouverts, sans rien ouvrir.
+class _FakeLinks implements ExternalLinks {
+  final List<Uri> opened = <Uri>[];
+
+  @override
+  Future<bool> open(Uri uri) async {
+    opened.add(uri);
+    return true;
+  }
+}
+
 void main() {
   late AppDatabase db;
   late _FakeFileExchange files;
+  late _FakeLinks links;
 
   setUpAll(() {
     initializeDateFormatting('fr_FR');
@@ -67,6 +87,7 @@ void main() {
   setUp(() {
     db = createTestDatabase();
     files = _FakeFileExchange();
+    links = _FakeLinks();
   });
 
   tearDown(() async {
@@ -89,6 +110,7 @@ void main() {
         overrides: [
           databaseProvider.overrideWithValue(db),
           fileExchangeProvider.overrideWithValue(files),
+          externalLinksProvider.overrideWithValue(links),
           // Le thème n'est pas l'objet de ces tests : on court-circuite les
           // préférences, qui exigeraient un canal de plateforme.
           themeModeProvider.overrideWith(_FixedThemeMode.new),
@@ -122,11 +144,13 @@ void main() {
   settingsTest('change la langue de l\'interface', (tester) async {
     await pumpSettings(tester);
 
-    // Sans choix enregistré, la langue du téléphone est cochée.
+    // Sans choix enregistré, la langue du téléphone est affichée.
     expect(find.text('Langue du téléphone'), findsOne);
 
-    await tester.tap(find.text('English'));
-    await tester.pump();
+    await tester.tap(find.byType(LanguageDropdown));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('English').last);
+    await tester.pumpAndSettle();
 
     final container = ProviderScope.containerOf(
       tester.element(find.byType(SettingsScreen)),
@@ -141,13 +165,17 @@ void main() {
     await tester.tap(find.text('Exporter ma bibliothèque'));
     await settle(tester);
 
-    expect(files.savedFileName, matches(r'^mybookmark-\d{4}-\d{2}-\d{2}\.json$'));
+    expect(
+      files.savedFileName,
+      matches(r'^mybookmark-\d{4}-\d{2}-\d{2}\.json$'),
+    );
     expect(files.savedContents, contains('Dune'));
     expect(find.textContaining('Bibliothèque exportée'), findsOne);
   });
 
-  settingsTest('ne dit rien si l\'utilisateur annule l\'enregistrement',
-      (tester) async {
+  settingsTest('ne dit rien si l\'utilisateur annule l\'enregistrement', (
+    tester,
+  ) async {
     files.cancelSave = true;
     await pumpSettings(tester);
 
@@ -157,9 +185,11 @@ void main() {
     expect(find.byType(SnackBar), findsNothing);
   });
 
-  settingsTest('importe sans rien demander quand la base est vide',
-      (tester) async {
-    files.toReturn = '{"version": 1, "books": [{"title": "Dune", '
+  settingsTest('importe sans rien demander quand la base est vide', (
+    tester,
+  ) async {
+    files.toReturn =
+        '{"version": 1, "books": [{"title": "Dune", '
         '"readings": [{"shelf": "read", "isCurrent": true}]}]}';
     await pumpSettings(tester);
 
@@ -172,10 +202,59 @@ void main() {
     expect(find.textContaining('1 livre importé'), findsOne);
   });
 
-  settingsTest('demande fusion ou remplacement sur une base non vide',
-      (tester) async {
+  settingsTest('permet d\'écrire au développeur et de noter l\'app', (
+    tester,
+  ) async {
+    await pumpSettings(tester);
+
+    await tester.tap(find.text("M'écrire"));
+    await settle(tester);
+    await tester.tap(find.text('Noter sur Google Play'));
+    await settle(tester);
+
+    expect(links.opened.map((uri) => uri.scheme), <String>['mailto', 'market']);
+  });
+
+  settingsTest('importe un export Goodreads', (tester) async {
     await db.booksDao.addBook(title: 'Zazie', shelf: Shelf.toRead);
-    files.toReturn = '{"version": 1, "books": [{"title": "Dune", '
+    files.toReturn =
+        'Book Id,Title,Author,Exclusive Shelf,My Rating,Number of Pages\n'
+        '1,"Dune (Dune, #1)",Frank Herbert,read,5,658\n';
+    await pumpSettings(tester);
+
+    await tester.tap(find.text('Importer depuis Goodreads'));
+    await settle(tester);
+
+    expect(files.pickedExtensions, <String>['csv']);
+    expect(find.textContaining('Export Goodreads : 1 livre'), findsOne);
+
+    await tester.tap(find.widgetWithText(FilledButton, 'Fusionner'));
+    await settle(tester);
+
+    final dune = (await db.booksDao.watchLibrary().first).singleWhere(
+      (item) => item.book.title == 'Dune',
+    );
+    expect(dune.currentEntry.shelf, Shelf.read);
+    expect(dune.currentEntry.rating, 5);
+  });
+
+  settingsTest('refuse un CSV qui ne vient pas de Goodreads', (tester) async {
+    files.toReturn = 'nom,prenom\nDupont,Jean\n';
+    await pumpSettings(tester);
+
+    await tester.tap(find.text('Importer depuis Goodreads'));
+    await settle(tester);
+
+    expect(find.textContaining("n'est pas un export Goodreads"), findsOne);
+    expect(await db.booksDao.watchLibrary().first, isEmpty);
+  });
+
+  settingsTest('demande fusion ou remplacement sur une base non vide', (
+    tester,
+  ) async {
+    await db.booksDao.addBook(title: 'Zazie', shelf: Shelf.toRead);
+    files.toReturn =
+        '{"version": 1, "books": [{"title": "Dune", '
         '"readings": [{"shelf": "read", "isCurrent": true}]}]}';
     await pumpSettings(tester);
 
@@ -196,7 +275,8 @@ void main() {
 
   settingsTest('remplace toute la bibliothèque sur demande', (tester) async {
     await db.booksDao.addBook(title: 'Zazie', shelf: Shelf.toRead);
-    files.toReturn = '{"version": 1, "books": [{"title": "Dune", '
+    files.toReturn =
+        '{"version": 1, "books": [{"title": "Dune", '
         '"readings": [{"shelf": "read", "isCurrent": true}]}]}';
     await pumpSettings(tester);
 
@@ -212,10 +292,12 @@ void main() {
     expect(find.textContaining('Bibliothèque remplacée'), findsOne);
   });
 
-  settingsTest('n\'écrit rien si l\'utilisateur annule le dialogue',
-      (tester) async {
+  settingsTest('n\'écrit rien si l\'utilisateur annule le dialogue', (
+    tester,
+  ) async {
     await db.booksDao.addBook(title: 'Zazie', shelf: Shelf.toRead);
-    files.toReturn = '{"version": 1, "books": [{"title": "Dune", '
+    files.toReturn =
+        '{"version": 1, "books": [{"title": "Dune", '
         '"readings": [{"shelf": "read", "isCurrent": true}]}]}';
     await pumpSettings(tester);
 
@@ -237,15 +319,13 @@ void main() {
     await tester.tap(find.text('Importer une sauvegarde'));
     await settle(tester);
 
-    expect(
-      find.text('Ce fichier n\'est pas une sauvegarde valide.'),
-      findsOne,
-    );
+    expect(find.text('Ce fichier n\'est pas une sauvegarde valide.'), findsOne);
     expect(await db.booksDao.watchLibrary().first, isEmpty);
   });
 
-  settingsTest('explique un fichier venu d\'une version plus récente',
-      (tester) async {
+  settingsTest('explique un fichier venu d\'une version plus récente', (
+    tester,
+  ) async {
     files.toReturn = '{"version": 99, "books": []}';
     await pumpSettings(tester);
 

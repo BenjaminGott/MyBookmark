@@ -2,7 +2,7 @@ name: biblivre
 description: "Suivi de lecture personnel, 100 % local"
 publish_to: 'none'
 
-version: 1.4.0+7
+version: 1.5.0+8
 
 environment:
   sdk: ^3.12.2
@@ -49,6 +49,19 @@ dependencies:
   # Formatage des dates selon la langue
   intl: ^0.20.2 # épinglé à 0.20.2 par flutter_localizations
   gal: ^2.3.3
+
+  # Liens de l'écran « À propos » : e-mail, Google Play, site
+  url_launcher: ^6.3.2
+
+  # Scanner le code-barres d'un livre : zxing, décodé sur le téléphone, sans
+  # service Google
+  flutter_zxing: ^3.1.0
+
+  # Widget d'écran d'accueil (livre en cours)
+  home_widget: ^0.10.0
+
+  # Fenêtre « Noter l'application » de Google Play, sans quitter l'app
+  in_app_review: ^2.0.12
 
 dev_dependencies:
   flutter_test:

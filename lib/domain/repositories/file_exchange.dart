@@ -7,5 +7,7 @@ abstract class FileExchange {
   Future<bool> saveText({required String fileName, required String contents});
 
   /// Demande un fichier et renvoie son contenu, ou `null` en cas d'annulation.
-  Future<String?> pickText();
+  ///
+  /// [extensions] limite le choix aux fichiers de ces types.
+  Future<String?> pickText({List<String> extensions = const <String>['json']});
 }

@@ -4,11 +4,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/models/app_language.dart';
 import '../../domain/models/app_theme_mode.dart';
 import '../../domain/models/backup.dart';
-import '../l10n/app_language_label.dart';
 import '../l10n/error_text.dart';
 import '../l10n/l10n.dart';
+import '../l10n/language_dropdown.dart';
 import '../providers/settings_providers.dart';
+import '../widgets/readable_width.dart';
+import 'about_screen.dart';
 import 'backup_controller.dart';
+import 'feedback_actions.dart';
 
 /// Réglages : apparence, langue, et sauvegarde de la bibliothèque.
 class SettingsScreen extends ConsumerWidget {
@@ -23,78 +26,102 @@ class SettingsScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.navSettings)),
-      body: ListView(
-        children: <Widget>[
-          _SectionTitle(l10n.appearance),
-          RadioGroup<AppThemeMode>(
-            groupValue: theme,
-            onChanged: (mode) {
-              if (mode != null) {
-                ref.read(themeModeProvider.notifier).select(mode);
-              }
-            },
-            child: Column(
-              children: <Widget>[
-                RadioListTile<AppThemeMode>(
-                  value: AppThemeMode.system,
-                  title: Text(l10n.themeSystem),
-                ),
-                RadioListTile<AppThemeMode>(
-                  value: AppThemeMode.light,
-                  title: Text(l10n.themeLight),
-                ),
-                RadioListTile<AppThemeMode>(
-                  value: AppThemeMode.dark,
-                  title: Text(l10n.themeDark),
-                ),
-              ],
-            ),
-          ),
-          const Divider(),
-          _SectionTitle(l10n.language),
-          RadioGroup<AppLanguage>(
-            groupValue: language,
-            onChanged: (value) {
-              if (value != null) {
-                ref.read(languageProvider.notifier).select(value);
-              }
-            },
-            child: Column(
-              children: <Widget>[
-                for (final option in AppLanguage.values)
-                  RadioListTile<AppLanguage>(
-                    value: option,
-                    title: Text(option.label(l10n)),
+      body: ReadableWidth(
+        child: ListView(
+          children: <Widget>[
+            _SectionTitle(l10n.appearance),
+            RadioGroup<AppThemeMode>(
+              groupValue: theme,
+              onChanged: (mode) {
+                if (mode != null) {
+                  ref.read(themeModeProvider.notifier).select(mode);
+                }
+              },
+              child: Column(
+                children: <Widget>[
+                  RadioListTile<AppThemeMode>(
+                    value: AppThemeMode.system,
+                    title: Text(l10n.themeSystem),
                   ),
-              ],
+                  RadioListTile<AppThemeMode>(
+                    value: AppThemeMode.light,
+                    title: Text(l10n.themeLight),
+                  ),
+                  RadioListTile<AppThemeMode>(
+                    value: AppThemeMode.dark,
+                    title: Text(l10n.themeDark),
+                  ),
+                ],
+              ),
             ),
-          ),
-          const Divider(),
-          _SectionTitle(l10n.myData),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-            child: Text(l10n.dataExplanation),
-          ),
-          ListTile(
-            leading: const Icon(Icons.download_outlined),
-            title: Text(l10n.exportLibrary),
-            subtitle: Text(l10n.exportSubtitle),
-            enabled: !busy,
-            onTap: () => _export(context, ref),
-          ),
-          ListTile(
-            leading: const Icon(Icons.upload_outlined),
-            title: Text(l10n.importBackup),
-            subtitle: Text(l10n.importSubtitle),
-            enabled: !busy,
-            onTap: () => _import(context, ref),
-          ),
-          if (busy)
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              child: LinearProgressIndicator(),
+            const Divider(),
+            _SectionTitle(l10n.language),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+              child: LanguageDropdown(
+                languages: AppLanguage.values,
+                value: language,
+                onChanged: (value) =>
+                    ref.read(languageProvider.notifier).select(value),
+              ),
             ),
-        ],
+            const Divider(),
+            _SectionTitle(l10n.myData),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+              child: Text(l10n.dataExplanation),
+            ),
+            ListTile(
+              leading: const Icon(Icons.download_outlined),
+              title: Text(l10n.exportLibrary),
+              subtitle: Text(l10n.exportSubtitle),
+              enabled: !busy,
+              onTap: () => _export(context, ref),
+            ),
+            ListTile(
+              leading: const Icon(Icons.upload_outlined),
+              title: Text(l10n.importBackup),
+              subtitle: Text(l10n.importSubtitle),
+              enabled: !busy,
+              onTap: () => _import(context, ref),
+            ),
+            ListTile(
+              leading: const Icon(Icons.library_add_outlined),
+              title: Text(l10n.importGoodreads),
+              subtitle: Text(l10n.importGoodreadsSubtitle),
+              enabled: !busy,
+              onTap: () =>
+                  _import(context, ref, format: BackupFormat.goodreads),
+            ),
+            if (busy)
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16),
+                child: LinearProgressIndicator(),
+              ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.mail_outline),
+              title: Text(l10n.aboutFeedbackButton),
+              subtitle: Text(l10n.aboutFeedbackTitle),
+              onTap: () => FeedbackActions.writeToMe(context, ref),
+            ),
+            ListTile(
+              leading: const Icon(Icons.star_outline),
+              title: Text(l10n.aboutRateButton),
+              subtitle: Text(l10n.aboutRateTitle),
+              onTap: () => FeedbackActions.rate(context, ref),
+            ),
+            ListTile(
+              leading: const Icon(Icons.info_outline),
+              title: Text(l10n.aboutTitle),
+              subtitle: Text(l10n.aboutSubtitle),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(builder: (_) => const AboutScreen()),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -118,8 +145,14 @@ class SettingsScreen extends ConsumerWidget {
     }
   }
 
-  Future<void> _import(BuildContext context, WidgetRef ref) async {
-    final outcome = await ref.read(backupControllerProvider.notifier).inspect();
+  Future<void> _import(
+    BuildContext context,
+    WidgetRef ref, {
+    BackupFormat format = BackupFormat.mybookmark,
+  }) async {
+    final outcome = await ref
+        .read(backupControllerProvider.notifier)
+        .inspect(format: format);
     if (!context.mounted) {
       return;
     }
@@ -136,7 +169,7 @@ class SettingsScreen extends ConsumerWidget {
         }
         final applied = await ref
             .read(backupControllerProvider.notifier)
-            .applyImport(contents, mode: mode);
+            .applyImport(contents, mode: mode, format: summary.format);
         if (!context.mounted) {
           return;
         }
@@ -178,7 +211,10 @@ class SettingsScreen extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Text(
-              '${l10n.importFileDated(summary.exportedAt)} '
+              '${switch (summary.format) {
+                BackupFormat.mybookmark => l10n.importFileDated(summary.exportedAt),
+                BackupFormat.goodreads => l10n.importGoodreadsFile,
+              }} '
               '${l10n.importBookCount(summary.bookCount)}, '
               '${l10n.importReadingCount(summary.readingCount)}.',
             ),
@@ -241,10 +277,9 @@ class _SectionTitle extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(16, 20, 16, 8),
       child: Text(
         title,
-        style: Theme.of(context)
-            .textTheme
-            .titleSmall
-            ?.copyWith(color: Theme.of(context).colorScheme.primary),
+        style: Theme.of(context).textTheme.titleSmall?.copyWith(
+          color: Theme.of(context).colorScheme.primary,
+        ),
       ),
     );
   }

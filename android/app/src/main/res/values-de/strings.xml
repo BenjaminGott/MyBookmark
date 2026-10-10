@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Widget d'écran d'accueil (voir ReadingWidgetProvider). -->
+    <string name="widget_name">Aktuelle Lektüre</string>
+    <string name="widget_description">Dein aktuelles Buch und dein Fortschritt auf dem Startbildschirm.</string>
+    <string name="widget_kicker">AKTUELLE LEKTÜRE</string>
+    <string name="widget_sample_title">Der kleine Prinz</string>
+    <string name="widget_sample_author">Antoine de Saint-Exupéry</string>
+    <string name="widget_sample_progress">Seite 60 von 96 · 62 %</string>
+    <string name="widget_empty_title">Kein Buch in Arbeit</string>
+    <string name="widget_empty_hint">Tippe, um eines anzufangen.</string>
+</resources>

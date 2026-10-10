@@ -2,6 +2,15 @@ import 'package:meta/meta.dart';
 
 import 'shelf.dart';
 
+/// D'où vient un fichier à importer.
+enum BackupFormat {
+  /// Une sauvegarde MyBookmark, en JSON.
+  mybookmark,
+
+  /// L'export CSV de Goodreads.
+  goodreads,
+}
+
 /// Version du format d'export. À incrémenter dès que la structure change.
 const int kBackupFormatVersion = 1;
 
@@ -96,6 +105,7 @@ class BackupArchive {
 class BackupSummary {
   const BackupSummary({
     required this.version,
+    this.format = BackupFormat.mybookmark,
     required this.exportedAt,
     required this.bookCount,
     required this.readingCount,
@@ -104,6 +114,10 @@ class BackupSummary {
   });
 
   final int version;
+  final BackupFormat format;
+
+  /// La date de l'export ; celle de la lecture pour un fichier Goodreads, qui
+  /// n'en indique pas.
   final DateTime exportedAt;
   final int bookCount;
   final int readingCount;

@@ -9,10 +9,10 @@ import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 
 http.Response _json(Object? body) => http.Response(
-      jsonEncode(body),
-      200,
-      headers: <String, String>{'content-type': 'application/json'},
-    );
+  jsonEncode(body),
+  200,
+  headers: <String, String>{'content-type': 'application/json'},
+);
 
 void main() {
   group('search', () {
@@ -36,6 +36,21 @@ void main() {
         'title,author_name,number_of_pages_median,cover_i,'
         'first_publish_year,key',
       );
+    });
+
+    test('cherche un ISBN par le champ isbn, pas en plein texte', () async {
+      late Uri captured;
+      final client = OpenLibraryClient(
+        httpClient: MockClient((request) async {
+          captured = request.url;
+          return _json(<String, Object?>{'docs': <Object?>[]});
+        }),
+      );
+
+      await client.search('9782070612758');
+
+      expect(captured.queryParameters['isbn'], '9782070612758');
+      expect(captured.queryParameters.containsKey('q'), isFalse);
     });
 
     test('renvoie les livres lus dans la réponse', () async {
@@ -91,8 +106,11 @@ void main() {
       await expectLater(
         client.search('dune'),
         throwsA(
-          isA<ServerException>()
-              .having((error) => error.statusCode, 'statusCode', 503),
+          isA<ServerException>().having(
+            (error) => error.statusCode,
+            'statusCode',
+            503,
+          ),
         ),
       );
     });
@@ -173,15 +191,18 @@ void main() {
 
       final description = await client.fetchDescription('/works/OL893415W');
 
-      expect(captured.toString(),
-          'https://openlibrary.org/works/OL893415W.json');
+      expect(
+        captured.toString(),
+        'https://openlibrary.org/works/OL893415W.json',
+      );
       expect(description, 'Un résumé.');
     });
 
     test('renvoie null quand l\'œuvre est introuvable', () async {
       final client = OpenLibraryClient(
-        httpClient:
-            MockClient((request) async => http.Response('not found', 404)),
+        httpClient: MockClient(
+          (request) async => http.Response('not found', 404),
+        ),
       );
 
       expect(await client.fetchDescription('/works/OL1W'), isNull);

@@ -95,21 +95,26 @@ class _ProgressCardState extends ConsumerState<ProgressCard> {
             ],
           ),
           const SizedBox(height: 8),
-          Row(
-            children: <Widget>[
-              if (pageCount != null)
+          // Aux extrémités quand la place suffit ; l'un sous l'autre avec une
+          // grande taille de police, plutôt que de déborder.
+          SizedBox(
+            width: double.infinity,
+            child: Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              children: <Widget>[
+                if (pageCount != null)
+                  TextButton.icon(
+                    onPressed: busy ? null : () => _saveValue(pageCount),
+                    icon: const Icon(Icons.done_all),
+                    label: Text(context.l10n.lastPage),
+                  ),
                 TextButton.icon(
-                  onPressed: busy ? null : () => _saveValue(pageCount),
-                  icon: const Icon(Icons.done_all),
-                  label: Text(context.l10n.lastPage),
+                  onPressed: () => openProgressSharing(context, widget.item),
+                  icon: const Icon(Icons.share_outlined),
+                  label: Text(context.l10n.share),
                 ),
-              const Spacer(),
-              TextButton.icon(
-                onPressed: () => openProgressSharing(context, widget.item),
-                icon: const Icon(Icons.share_outlined),
-                label: Text(context.l10n.share),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),
@@ -125,10 +130,9 @@ class _ProgressCardState extends ConsumerState<ProgressCard> {
     final pageCount = widget.item.book.pageCount;
     final clamped = ReadingProgress.clampPage(page: page, pageCount: pageCount);
 
-    final outcome = await ref.read(bookActionsProvider.notifier).updateProgress(
-          entryId: widget.item.currentEntry.id,
-          page: page,
-        );
+    final outcome = await ref
+        .read(bookActionsProvider.notifier)
+        .updateProgress(entryId: widget.item.currentEntry.id, page: page);
     if (!mounted) {
       return;
     }

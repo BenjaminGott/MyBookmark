@@ -14,6 +14,7 @@ enum AppErrorReason {
   bookReadFailed,
   libraryReadFailed,
   malformedBackup,
+  malformedGoodreads,
   backupUntitledBook,
   backupUnknownShelf,
   backupNotText,

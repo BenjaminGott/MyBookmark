@@ -14,6 +14,7 @@ extension AppExceptionText on AppException {
     AppErrorReason.bookReadFailed => l10n.errorBookReadFailed,
     AppErrorReason.libraryReadFailed => l10n.errorLibraryReadFailed,
     AppErrorReason.malformedBackup => l10n.errorMalformedBackup,
+    AppErrorReason.malformedGoodreads => l10n.errorMalformedGoodreads,
     AppErrorReason.backupUntitledBook => l10n.errorBackupUntitledBook,
     AppErrorReason.backupUnknownShelf => l10n.errorBackupUnknownShelf,
     AppErrorReason.backupNotText => l10n.errorBackupNotText,
