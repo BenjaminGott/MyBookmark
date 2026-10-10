@@ -14,6 +14,12 @@ on:
   push:
     branches: [main]
     tags: ['v*']
+    # Un changement qui ne touche pas l'app (workflows, docs) ne publie rien.
+    paths-ignore:
+      - '.github/**'
+      - 'docs/**'
+      - '**/*.md'
+      - 'tool/ci/play_publish.py'
   workflow_dispatch:
     inputs:
       tag:
@@ -31,6 +37,10 @@ permissions:
 jobs:
   apk:
     runs-on: ubuntu-latest
+    env:
+      CMAKE_C_COMPILER_LAUNCHER: ccache
+      CMAKE_CXX_COMPILER_LAUNCHER: ccache
+      CCACHE_COMPILERCHECK: content
     steps:
       - uses: actions/checkout@v4
         with:
@@ -58,6 +68,16 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
+          cache: gradle
+
+      # Le code natif du scanner (zxing, en C++, pour trois processeurs) est
+      # le plus long de la compilation : ccache garde les fichiers déjà
+      # compilés d'une fois sur l'autre. Le NDK est redécompressé à chaque
+      # fois : le compilateur est reconnu à son contenu, pas à sa date.
+      - uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: android-native-${{ github.workflow }}
+          max-size: 2G
 
       - uses: subosito/flutter-action@v2
         with:

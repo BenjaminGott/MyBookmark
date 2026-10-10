@@ -208,6 +208,18 @@ Réglages, dans *Settings → Secrets and variables → Actions → Variables* :
   `draft` tant que l'app n'a jamais été publiée : la version arrive alors en
   brouillon dans la console, à publier d'un clic.
 
+### Republier sans recompiler
+
+Si l'envoi est passé (« Successfully uploaded ») mais que la publication a été
+refusée, par exemple pour des pays manquants ou une autorisation absente, il
+est inutile de tout recompiler. Une fois le problème réglé dans la Play
+Console : *Actions → Republier sur le Play Store → Run workflow*. La dernière
+version envoyée est publiée sur la piste choisie, en 30 secondes. Un numéro de
+version précis peut être donné (*Livre d'applications → Bundles*).
+
+Un push sur `main` qui ne touche que les workflows ou la documentation ne
+publie rien.
+
 Autres erreurs possibles : « The caller does not have permission » (droits du
 compte de service pas encore actifs, jusqu'à 24 h, ou app non cochée dans ses
 autorisations) ; « Package not found » (aucun AAB envoyé à la main
