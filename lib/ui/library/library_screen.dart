@@ -170,6 +170,9 @@ class _LibraryList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.separated(
+      // Sous le dernier livre, la place du bouton « Ajouter un livre » : il
+      // ne cache jamais la note ni la progression.
+      padding: const EdgeInsets.only(bottom: 96),
       itemCount: items.length,
       separatorBuilder: (context, index) => const Divider(height: 1),
       itemBuilder: (context, index) {
