@@ -144,7 +144,10 @@ jobs:
           flutter build apk --release --build-number "$BUILD_NUMBER"
           cp build/app/outputs/flutter-apk/app-release.apk "mybookmark-${TAG}.apk"
 
+      # Bonus : l'app est déjà sur le Play Store à ce stade, une release GitHub
+      # refusée ne doit pas faire passer l'envoi pour un échec.
       - uses: softprops/action-gh-release@v2
+        continue-on-error: true
         with:
           tag_name: ${{ env.TAG }}
           target_commitish: ${{ github.sha }}
