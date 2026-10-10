@@ -77,33 +77,29 @@ jobs:
           echo "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/release.jks"
           echo "ANDROID_KEYSTORE_PATH=$RUNNER_TEMP/release.jks" >> "$GITHUB_ENV"
 
+      # Le runner GitHub a 16 Go : Gradle limité à 4 Go (le projet en demande
+      # 8), pour laisser de la place à Kotlin et à la compilation native du
+      # scanner. Sans cela, la machine s'arrête en pleine compilation.
+      - name: Limite la mémoire de Gradle
+        run: |
+          mkdir -p ~/.gradle
+          echo 'org.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=1g' > ~/.gradle/gradle.properties
+
       - run: flutter pub get
       - run: flutter test
-      # L'APK s'installe directement ; l'AAB est le format exigé par le Play
-      # Store. Les deux sont signés avec la même clé.
-      - name: Compile l'APK et l'AAB
+
+      # L'AAB d'abord, le format exigé par le Play Store : il part avant tout le
+      # reste.
+      - name: Compile l'AAB
         env:
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
           number=$(tool/ci/build_number.sh)
-          flutter build apk --release --build-number "$number"
+          echo "BUILD_NUMBER=$number" >> "$GITHUB_ENV"
           flutter build appbundle --release --build-number "$number"
-
-      - name: Nomme les fichiers d'après le tag
-        run: |
-          cp build/app/outputs/flutter-apk/app-release.apk "mybookmark-${TAG}.apk"
           cp build/app/outputs/bundle/release/app-release.aab "mybookmark-${TAG}.aab"
-
-      - uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ env.TAG }}
-          target_commitish: ${{ github.sha }}
-          files: |
-            mybookmark-*.apk
-            mybookmark-*.aab
-          generate_release_notes: true
 
       # La piste peut être changée dans les variables du dépôt (PLAY_TRACK),
       # par exemple « alpha » pour repasser par le test fermé.
@@ -115,3 +111,24 @@ jobs:
           releaseName: ${{ env.TAG }}
           track: ${{ vars.PLAY_TRACK || 'production' }}
           status: ${{ vars.PLAY_RELEASE_STATUS || 'completed' }}
+
+      # Puis l'APK, à installer directement, signé avec la même clé. Gradle est
+      # arrêté entre les deux pour repartir avec toute la mémoire.
+      - name: Compile l'APK
+        env:
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          (cd android && ./gradlew --stop) || true
+          flutter build apk --release --build-number "$BUILD_NUMBER"
+          cp build/app/outputs/flutter-apk/app-release.apk "mybookmark-${TAG}.apk"
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.TAG }}
+          target_commitish: ${{ github.sha }}
+          files: |
+            mybookmark-*.apk
+            mybookmark-*.aab
+          generate_release_notes: true
