@@ -1,0 +1,44 @@
+# Republie une version déjà envoyée sur le Play Store, sans recompiler :
+# 30 secondes au lieu de 20 minutes. Pour le cas où l'envoi est passé mais la
+# publication a été refusée (pays manquants, autorisation…), une fois le
+# problème réglé dans la Play Console.
+#
+# Onglet Actions → « Republier sur le Play Store » → Run workflow.
+name: Republier sur le Play Store
+
+on:
+  workflow_dispatch:
+    inputs:
+      track:
+        description: 'Piste'
+        type: choice
+        options: [production, alpha, internal]
+        default: production
+      version_code:
+        description: 'Numéro de version (vide = le dernier envoyé)'
+        required: false
+      name:
+        description: 'Nom de la version (vide = celui de pubspec.yaml)'
+        required: false
+
+concurrency:
+  group: play-${{ inputs.track }}
+  cancel-in-progress: false
+
+jobs:
+  republish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install --quiet google-auth requests
+      - name: Publie
+        env:
+          PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          TRACK: ${{ inputs.track }}
+          VERSION_CODE: ${{ inputs.version_code }}
+          NAME: ${{ inputs.name }}
+          STATUS: ${{ vars.PLAY_RELEASE_STATUS || 'completed' }}
+        run: |
+          name="${NAME:-$(sed -n 's/^version: *\([^+]*\).*/\1/p' pubspec.yaml)}"
+          python3 tool/ci/play_publish.py --track "$TRACK" --name "$name" \
+            --status "$STATUS" ${VERSION_CODE:+--version-code "$VERSION_CODE"}
