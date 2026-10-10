@@ -1,19 +1,29 @@
-# Publie une release GitHub avec l'APK et l'AAB, puis envoie l'AAB sur la piste
-# « Test fermé » du Play Store (plus tard : la production). À chaque tag `v*`
-# (ex. `v1.1.0`), ou à la main depuis l'onglet Actions, en donnant le tag.
-name: Release APK
+# Production : à chaque push sur `main`, l'app est testée, compilée, publiée
+# en release GitHub (APK + AAB) et envoyée sur la piste « Production » du Play
+# Store, où Google l'examine avant de la proposer à tout le monde.
+#
+# Le tag vient de la version de pubspec.yaml (`v1.4.0`). S'il existe déjà, le
+# numéro de compilation lui est ajouté (`v1.4.0-123456`) : changer la version
+# dans pubspec.yaml reste conseillé pour chaque nouveauté visible.
+#
+# Un tag `v*` poussé à la main, ou un lancement depuis l'onglet Actions,
+# fonctionne aussi.
+name: Production
 
 on:
   push:
+    branches: [main]
     tags: ['v*']
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Tag de la release (ex. v1.1.0)'
-        required: true
+        description: 'Tag de la release (ex. v1.5.0), vide = version de pubspec.yaml'
+        required: false
 
-env:
-  TAG: ${{ inputs.tag || github.ref_name }}
+# Jamais deux envois en même temps, et jamais d'envoi interrompu à mi-chemin.
+concurrency:
+  group: production
+  cancel-in-progress: false
 
 permissions:
   contents: write
@@ -23,6 +33,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Choisit le tag
+        env:
+          INPUT_TAG: ${{ inputs.tag }}
+        run: |
+          if [ -n "$INPUT_TAG" ]; then
+            tag="$INPUT_TAG"
+          elif [ "$GITHUB_REF_TYPE" = tag ]; then
+            tag="$GITHUB_REF_NAME"
+          else
+            version=$(sed -n 's/^version: *\([^+]*\).*/\1/p' pubspec.yaml)
+            tag="v$version"
+            if git rev-parse -q --verify "refs/tags/$tag" >/dev/null; then
+              tag="$tag-$(tool/ci/build_number.sh)"
+            fi
+          fi
+          echo "TAG=$tag" >> "$GITHUB_ENV"
+          echo "Tag : $tag"
 
       - uses: actions/setup-java@v4
         with:
@@ -75,13 +105,13 @@ jobs:
             mybookmark-*.aab
           generate_release_notes: true
 
-      # La piste se règle dans les variables du dépôt (PLAY_CLOSED_TRACK) :
-      # « alpha » est le test fermé par défaut, « production » le jour venu.
+      # La piste peut être changée dans les variables du dépôt (PLAY_TRACK),
+      # par exemple « alpha » pour repasser par le test fermé.
       - uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
           packageName: com.libergot.mybookmark
           releaseFiles: mybookmark-${{ env.TAG }}.aab
           releaseName: ${{ env.TAG }}
-          track: ${{ vars.PLAY_CLOSED_TRACK || 'alpha' }}
+          track: ${{ vars.PLAY_TRACK || 'production' }}
           status: ${{ vars.PLAY_RELEASE_STATUS || 'completed' }}

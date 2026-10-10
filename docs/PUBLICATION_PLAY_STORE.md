@@ -185,14 +185,15 @@ clé est dans le secret GitHub `PLAY_SERVICE_ACCOUNT_JSON`) :
 | Branche | Workflow | Piste Play Console |
 | --- | --- | --- |
 | `dev` | *Test interne* (`internal.yml`), à chaque push | Test interne |
-| `main` | *Release APK* (`release.yml`), lancé avec un tag | Test fermé (`alpha`) |
+| `main` | *Production* (`release.yml`), à chaque push | Production |
 
 1. Travailler sur `dev` : chaque push part sur la piste **Test interne**, avec
    un nom de version du type `1.4.0-dev.12`.
 2. Quand c'est prêt, augmenter `version:` dans `pubspec.yaml` (seul le nom
-   avant le `+` compte), merger `dev` dans `main`, puis lancer
-   *Actions → Release APK* avec le tag (ex. `v1.5.0`). La release GitHub est
-   créée et l'AAB part sur le **Test fermé**.
+   avant le `+` compte), puis merger `dev` dans `main`. La release GitHub
+   (tag `v1.5.0`) est créée et l'AAB part en **Production**, où Google
+   l'examine avant de la publier. Si le tag existe déjà, le numéro de
+   compilation est ajouté (`v1.5.0-123456`).
 
 Le numéro de version Android (`versionCode`) est calculé à la compilation par
 `tool/ci/build_number.sh` (minutes écoulées depuis 2026) : il augmente tout
@@ -200,8 +201,8 @@ seul, Google ne refuse donc jamais un envoi pour un numéro déjà utilisé.
 
 Réglages, dans *Settings → Secrets and variables → Actions → Variables* :
 
-- `PLAY_CLOSED_TRACK` : la piste des releases, `alpha` par défaut. Mettre
-  `production` le jour de la sortie publique.
+- `PLAY_TRACK` : la piste des envois de `main`, `production` par défaut.
+  Mettre `alpha` pour repasser par le test fermé.
 - `PLAY_RELEASE_STATUS` : `completed` par défaut. Si l'envoi échoue avec
   « Only releases with status draft may be created on draft app », mettre
   `draft` tant que l'app n'a jamais été publiée : la version arrive alors en
