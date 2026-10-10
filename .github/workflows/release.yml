@@ -1,19 +1,13 @@
-# Production : à chaque push sur `main`, l'app est testée, compilée, publiée
-# en release GitHub (APK + AAB) et envoyée sur la piste « Production » du Play
-# Store, où Google l'examine avant de la proposer à tout le monde.
+# Production : à chaque push sur `main`, l'app est testée, compilée et envoyée
+# sur la piste « Production » du Play Store, où Google l'examine avant de la
+# proposer à tout le monde. Le nom de la version vient de pubspec.yaml.
 #
-# Le tag vient de la version de pubspec.yaml (`v1.4.0`). S'il existe déjà, le
-# numéro de compilation lui est ajouté (`v1.4.0-123456`) : changer la version
-# dans pubspec.yaml reste conseillé pour chaque nouveauté visible.
-#
-# Un tag `v*` poussé à la main, ou un lancement depuis l'onglet Actions,
-# fonctionne aussi.
+# Se lance aussi à la main depuis l'onglet Actions.
 name: Production
 
 on:
   push:
     branches: [main]
-    tags: ['v*']
     # Un changement qui ne touche pas l'app (workflows, docs) ne publie rien.
     paths-ignore:
       - '.github/**'
@@ -21,21 +15,14 @@ on:
       - '**/*.md'
       - 'tool/ci/play_publish.py'
   workflow_dispatch:
-    inputs:
-      tag:
-        description: 'Tag de la release (ex. v1.5.0), vide = version de pubspec.yaml'
-        required: false
 
 # Jamais deux envois en même temps, et jamais d'envoi interrompu à mi-chemin.
 concurrency:
   group: production
   cancel-in-progress: false
 
-permissions:
-  contents: write
-
 jobs:
-  apk:
+  production:
     runs-on: ubuntu-latest
     env:
       CMAKE_C_COMPILER_LAUNCHER: ccache
@@ -43,26 +30,6 @@ jobs:
       CCACHE_COMPILERCHECK: content
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Choisit le tag
-        env:
-          INPUT_TAG: ${{ inputs.tag }}
-        run: |
-          if [ -n "$INPUT_TAG" ]; then
-            tag="$INPUT_TAG"
-          elif [ "$GITHUB_REF_TYPE" = tag ]; then
-            tag="$GITHUB_REF_NAME"
-          else
-            version=$(sed -n 's/^version: *\([^+]*\).*/\1/p' pubspec.yaml)
-            tag="v$version"
-            if git rev-parse -q --verify "refs/tags/$tag" >/dev/null; then
-              tag="$tag-$(tool/ci/build_number.sh)"
-            fi
-          fi
-          echo "TAG=$tag" >> "$GITHUB_ENV"
-          echo "Tag : $tag"
 
       - uses: actions/setup-java@v4
         with:
@@ -108,18 +75,15 @@ jobs:
       - run: flutter pub get
       - run: flutter test
 
-      # L'AAB d'abord, le format exigé par le Play Store : il part avant tout le
-      # reste.
+      # L'AAB, le format exigé par le Play Store.
       - name: Compile l'AAB
         env:
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
-          number=$(tool/ci/build_number.sh)
-          echo "BUILD_NUMBER=$number" >> "$GITHUB_ENV"
-          flutter build appbundle --release --build-number "$number"
-          cp build/app/outputs/bundle/release/app-release.aab "mybookmark-${TAG}.aab"
+          echo "VERSION_NAME=$(sed -n 's/^version: *\([^+]*\).*/\1/p' pubspec.yaml)" >> "$GITHUB_ENV"
+          flutter build appbundle --release --build-number "$(tool/ci/build_number.sh)"
 
       # La piste peut être changée dans les variables du dépôt (PLAY_TRACK),
       # par exemple « alpha » pour repasser par le test fermé.
@@ -127,31 +91,7 @@ jobs:
         with:
           serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
           packageName: com.libergot.mybookmark
-          releaseFiles: mybookmark-${{ env.TAG }}.aab
-          releaseName: ${{ env.TAG }}
+          releaseFiles: build/app/outputs/bundle/release/app-release.aab
+          releaseName: ${{ env.VERSION_NAME }}
           track: ${{ vars.PLAY_TRACK || 'production' }}
           status: ${{ vars.PLAY_RELEASE_STATUS || 'completed' }}
-
-      # Puis l'APK, à installer directement, signé avec la même clé. Gradle est
-      # arrêté entre les deux pour repartir avec toute la mémoire.
-      - name: Compile l'APK
-        env:
-          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-        run: |
-          (cd android && ./gradlew --stop) || true
-          flutter build apk --release --build-number "$BUILD_NUMBER"
-          cp build/app/outputs/flutter-apk/app-release.apk "mybookmark-${TAG}.apk"
-
-      # Bonus : l'app est déjà sur le Play Store à ce stade, une release GitHub
-      # refusée ne doit pas faire passer l'envoi pour un échec.
-      - uses: softprops/action-gh-release@v2
-        continue-on-error: true
-        with:
-          tag_name: ${{ env.TAG }}
-          target_commitish: ${{ github.sha }}
-          files: |
-            mybookmark-*.apk
-            mybookmark-*.aab
-          generate_release_notes: true

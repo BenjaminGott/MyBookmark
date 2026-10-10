@@ -190,10 +190,8 @@ clé est dans le secret GitHub `PLAY_SERVICE_ACCOUNT_JSON`) :
 1. Travailler sur `dev` : chaque push part sur la piste **Test interne**, avec
    un nom de version du type `1.4.0-dev.12`.
 2. Quand c'est prêt, augmenter `version:` dans `pubspec.yaml` (seul le nom
-   avant le `+` compte), puis merger `dev` dans `main`. La release GitHub
-   (tag `v1.5.0`) est créée et l'AAB part en **Production**, où Google
-   l'examine avant de la publier. Si le tag existe déjà, le numéro de
-   compilation est ajouté (`v1.5.0-123456`).
+   avant le `+` compte), puis merger `dev` dans `main`. L'AAB part en
+   **Production**, où Google l'examine avant de la publier.
 
 Le numéro de version Android (`versionCode`) est calculé à la compilation par
 `tool/ci/build_number.sh` (minutes écoulées depuis 2026) : il augmente tout
