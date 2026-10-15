@@ -457,8 +457,20 @@
     }
   },
   "aboutRateTitle": "Vous aimez Mon marque-page ?",
-  "aboutRateBody": "Une note sur Google Play aide d'autres lecteurs à découvrir l'application. Merci !",
-  "aboutRateButton": "Noter sur Google Play",
+  "aboutRateBody": "Une note sur {store, select, apple{l'App Store} other{Google Play}} aide d'autres lecteurs à découvrir l'application. Merci !",
+  "@aboutRateBody": {
+    "description": "Invitation à noter ; store vaut apple (App Store) ou google (Google Play).",
+    "placeholders": {
+      "store": {"type": "String", "example": "google"}
+    }
+  },
+  "aboutRateButton": "Noter sur {store, select, apple{l'App Store} other{Google Play}}",
+  "@aboutRateButton": {
+    "description": "Bouton pour noter ; store vaut apple ou google.",
+    "placeholders": {
+      "store": {"type": "String", "example": "google"}
+    }
+  },
   "aboutWebsite": "Site web",
   "aboutPrivacy": "Politique de confidentialité",
   "aboutLinkFailed": "Impossible d'ouvrir le lien.",

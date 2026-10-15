@@ -1,3 +1,5 @@
+import 'dart:io' show Platform;
+
 /// Les adresses publiques de l'application.
 class AppLinks {
   const AppLinks._();
@@ -12,6 +14,24 @@ class AppLinks {
   static final Uri playStoreWeb = Uri.parse(
     'https://play.google.com/store/apps/details?id=$packageName',
   );
+
+  /// L'identifiant de l'application sur l'App Store (« Apple ID », un nombre,
+  /// dans App Store Connect → Informations sur l'app). Tant qu'il est vide,
+  /// « Noter l'application » est masqué sur iPhone.
+  static const String? appStoreId = null;
+
+  /// La page d'avis de l'App Store, ouverte dans l'application App Store.
+  static Uri? get appStoreReview => appStoreId == null
+      ? null
+      : Uri.parse(
+          'https://apps.apple.com/app/id$appStoreId?action=write-review',
+        );
+
+  /// La boutique de la plateforme, pour les textes : `apple` ou `google`.
+  static String get store => Platform.isIOS ? 'apple' : 'google';
+
+  /// Vrai si « Noter l'application » mène quelque part sur cette plateforme.
+  static bool get canRate => !Platform.isIOS || appStoreId != null;
 
   /// Le site et la politique de confidentialité, en français ou en anglais.
   static Uri website({required bool french}) => Uri.parse(

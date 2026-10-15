@@ -1,0 +1,55 @@
+# Compilations iOS sur Codemagic (Mac dans le cloud), lancées à la main depuis
+# codemagic.io. Voir docs/PUBLICATION_APP_STORE.md.
+workflows:
+  # Vérifie que l'app compile pour iPhone, sans signature : ne demande pas de
+  # compte Apple Developer.
+  ios-check:
+    name: iOS – vérification
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+    environment:
+      flutter: stable
+      xcode: latest
+    scripts:
+      - name: Dépendances
+        script: flutter pub get
+      - name: Tests
+        script: flutter test
+      - name: Compilation sans signature
+        script: flutter build ios --release --no-codesign
+    artifacts:
+      - build/ios/iphoneos/*.app
+
+  # Compile, signe et envoie sur TestFlight. Demande la clé d'API App Store
+  # Connect, ajoutée dans Codemagic sous le nom « mybookmark_asc ».
+  ios-testflight:
+    name: iOS – TestFlight
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+    integrations:
+      app_store_connect: mybookmark_asc
+    environment:
+      flutter: stable
+      xcode: latest
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.libergot.mybookmark
+    scripts:
+      - name: Profils de signature
+        script: xcode-project use-profiles
+      - name: Dépendances
+        script: flutter pub get
+      - name: Tests
+        script: flutter test
+      - name: Compilation de l'IPA
+        script: |
+          flutter build ipa --release \
+            --build-name="$(sed -n 's/^version: *\([^+]*\).*/\1/p' pubspec.yaml)" \
+            --build-number="$(tool/ci/build_number.sh)" \
+            --export-options-plist=/Users/builder/export_options.plist
+    artifacts:
+      - build/ios/ipa/*.ipa
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true

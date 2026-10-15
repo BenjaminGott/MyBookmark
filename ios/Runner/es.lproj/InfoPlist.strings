@@ -1,0 +1,5 @@
+/* Textes affichés par iOS : nom sous l'icône et demandes d'autorisation. */
+"CFBundleDisplayName" = "MyBookmark";
+"NSCameraUsageDescription" = "La cámara lee el código de barras de un libro para encontrarlo. Las imágenes se quedan en tu teléfono.";
+"NSPhotoLibraryAddUsageDescription" = "Tus tarjetas de progreso se guardan en tus fotos.";
+"NSPhotoLibraryUsageDescription" = "Tus tarjetas de progreso se guardan en el álbum MyBookmark de tus fotos.";

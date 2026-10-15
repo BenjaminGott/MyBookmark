@@ -835,11 +835,22 @@ class AppLocalizationsFr extends AppLocalizations {
   String get aboutRateTitle => 'Vous aimez Mon marque-page ?';
 
   @override
-  String get aboutRateBody =>
-      'Une note sur Google Play aide d\'autres lecteurs à découvrir l\'application. Merci !';
+  String aboutRateBody(String store) {
+    String _temp0 = intl.Intl.selectLogic(store, {
+      'apple': 'l\'App Store',
+      'other': 'Google Play',
+    });
+    return 'Une note sur $_temp0 aide d\'autres lecteurs à découvrir l\'application. Merci !';
+  }
 
   @override
-  String get aboutRateButton => 'Noter sur Google Play';
+  String aboutRateButton(String store) {
+    String _temp0 = intl.Intl.selectLogic(store, {
+      'apple': 'l\'App Store',
+      'other': 'Google Play',
+    });
+    return 'Noter sur $_temp0';
+  }
 
   @override
   String get aboutWebsite => 'Site web';

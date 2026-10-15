@@ -1,0 +1,5 @@
+/* Textes affichés par iOS : nom sous l'icône et demandes d'autorisation. */
+"CFBundleDisplayName" = "Mon marque-page";
+"NSCameraUsageDescription" = "L'appareil photo lit le code-barres d'un livre pour le retrouver. Les images restent sur votre téléphone.";
+"NSPhotoLibraryAddUsageDescription" = "Vos cartes de progression sont enregistrées dans vos photos.";
+"NSPhotoLibraryUsageDescription" = "Vos cartes de progression sont enregistrées dans l'album MyBookmark de vos photos.";

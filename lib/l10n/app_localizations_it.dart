@@ -830,11 +830,22 @@ class AppLocalizationsIt extends AppLocalizations {
   String get aboutRateTitle => 'Ti piace MyBookmark?';
 
   @override
-  String get aboutRateBody =>
-      'Una valutazione su Google Play aiuta altri lettori a scoprire l\'app. Grazie!';
+  String aboutRateBody(String store) {
+    String _temp0 = intl.Intl.selectLogic(store, {
+      'apple': 'sull\'App Store',
+      'other': 'su Google Play',
+    });
+    return 'Una valutazione $_temp0 aiuta altri lettori a scoprire l\'app. Grazie!';
+  }
 
   @override
-  String get aboutRateButton => 'Valuta su Google Play';
+  String aboutRateButton(String store) {
+    String _temp0 = intl.Intl.selectLogic(store, {
+      'apple': 'Valuta sull\'App Store',
+      'other': 'Valuta su Google Play',
+    });
+    return '$_temp0';
+  }
 
   @override
   String get aboutWebsite => 'Sito web';

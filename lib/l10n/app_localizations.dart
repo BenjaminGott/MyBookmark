@@ -1438,17 +1438,17 @@ abstract class AppLocalizations {
   /// **'Vous aimez Mon marque-page ?'**
   String get aboutRateTitle;
 
-  /// No description provided for @aboutRateBody.
+  /// Invitation à noter ; store vaut apple (App Store) ou google (Google Play).
   ///
   /// In fr, this message translates to:
-  /// **'Une note sur Google Play aide d\'autres lecteurs à découvrir l\'application. Merci !'**
-  String get aboutRateBody;
+  /// **'Une note sur {store, select, apple{l\'App Store} other{Google Play}} aide d\'autres lecteurs à découvrir l\'application. Merci !'**
+  String aboutRateBody(String store);
 
-  /// No description provided for @aboutRateButton.
+  /// Bouton pour noter ; store vaut apple ou google.
   ///
   /// In fr, this message translates to:
-  /// **'Noter sur Google Play'**
-  String get aboutRateButton;
+  /// **'Noter sur {store, select, apple{l\'App Store} other{Google Play}}'**
+  String aboutRateButton(String store);
 
   /// No description provided for @aboutWebsite.
   ///

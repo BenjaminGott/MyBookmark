@@ -6,11 +6,11 @@ import 'package:path_provider/path_provider.dart';
 import '../../core/failure.dart';
 import '../../domain/repositories/story_sharing.dart';
 
-/// Partage en story Instagram, par l'intent `ADD_TO_STORY` de Meta.
+/// Partage en story Instagram.
 ///
-/// L'intent lui-même est lancé côté Android, dans `MainActivity` : il faut un
-/// `FileProvider` et une permission de lecture accordée à Instagram, ce que
-/// Dart ne sait pas faire seul.
+/// Le partage est fait côté natif : sur Android par l'intent `ADD_TO_STORY` de
+/// Meta (`MainActivity`, avec un `FileProvider`), sur iOS par le
+/// presse-papiers et le lien `instagram-stories://` (`AppDelegate.swift`).
 class InstagramStorySharing implements StorySharing {
   const InstagramStorySharing();
 
@@ -23,7 +23,7 @@ class InstagramStorySharing implements StorySharing {
     try {
       return await _channel.invokeMethod<bool>('isAvailable') ?? false;
     } on MissingPluginException {
-      // Pas d'Android derrière (tests, autre plateforme) : pas de story.
+      // Pas de code natif derrière (tests, autre plateforme) : pas de story.
       return false;
     } on PlatformException {
       return false;
@@ -45,13 +45,9 @@ class InstagramStorySharing implements StorySharing {
       file = File('${directory.path}/$fileName');
       await file.writeAsBytes(bytes, flush: true);
     } on FileSystemException {
-      throw const FileAccessException(
-        AppErrorReason.imagePrepare,
-      );
+      throw const FileAccessException(AppErrorReason.imagePrepare);
     } on MissingPlatformDirectoryException {
-      throw const FileAccessException(
-        AppErrorReason.imagePrepare,
-      );
+      throw const FileAccessException(AppErrorReason.imagePrepare);
     }
 
     try {

@@ -1,0 +1,5 @@
+/* Textes affichés par iOS : nom sous l'icône et demandes d'autorisation. */
+"CFBundleDisplayName" = "MyBookmark";
+"NSCameraUsageDescription" = "Die Kamera liest den Strichcode eines Buches, um es zu finden. Die Bilder bleiben auf deinem Telefon.";
+"NSPhotoLibraryAddUsageDescription" = "Deine Fortschrittskarten werden in deinen Fotos gespeichert.";
+"NSPhotoLibraryUsageDescription" = "Deine Fortschrittskarten werden im Album MyBookmark deiner Fotos gespeichert.";

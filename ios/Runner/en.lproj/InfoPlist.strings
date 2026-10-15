@@ -1,0 +1,5 @@
+/* Textes affichés par iOS : nom sous l'icône et demandes d'autorisation. */
+"CFBundleDisplayName" = "MyBookmark";
+"NSCameraUsageDescription" = "The camera scans the barcode of a book to find it. Images stay on your phone.";
+"NSPhotoLibraryAddUsageDescription" = "Your progress cards are saved to your photos.";
+"NSPhotoLibraryUsageDescription" = "Your progress cards are saved to the MyBookmark album in your photos.";

@@ -1,0 +1,5 @@
+/* Textes affichés par iOS : nom sous l'icône et demandes d'autorisation. */
+"CFBundleDisplayName" = "MyBookmark";
+"NSCameraUsageDescription" = "La fotocamera legge il codice a barre di un libro per trovarlo. Le immagini restano sul tuo telefono.";
+"NSPhotoLibraryAddUsageDescription" = "Le tue schede di avanzamento vengono salvate nelle tue foto.";
+"NSPhotoLibraryUsageDescription" = "Le tue schede di avanzamento vengono salvate nell'album MyBookmark delle tue foto.";

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/app_links.dart';
 import '../../domain/models/app_language.dart';
 import '../../domain/models/app_theme_mode.dart';
 import '../../domain/models/backup.dart';
@@ -105,12 +106,13 @@ class SettingsScreen extends ConsumerWidget {
               subtitle: Text(l10n.aboutFeedbackTitle),
               onTap: () => FeedbackActions.writeToMe(context, ref),
             ),
-            ListTile(
-              leading: const Icon(Icons.star_outline),
-              title: Text(l10n.aboutRateButton),
-              subtitle: Text(l10n.aboutRateTitle),
-              onTap: () => FeedbackActions.rate(context, ref),
-            ),
+            if (AppLinks.canRate)
+              ListTile(
+                leading: const Icon(Icons.star_outline),
+                title: Text(l10n.aboutRateButton(AppLinks.store)),
+                subtitle: Text(l10n.aboutRateTitle),
+                onTap: () => FeedbackActions.rate(context, ref),
+              ),
             ListTile(
               leading: const Icon(Icons.info_outline),
               title: Text(l10n.aboutTitle),

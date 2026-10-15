@@ -1,4 +1,4 @@
-"""Génère les icônes Android et l'icône du Play Store à partir du logo.
+"""Génère les icônes Android, iOS et l'icône du Play Store à partir du logo.
 
 Le logo d'origine est un livre-hibou jaune posé sur un fond vert uni. Le dessin
 est détaché du fond (couleurs conservées, bords adoucis), puis reposé sur le
@@ -9,6 +9,7 @@ tailles, quel que soit le masque du lanceur.
     python3 tool/generate_icons.py
 """
 
+import json
 from pathlib import Path
 
 import numpy as np
@@ -19,6 +20,8 @@ SOURCE = ROOT / 'branding' / 'logo-source.jpg'
 RES = ROOT / 'android' / 'app' / 'src' / 'main' / 'res'
 COLORS = RES / 'values' / 'colors.xml'
 ASSET = ROOT / 'assets' / 'logo.png'
+IOS_ICONS = (ROOT / 'ios' / 'Runner' / 'Assets.xcassets' /
+             'AppIcon.appiconset')
 
 DENSITIES = {'mdpi': 1, 'hdpi': 1.5, 'xhdpi': 2, 'xxhdpi': 3, 'xxxhdpi': 4}
 
@@ -84,6 +87,17 @@ def write_background_color(background: tuple) -> None:
     )
 
 
+def write_ios_icons(logo: Image.Image, solid: tuple) -> None:
+    """Les icônes iOS listées par Contents.json : carrées, sans transparence
+    (Apple refuse l'alpha), le système arrondit lui-même les coins."""
+    contents = json.loads((IOS_ICONS / 'Contents.json').read_text())
+    for image in contents['images']:
+        side = float(image['size'].split('x')[0])
+        scale = int(image['scale'].rstrip('x'))
+        place(logo, round(side * scale), 0.72, background=solid).convert(
+            'RGB').save(IOS_ICONS / image['filename'])
+
+
 def main() -> None:
     rgb = np.asarray(Image.open(SOURCE).convert('RGB')).astype(float)
     background = background_color(rgb)
@@ -105,6 +119,7 @@ def main() -> None:
             folder / 'ic_launcher_monochrome.png')
 
     write_background_color(background)
+    write_ios_icons(logo, solid)
 
     # Le logo seul, sur fond transparent, pour l'en-tête de l'application.
     ASSET.parent.mkdir(parents=True, exist_ok=True)
