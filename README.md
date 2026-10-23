@@ -1,60 +1,34 @@
 # MyBookmark — Mon marque-page
 
-Suivi de lecture personnel pour Android, publié par libergot sous le nom
-**MyBookmark** en anglais et **Mon marque-page** en français (identifiant
-`com.libergot.mybookmark`). Tout reste sur le téléphone : pas de compte, pas de
-serveur, pas de synchronisation. Les métadonnées des livres viennent des API
-publiques Open Library et Apple Books et sont recopiées en base au moment de
-l'ajout — passé ce point, l'application fonctionne entièrement hors ligne.
+Application de suivi de lecture pour Android (et bientôt iPhone), publiée par
+libergot sous le nom **MyBookmark** en anglais et **Mon marque-page** en
+français.
+
+- Google Play : <https://play.google.com/store/apps/details?id=com.libergot.mybookmark>
+- Site : <https://benjamingott.github.io/mybookmark/>
+
+Tout reste sur le téléphone : pas de compte, pas de serveur, pas de publicité,
+pas de pistage. Les informations des livres viennent des API publiques Open
+Library et Apple Books ; elles sont recopiées en base au moment de l'ajout,
+après quoi l'application fonctionne entièrement hors ligne.
 
 Le dépôt et le paquet Dart s'appellent encore `biblivre`, l'ancien nom de
 l'application : c'est interne et invisible pour les utilisateurs.
 
 ## Fonctionnalités
 
-1. Recherche avec autocomplétion (anti-rebond de 250 ms, annulation de la
-   requête précédente, cache en mémoire)
-2. Ajout d'un livre dans « À lire », « En cours » ou « Lu »
-3. Ma bibliothèque : filtrable par étagère, triable par titre, auteur, date
-   d'ajout et note
-4. Fiche livre : grande couverture, résumé, note en étoiles, avis libre, dates
-   de début et de fin, historique des relectures
-5. Progression : saisie de la page en cours, pourcentage et barre
-6. Saisie manuelle d'un livre, et correction des métadonnées fausses
-7. Export et import JSON de toute la base
-8. Partage de sa progression en carte image, en deux formats — bloc
-   (1080 × 636, par défaut) et story 9:16 (1080 × 1920) — sur un dégradé tiré
-   de la couverture, avec variantes claire, sombre et vive, et composition
-   manuelle du dégradé ; envoi direct en story Instagram, le bloc posé en
-   sticker sur son dégradé pour garder ses coins arrondis transparents ;
-   enregistrement de la carte dans la galerie, album « MyBookmark »
-9. Interface en français, anglais, espagnol, allemand, italien et portugais
-   (brésilien) : la langue se choisit au premier lancement (celle du
-   téléphone est proposée d'office), puis dans les réglages
-10. Recherche Apple Books dans la boutique du pays du téléphone, pour
-   proposer les éditions locales
-
-Thèmes clair et sombre.
-
-## Traductions
-
-Les textes de l'interface sont dans `lib/l10n/app_fr.arb` (la référence) et
-ses traductions `app_en`, `app_es`, `app_de`, `app_it` et `app_pt.arb`. Pour
-ajouter ou modifier un texte : l'écrire dans chaque fichier, puis
-`flutter gen-l10n` (ou simplement `flutter pub get`) régénère
-`AppLocalizations`. Un test vérifie que toutes les langues ont les mêmes clés.
-
-Pour ajouter une langue : un fichier `app_xx.arb`, une valeur dans
-`AppLanguage` (et son nom dans `app_language_label.dart`), et au besoin un
-pays de boutique par défaut dans `storeCountry`.
-
-Les couches `data/` et `domain/` ne produisent jamais de texte affiché : une
-erreur porte une raison (`AppErrorReason`), que l'interface traduit dans
-`ui/l10n/error_text.dart`.
-
-Le nom sous l'icône suit la langue du téléphone :
-`android/app/src/main/res/values/strings.xml` (« MyBookmark », pour toutes
-les langues) et `values-fr/` (« Mon marque-page »).
+- Recherche de livres avec autocomplétion, ou scan du code-barres (ISBN), lu
+  sur le téléphone sans service extérieur
+- Trois étagères : « À lire », « En cours », « Lu », avec filtres et tris
+- Fiche livre : couverture, résumé, note, avis, dates, relectures
+- Progression : page en cours, pourcentage et barre
+- Saisie manuelle d'un livre et correction des informations
+- Carte de progression à partager en image (bloc ou story), avec envoi direct
+  en story Instagram et enregistrement dans la galerie
+- Widget d'écran d'accueil « Lecture en cours » (Android)
+- Import de la bibliothèque Goodreads (CSV), export et import JSON
+- Interface en français, anglais, espagnol, allemand, italien et portugais
+- Thèmes clair et sombre, grandes polices et tablettes
 
 ## Stack
 
@@ -62,43 +36,46 @@ les langues) et `values-fr/` (« Mon marque-page »).
 |---|---|
 | Base locale | `drift` + `drift_flutter` (SQLite) |
 | État | `flutter_riverpod` |
-| Réseau | `http` (Open Library, sans clé) |
+| Réseau | `http` (Open Library, Apple Books, sans clé) |
 | Couvertures | `cached_network_image` (jamais stockées en base) |
-| Réglages | `shared_preferences` |
-| Fichiers | `file_picker` (export/import) |
-| Partage | `share_plus`, `path_provider`, `palette_generator`, `gal` |
-
-`sqlite3_flutter_libs` n'est pas utilisé : il est marqué EOL sur pub.dev,
-`drift_flutter` embarque désormais `sqlite3` 3.x.
+| Scanner | `flutter_zxing` |
+| Widget | `home_widget` |
+| Partage | `share_plus`, `palette_generator`, `gal` |
+| Fichiers | `file_picker` |
+| Avis | `in_app_review` |
 
 ## Architecture
 
 ```
 lib/
-├─ core/      transverse : thème, erreurs nommées, annulation
+├─ core/      transverse : thème, erreurs nommées, liens publics
 ├─ domain/    modèles purs, interfaces de dépôts, logique métier
 │             (aucun import de drift, http ou Flutter)
 ├─ data/      drift (tables, DAO), clients Open Library et Apple Books,
-│             préférences, fichiers
+│             préférences, fichiers, widget
 ├─ l10n/      textes de l'interface (ARB) et code généré
 └─ ui/        écrans, widgets, contrôleurs riverpod
 ```
 
 Un widget ne fait jamais de SQL ni de HTTP : il parle à un contrôleur, qui parle
 à une interface de `domain/repositories`. Seul `data/` connaît drift et `http`.
+Les couches `data/` et `domain/` ne produisent jamais de texte affiché : une
+erreur porte une raison (`AppErrorReason`), que l'interface traduit.
 
 ## Schéma de données
 
-- `books` — métadonnées recopiées à l'ajout, plus `isbn` (prévu pour le scan de
-  code-barres) et `is_manual`
-- `reading_entries` — une par lecture, avec étagère, note, avis, dates et page
+- `books` : informations recopiées à l'ajout, plus `isbn` et `is_manual`
+- `reading_entries` : une par lecture, avec étagère, note, avis, dates et page
   en cours. Une seule porte `is_current` : c'est elle qui décide de l'étagère
   affichée, les précédentes gardent leur note et leur avis
-- `tags` + `book_tags` — étagères personnalisées, plusieurs par livre
+- `tags` + `book_tags` : étagères personnalisées, plusieurs par livre
 
-Prévu pour la suite sans migration douloureuse : statistiques mensuelles
-(`finished_at` est indexé), défi de lecture annuel (clé déjà en place dans les
-préférences), citations, recherche locale en FTS5, scan ISBN.
+## Traductions
+
+Les textes sont dans `lib/l10n/app_fr.arb` (la référence) et ses traductions
+`app_en`, `app_es`, `app_de`, `app_it` et `app_pt.arb`. Après modification,
+`flutter gen-l10n` régénère `AppLocalizations`. Un test vérifie que toutes les
+langues ont les mêmes clés.
 
 ## Commandes
 
@@ -109,62 +86,32 @@ flutter analyze                      # doit rester sans avertissement
 flutter test                         # toute la suite
 ```
 
-## Produire l'APK
+## Publication
 
-```bash
-flutter build apk --release --split-per-abi
-```
+Les versions sont compilées et envoyées automatiquement par GitHub Actions :
 
-Les APK sortent dans `build/app/outputs/flutter-apk/`. Pour un téléphone
-Android récent, prendre `app-arm64-v8a-release.apk` (~21 Mo).
+| Branche | Destination |
+|---|---|
+| `dev` | Google Play, test interne |
+| `main` | Google Play, production |
 
-`flutter build apk --release` seul produit un APK universel de ~60 Mo qui
-contient les trois architectures ; c'est pratique si l'on ne sait pas quel
-téléphone recevra le fichier. Pour un seul appareil connu :
-
-```bash
-flutter build apk --release --target-platform android-arm64
-```
-
-**Attention en changeant de commande** : `--split-per-abi` décale le code de
-version (+1000 pour armeabi-v7a, +2000 pour arm64-v8a, +4000 pour x86_64). Un
-APK issu de `--split-per-abi` porte donc le code 2001 là où les autres portent
-1, et réinstaller par-dessus échoue avec `INSTALL_FAILED_VERSION_DOWNGRADE`. Il
-faut alors désinstaller d'abord, ou s'en tenir à une seule des deux commandes.
-
-## Installer sur un téléphone
-
-Par câble, appareil en mode développeur et débogage USB activé :
-
-```bash
-flutter install --release
-```
-
-Sinon, copier `app-arm64-v8a-release.apk` sur le téléphone et l'ouvrir depuis le
-gestionnaire de fichiers ; Android demandera d'autoriser l'installation
-d'applications issues de cette source.
-
-Compilé sur un poste sans `android/key.properties`, l'APK est signé avec la clé
-de débogage : il s'installe, mais ne met pas à jour une version publiée. Les
-releases GitHub, elles, sont signées avec la clé de release (APK et AAB).
-
-## Publier
-
-- Release GitHub : onglet Actions → « Release APK » → tag `vX.Y.Z`.
-- Play Store : voir [docs/PUBLICATION_PLAY_STORE.md](docs/PUBLICATION_PLAY_STORE.md).
+- Android : [docs/PUBLICATION_PLAY_STORE.md](docs/PUBLICATION_PLAY_STORE.md)
+- iOS (Codemagic, TestFlight) : [docs/PUBLICATION_APP_STORE.md](docs/PUBLICATION_APP_STORE.md)
 - Icônes : `python3 tool/generate_icons.py` les régénère depuis
   `branding/logo-source.jpg`.
-- Captures pour le site (et le Play Store) : de vrais écrans de l'app, avec une
-  bibliothèque de démonstration, posés sur une fresque découpée en panneaux.
+- Captures et vidéo de présentation : `tool/screenshots/`.
 
-  ```bash
-  python3 tool/screenshots/fetch_covers.py   # vraies couvertures (Apple Books)
-  flutter test tool/screenshots/capture_test.dart
-  python3 tool/screenshots/compose.py <dossier> --lang en   # ou fr
-  ```
+## Licence
 
-  Deux séries : anglaise (*The Knight and the Moth*, classiques anglais) et
-  française (*Le chevalier et la phalène*, classiques français). Une
-  couverture posée dans `tool/screenshots/covers/<livre>.*` remplace celle
-  d'Apple Books. Les couvertures appartiennent à leurs éditeurs : à réserver
-  au site, et à vérifier avant tout usage sur le Play Store.
+Copyright © 2026 libergot. **Tous droits réservés.**
+
+Ce code est rendu public pour être consulté, à titre de vitrine. Il n'est
+**pas** open source : aucune licence n'est accordée. Sans autorisation écrite,
+il est interdit de copier, modifier, redistribuer ou publier tout ou partie de
+ce code, ainsi que d'en tirer une application.
+
+Le nom « MyBookmark », le nom « Mon marque-page », le logo et les visuels de
+l'application sont également réservés.
+
+Les bibliothèques utilisées restent sous leurs propres licences. Pour toute
+demande : <libergot.pro@gmail.com>.
