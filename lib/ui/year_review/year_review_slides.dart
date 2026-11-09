@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -173,6 +175,98 @@ class _Signature extends StatelessWidget {
   }
 }
 
+/// La mosaïque de couvertures la plus grande possible dans [space] : on
+/// essaie chaque nombre de colonnes et on garde le meilleur. Peu de livres,
+/// grandes couvertures.
+///
+/// Une grille pleine est préférée à une grille à trous : quatre livres font
+/// un carré de deux sur deux plutôt qu'une rangée de trois et un orphelin.
+@visibleForTesting
+({int columns, double width}) coverGridLayout({
+  required int count,
+  required Size space,
+  double gap = 10,
+  double maxWidth = 200,
+  double ratio = 1.5,
+}) {
+  var best = (columns: 1, width: 0.0);
+  var bestScore = -1.0;
+  for (var columns = 1; columns <= math.max(count, 1); columns++) {
+    final rows = (count / columns).ceil();
+    final byWidth = (space.width - gap * (columns - 1)) / columns;
+    final byHeight = (space.height - gap * (rows - 1)) / rows / ratio;
+    final width = math.min(math.min(byWidth, byHeight), maxWidth);
+    final filled = count / (columns * rows);
+    final score = width * math.sqrt(filled);
+    if (score > bestScore) {
+      best = (columns: columns, width: width);
+      bestScore = score;
+    }
+  }
+  return best;
+}
+
+/// Les couvertures en mosaïque, à la taille que permet leur nombre.
+class _CoverGrid extends StatelessWidget {
+  const _CoverGrid({
+    required this.books,
+    this.maxWidth = 200,
+    this.gap = 10,
+    this.shadow = false,
+  });
+
+  final List<YearReviewBook> books;
+  final double maxWidth;
+  final double gap;
+  final bool shadow;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final layout = coverGridLayout(
+          count: books.length,
+          space: constraints.biggest,
+          gap: gap,
+          maxWidth: maxWidth,
+        );
+        final width = layout.width.floorToDouble();
+        return Align(
+          alignment: Alignment.centerLeft,
+          // Juste la largeur des colonnes choisies : la mosaïque passe à la
+          // ligne là où le calcul l'a prévu.
+          child: SizedBox(
+            width: layout.columns * width + gap * (layout.columns - 1),
+            child: Wrap(
+              spacing: gap,
+              runSpacing: gap,
+              children: <Widget>[
+                for (final book in books)
+                  DecoratedBox(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(width / 15),
+                      boxShadow: shadow
+                          ? const <BoxShadow>[
+                              BoxShadow(color: Colors.black38, blurRadius: 10),
+                            ]
+                          : null,
+                    ),
+                    child: BookCover(
+                      url: book.coverUrl,
+                      width: width,
+                      height: width * 1.5,
+                      borderRadius: width / 15,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
 String _number(BuildContext context, int value) => NumberFormat.decimalPattern(
   Localizations.localeOf(context).toLanguageTag(),
 ).format(value);
@@ -184,8 +278,8 @@ class _IntroSlide extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Les couvertures de l'année, en mosaïque : les six dernières lues,
-    // deux rangées qui tiennent sous l'année.
+    // Les couvertures de l'année, les six dernières lues au plus : moins il
+    // y en a, plus elles sont grandes.
     final covers = review.books.reversed.take(6).toList();
     return _Slide(
       halo: Alignment.bottomLeft,
@@ -193,24 +287,12 @@ class _IntroSlide extends StatelessWidget {
         _Kicker(context.l10n.yrIntroKicker),
         const SizedBox(height: 8),
         _BigNumber('${review.year}', size: 120),
-        const Spacer(),
-        Wrap(
-          spacing: 10,
-          runSpacing: 10,
-          children: <Widget>[
-            for (final book in covers)
-              DecoratedBox(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(6),
-                  boxShadow: const <BoxShadow>[
-                    BoxShadow(color: Colors.black38, blurRadius: 10),
-                  ],
-                ),
-                child: BookCover(url: book.coverUrl, width: 92, height: 138),
-              ),
-          ],
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 28),
+            child: _CoverGrid(books: covers, shadow: true),
+          ),
         ),
-        const Spacer(),
         const _Signature(),
       ],
     );
@@ -526,15 +608,14 @@ class _OutroSlide extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Wrap(
-                  spacing: 6,
-                  runSpacing: 6,
-                  children: <Widget>[
-                    for (final book in review.books.reversed.take(8))
-                      BookCover(url: book.coverUrl, width: 50, height: 75),
-                  ],
+                Expanded(
+                  child: _CoverGrid(
+                    books: review.books.reversed.take(8).toList(),
+                    maxWidth: 110,
+                    gap: 6,
+                  ),
                 ),
-                const Spacer(),
+                const SizedBox(height: 4),
                 for (final (label, value) in rows)
                   Padding(
                     padding: const EdgeInsets.only(top: 12),
