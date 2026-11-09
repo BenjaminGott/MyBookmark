@@ -10,6 +10,7 @@ extension ShelfPresentation on Shelf {
         Shelf.toRead => l10n.shelfToRead,
         Shelf.reading => l10n.shelfReading,
         Shelf.read => l10n.shelfRead,
+        Shelf.abandoned => l10n.shelfAbandoned,
       };
 
   /// Formulation utilisée dans les confirmations : « Ajouté à « À lire » ».
@@ -19,6 +20,7 @@ extension ShelfPresentation on Shelf {
         Shelf.toRead => Icons.bookmark_border,
         Shelf.reading => Icons.auto_stories_outlined,
         Shelf.read => Icons.check_circle_outline,
+        Shelf.abandoned => Icons.remove_circle_outline,
       };
 }
 

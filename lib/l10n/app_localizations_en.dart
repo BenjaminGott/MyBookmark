@@ -51,7 +51,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get navSearch => 'Search';
 
   @override
-  String get navSettings => 'Settings';
+  String get navSettings => 'More';
 
   @override
   String percent(int percent) {
@@ -80,6 +80,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get shelfRead => 'Read';
+
+  @override
+  String get shelfAbandoned => 'Abandoned';
 
   @override
   String shelfAdded(String shelf) {
@@ -134,6 +137,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sortTooltip => 'Sort';
 
   @override
+  String get librarySearchHint => 'Search a title, an author';
+
+  @override
+  String get librarySearchClear => 'Clear search';
+
+  @override
+  String get librarySearchNoResultTitle => 'No book found';
+
+  @override
+  String librarySearchNoResultMessage(String query) {
+    return 'Nothing matches “$query” on this shelf.';
+  }
+
+  @override
   String get sortTitle => 'Title';
 
   @override
@@ -147,6 +164,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get readNotRated => 'Read · not rated yet';
+
+  @override
+  String abandonedAtPage(int page) {
+    return 'Abandoned at page $page';
+  }
 
   @override
   String toReadWithPages(int count) {
@@ -350,7 +372,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appearance => 'Appearance';
 
   @override
-  String get themeSystem => 'System default';
+  String get themeSystem => 'Auto';
 
   @override
   String get themeLight => 'Light';
@@ -387,7 +409,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dataExplanation =>
-      'Everything is stored on this phone, with no account or server. Exporting is the only way to keep a copy of your library or move it to another device.';
+      'Everything stays on this phone. Export your library to keep a copy or move it to another device.';
 
   @override
   String get exportLibrary => 'Export my library';
@@ -645,6 +667,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cardKickerToRead => 'ON MY PILE';
 
   @override
+  String get cardKickerAbandoned => 'DID NOT FINISH';
+
+  @override
   String cardPage(int page) {
     return 'page $page';
   }
@@ -682,7 +707,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get welcomeChooseLanguage => 'Choose your language';
 
   @override
-  String get welcomeHint => 'You can change it anytime in Settings.';
+  String get welcomeHint => 'You can change it anytime in the More tab.';
 
   @override
   String get continueButton => 'Continue';
@@ -819,11 +844,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aboutRateTitle => 'Enjoying MyBookmark?';
 
   @override
-  String get aboutRateBody =>
-      'A rating on Google Play helps other readers discover the app. Thank you!';
+  String aboutRateBody(String store) {
+    String _temp0 = intl.Intl.selectLogic(store, {
+      'apple': 'the App Store',
+      'other': 'Google Play',
+    });
+    return 'A rating on $_temp0 helps other readers discover the app. Thank you!';
+  }
 
   @override
-  String get aboutRateButton => 'Rate on Google Play';
+  String aboutRateButton(String store) {
+    String _temp0 = intl.Intl.selectLogic(store, {
+      'apple': 'the App Store',
+      'other': 'Google Play',
+    });
+    return 'Rate on $_temp0';
+  }
 
   @override
   String get aboutWebsite => 'Website';
@@ -851,4 +887,216 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get widgetEmptyHint => 'Tap to start one.';
+
+  @override
+  String get settingsYearReviews => 'My reviews';
+
+  @override
+  String get settingsYearReviewsSubtitle => 'Your reading year, in pictures';
+
+  @override
+  String get yearReviewsEmptyTitle => 'No review yet';
+
+  @override
+  String get yearReviewsEmptyMessage =>
+      'A year\'s review shows up here once the year is over, if you finished at least one book.';
+
+  @override
+  String yearReviewsSummary(int books, int pages) {
+    final intl.NumberFormat pagesNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String pagesString = pagesNumberFormat.format(pages);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      books,
+      locale: localeName,
+      other: '$books books',
+      one: '1 book',
+    );
+    return '$_temp0 · $pagesString pages';
+  }
+
+  @override
+  String get yearReviewsNew => 'New';
+
+  @override
+  String yearReviewAnnounceTitle(String year) {
+    return 'Your $year in reading';
+  }
+
+  @override
+  String get yearReviewAnnounceBody =>
+      'Your review is ready: your books, your pages, your favorite… It\'s waiting for you all January in the Review tab.';
+
+  @override
+  String get yearReviewAnnounceOpen => 'See my review';
+
+  @override
+  String get yearReviewAnnounceLater => 'Later';
+
+  @override
+  String yearReviewTitle(String year) {
+    return '$year review';
+  }
+
+  @override
+  String get yearReviewShare => 'Share';
+
+  @override
+  String get yearReviewSave => 'Save';
+
+  @override
+  String get yearReviewSaved => 'Image saved to your gallery';
+
+  @override
+  String get yearReviewUpdate => 'Update';
+
+  @override
+  String get yearReviewUpdated => 'Review updated';
+
+  @override
+  String yearReviewNone(String year) {
+    return 'No book finished in $year.';
+  }
+
+  @override
+  String get yearReviewExportFailed => 'Couldn\'t prepare the image.';
+
+  @override
+  String get yrIntroKicker => 'MY YEAR IN READING';
+
+  @override
+  String yrBooksCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'books finished',
+      one: 'book finished',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String yrPages(int pages) {
+    final intl.NumberFormat pagesNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String pagesString = pagesNumberFormat.format(pages);
+
+    return '$pagesString pages turned';
+  }
+
+  @override
+  String get yrMonthKicker => 'MY BIGGEST MONTH';
+
+  @override
+  String yrMonthBooks(int count, String month) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count books finished in $month',
+      one: '1 book finished in $month',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get yrFavoriteKicker => 'MY FAVORITE';
+
+  @override
+  String get yrAuthorKicker => 'MY AUTHOR OF THE YEAR';
+
+  @override
+  String yrAuthorBooks(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count books read',
+      one: '1 book read',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get yrLongestKicker => 'MY LONGEST BOOK';
+
+  @override
+  String yrLongestPages(int pages) {
+    final intl.NumberFormat pagesNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String pagesString = pagesNumberFormat.format(pages);
+
+    return '$pagesString pages';
+  }
+
+  @override
+  String yrAverageDays(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: 'On average, $days days to finish a book',
+      one: 'On average, 1 day to finish a book',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String yrOutroKicker(String year) {
+    return 'MY $year';
+  }
+
+  @override
+  String get yrOutroBooks => 'Books';
+
+  @override
+  String get yrOutroPages => 'Pages';
+
+  @override
+  String get yrOutroFavorite => 'Favorite';
+
+  @override
+  String get yrOutroAuthor => 'Author';
+
+  @override
+  String yearReviewMovedTitle(String year) {
+    return 'Your $year review has moved';
+  }
+
+  @override
+  String yearReviewMovedBody(String year) {
+    return 'January is over, and so is the Review tab. Your $year review now lives in the More tab, under My reviews, along with your other years.';
+  }
+
+  @override
+  String get yearReviewMovedOpen => 'See my review';
+
+  @override
+  String get yearReviewMovedOk => 'Got it';
+
+  @override
+  String get errorVideoFailed => 'Couldn\'t create the video.';
+
+  @override
+  String get yearReviewVideo => 'Create the video';
+
+  @override
+  String get yearReviewVideoPreparing => 'Creating the video…';
+
+  @override
+  String get yearReviewVideoReadyTitle => 'Your video is ready';
+
+  @override
+  String get yearReviewVideoReadyBody =>
+      '18 seconds with music, in story format.';
+
+  @override
+  String get yearReviewVideoSaved => 'Video saved to your gallery';
+
+  @override
+  String get sectionMyYear => 'My year';
+
+  @override
+  String get sectionDisplay => 'Display';
+
+  @override
+  String get sectionHelp => 'Help & contact';
 }

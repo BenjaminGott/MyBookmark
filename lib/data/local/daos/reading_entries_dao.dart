@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 
 import '../../../domain/models/reading_entry.dart';
 import '../../../domain/models/shelf.dart';
+import '../../../domain/models/year_review.dart';
 import '../../../domain/services/reading_progress.dart';
 import '../app_database.dart';
 import '../mappers.dart';
@@ -32,6 +33,26 @@ class ReadingEntriesDao extends DatabaseAccessor<AppDatabase>
           (List<ReadingEntryRow> rows) =>
               rows.map((ReadingEntryRow row) => row.toDomain()).toList(),
         );
+  }
+
+  /// Toutes les lectures rangées dans « Lu » avec une date de fin, relectures
+  /// comprises, avec leur livre : la matière des bilans annuels.
+  Future<List<FinishedReading>> finishedReadings() async {
+    final query = select(readingEntries).join(<Join<HasResultSet, dynamic>>[
+      innerJoin(books, books.id.equalsExp(readingEntries.bookId)),
+    ])
+      ..where(
+        readingEntries.shelf.equalsValue(Shelf.read) &
+            readingEntries.finishedAt.isNotNull(),
+      );
+    final rows = await query.get();
+    return <FinishedReading>[
+      for (final row in rows)
+        FinishedReading(
+          book: row.readTable(books).toDomain(),
+          entry: row.readTable(readingEntries).toDomain(),
+        ),
+    ];
   }
 
   Future<ReadingEntry?> findCurrentEntry(int bookId) async {
@@ -73,7 +94,8 @@ class ReadingEntriesDao extends DatabaseAccessor<AppDatabase>
       switch (shelf) {
         case Shelf.toRead:
           break;
-        case Shelf.reading:
+        // Un livre abandonné a été commencé ; la page atteinte est gardée.
+        case Shelf.reading || Shelf.abandoned:
           if (entry.startedAt == null) {
             startedAt = Value<DateTime?>(timestamp);
           }

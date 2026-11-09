@@ -292,6 +292,7 @@ class _Kicker extends StatelessWidget {
       Shelf.reading => l10n.cardKickerReading,
       Shelf.read => l10n.cardKickerRead,
       Shelf.toRead => l10n.cardKickerToRead,
+      Shelf.abandoned => l10n.cardKickerAbandoned,
     };
 
     return Row(

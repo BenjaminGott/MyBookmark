@@ -51,7 +51,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get navSearch => 'Buscar';
 
   @override
-  String get navSettings => 'Ajustes';
+  String get navSettings => 'Más';
 
   @override
   String percent(int percent) {
@@ -80,6 +80,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get shelfRead => 'Leído';
+
+  @override
+  String get shelfAbandoned => 'Abandonado';
 
   @override
   String shelfAdded(String shelf) {
@@ -135,6 +138,20 @@ class AppLocalizationsEs extends AppLocalizations {
   String get sortTooltip => 'Ordenar';
 
   @override
+  String get librarySearchHint => 'Buscar un título, un autor';
+
+  @override
+  String get librarySearchClear => 'Borrar la búsqueda';
+
+  @override
+  String get librarySearchNoResultTitle => 'Ningún libro encontrado';
+
+  @override
+  String librarySearchNoResultMessage(String query) {
+    return 'Nada coincide con «$query» en esta estantería.';
+  }
+
+  @override
   String get sortTitle => 'Título';
 
   @override
@@ -148,6 +165,11 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get readNotRated => 'Leído · sin valorar';
+
+  @override
+  String abandonedAtPage(int page) {
+    return 'Abandonado en la página $page';
+  }
 
   @override
   String toReadWithPages(int count) {
@@ -353,7 +375,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get appearance => 'Apariencia';
 
   @override
-  String get themeSystem => 'Como el sistema';
+  String get themeSystem => 'Auto';
 
   @override
   String get themeLight => 'Claro';
@@ -390,7 +412,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get dataExplanation =>
-      'Todo se guarda en este teléfono, sin cuenta ni servidor. Exportar es la única forma de conservar una copia de tu biblioteca o de pasarla a otro dispositivo.';
+      'Todo se queda en este teléfono. Exporta tu biblioteca para guardar una copia o pasarla a otro dispositivo.';
 
   @override
   String get exportLibrary => 'Exportar mi biblioteca';
@@ -649,6 +671,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get cardKickerToRead => 'EN MI PILA';
 
   @override
+  String get cardKickerAbandoned => 'LECTURA ABANDONADA';
+
+  @override
   String cardPage(int page) {
     return 'página $page';
   }
@@ -686,7 +711,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get welcomeChooseLanguage => 'Elige tu idioma';
 
   @override
-  String get welcomeHint => 'Puedes cambiarlo cuando quieras en los ajustes.';
+  String get welcomeHint =>
+      'Puedes cambiarlo cuando quieras en la pestaña Más.';
 
   @override
   String get continueButton => 'Continuar';
@@ -830,11 +856,22 @@ class AppLocalizationsEs extends AppLocalizations {
   String get aboutRateTitle => '¿Te gusta MyBookmark?';
 
   @override
-  String get aboutRateBody =>
-      'Una valoración en Google Play ayuda a otros lectores a descubrir la app. ¡Gracias!';
+  String aboutRateBody(String store) {
+    String _temp0 = intl.Intl.selectLogic(store, {
+      'apple': 'la App Store',
+      'other': 'Google Play',
+    });
+    return 'Una valoración en $_temp0 ayuda a otros lectores a descubrir la app. ¡Gracias!';
+  }
 
   @override
-  String get aboutRateButton => 'Valorar en Google Play';
+  String aboutRateButton(String store) {
+    String _temp0 = intl.Intl.selectLogic(store, {
+      'apple': 'la App Store',
+      'other': 'Google Play',
+    });
+    return 'Valorar en $_temp0';
+  }
 
   @override
   String get aboutWebsite => 'Sitio web';
@@ -863,4 +900,216 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get widgetEmptyHint => 'Toca para empezar uno.';
+
+  @override
+  String get settingsYearReviews => 'Mis resúmenes';
+
+  @override
+  String get settingsYearReviewsSubtitle => 'Tu año de lectura, en imágenes';
+
+  @override
+  String get yearReviewsEmptyTitle => 'Todavía no hay resumen';
+
+  @override
+  String get yearReviewsEmptyMessage =>
+      'El resumen de un año aparece aquí cuando el año termina, si has terminado al menos un libro.';
+
+  @override
+  String yearReviewsSummary(int books, int pages) {
+    final intl.NumberFormat pagesNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String pagesString = pagesNumberFormat.format(pages);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      books,
+      locale: localeName,
+      other: '$books libros',
+      one: '1 libro',
+    );
+    return '$_temp0 · $pagesString páginas';
+  }
+
+  @override
+  String get yearReviewsNew => 'Nuevo';
+
+  @override
+  String yearReviewAnnounceTitle(String year) {
+    return 'Tu $year en lectura';
+  }
+
+  @override
+  String get yearReviewAnnounceBody =>
+      'Tu resumen está listo: tus libros, tus páginas, tu favorito… Te espera todo enero en la pestaña Resumen.';
+
+  @override
+  String get yearReviewAnnounceOpen => 'Ver mi resumen';
+
+  @override
+  String get yearReviewAnnounceLater => 'Más tarde';
+
+  @override
+  String yearReviewTitle(String year) {
+    return 'Resumen $year';
+  }
+
+  @override
+  String get yearReviewShare => 'Compartir';
+
+  @override
+  String get yearReviewSave => 'Guardar';
+
+  @override
+  String get yearReviewSaved => 'Imagen guardada en la galería';
+
+  @override
+  String get yearReviewUpdate => 'Actualizar';
+
+  @override
+  String get yearReviewUpdated => 'Resumen actualizado';
+
+  @override
+  String yearReviewNone(String year) {
+    return 'Ningún libro terminado en $year.';
+  }
+
+  @override
+  String get yearReviewExportFailed => 'No se pudo preparar la imagen.';
+
+  @override
+  String get yrIntroKicker => 'MI AÑO EN LECTURA';
+
+  @override
+  String yrBooksCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'libros terminados',
+      one: 'libro terminado',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String yrPages(int pages) {
+    final intl.NumberFormat pagesNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String pagesString = pagesNumberFormat.format(pages);
+
+    return '$pagesString páginas leídas';
+  }
+
+  @override
+  String get yrMonthKicker => 'MI MES MÁS LECTOR';
+
+  @override
+  String yrMonthBooks(int count, String month) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count libros terminados en $month',
+      one: '1 libro terminado en $month',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get yrFavoriteKicker => 'MI FAVORITO';
+
+  @override
+  String get yrAuthorKicker => 'MI AUTOR DEL AÑO';
+
+  @override
+  String yrAuthorBooks(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count libros leídos',
+      one: '1 libro leído',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get yrLongestKicker => 'MI LIBRO MÁS LARGO';
+
+  @override
+  String yrLongestPages(int pages) {
+    final intl.NumberFormat pagesNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String pagesString = pagesNumberFormat.format(pages);
+
+    return '$pagesString páginas';
+  }
+
+  @override
+  String yrAverageDays(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: 'De media, $days días para terminar un libro',
+      one: 'De media, 1 día para terminar un libro',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String yrOutroKicker(String year) {
+    return 'MI $year';
+  }
+
+  @override
+  String get yrOutroBooks => 'Libros';
+
+  @override
+  String get yrOutroPages => 'Páginas';
+
+  @override
+  String get yrOutroFavorite => 'Favorito';
+
+  @override
+  String get yrOutroAuthor => 'Autor';
+
+  @override
+  String yearReviewMovedTitle(String year) {
+    return 'Tu resumen $year se ha mudado';
+  }
+
+  @override
+  String yearReviewMovedBody(String year) {
+    return 'Enero ha terminado, y la pestaña Resumen también. Tu resumen $year está ahora en la pestaña Más, en Mis resúmenes, junto a los de otros años.';
+  }
+
+  @override
+  String get yearReviewMovedOpen => 'Ver mi resumen';
+
+  @override
+  String get yearReviewMovedOk => 'Entendido';
+
+  @override
+  String get errorVideoFailed => 'No se pudo crear el vídeo.';
+
+  @override
+  String get yearReviewVideo => 'Crear el vídeo';
+
+  @override
+  String get yearReviewVideoPreparing => 'Creando el vídeo…';
+
+  @override
+  String get yearReviewVideoReadyTitle => 'Tu vídeo está listo';
+
+  @override
+  String get yearReviewVideoReadyBody =>
+      '18 segundos con música, en formato historia.';
+
+  @override
+  String get yearReviewVideoSaved => 'Vídeo guardado en la galería';
+
+  @override
+  String get sectionMyYear => 'Mi año';
+
+  @override
+  String get sectionDisplay => 'Pantalla';
+
+  @override
+  String get sectionHelp => 'Ayuda y contacto';
 }

@@ -14,7 +14,7 @@
   "errorTitle": "Ça n'a pas marché",
   "navLibrary": "Bibliothèque",
   "navSearch": "Chercher",
-  "navSettings": "Réglages",
+  "navSettings": "Plus",
   "percent": "{percent} %",
   "@percent": {
     "placeholders": {
@@ -35,6 +35,7 @@
   "shelfToRead": "À lire",
   "shelfReading": "En cours",
   "shelfRead": "Lu",
+  "shelfAbandoned": "Abandonné",
   "shelfAdded": "Ajouté à « {shelf} »",
   "@shelfAdded": {
     "placeholders": {
@@ -91,11 +92,32 @@
   "addBookManuallyTooltip": "Ajouter un livre que la recherche ne trouve pas",
   "filterAll": "Toutes",
   "sortTooltip": "Trier",
+  "librarySearchHint": "Rechercher un titre, un auteur",
+  "librarySearchClear": "Effacer la recherche",
+  "librarySearchNoResultTitle": "Aucun livre trouvé",
+  "librarySearchNoResultMessage": "Rien ne correspond à « {query} » dans cette étagère.",
+  "@librarySearchNoResultMessage": {
+    "description": "Recherche sans résultat dans la bibliothèque.",
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
   "sortTitle": "Titre",
   "sortAuthor": "Auteur",
   "sortAddedAt": "Date d'ajout",
   "sortRating": "Note",
   "readNotRated": "Lu · pas encore noté",
+  "abandonedAtPage": "Abandonné à la page {page}",
+  "@abandonedAtPage": {
+    "description": "Sous un livre abandonné, dans la bibliothèque.",
+    "placeholders": {
+      "page": {
+        "type": "int"
+      }
+    }
+  },
   "toReadWithPages": "{count, plural, =1{À lire · 1 page} other{À lire · {count} pages}}",
   "@toReadWithPages": {
     "placeholders": {
@@ -226,7 +248,7 @@
   "saveReview": "Enregistrer l'avis",
   "reviewSaved": "Avis enregistré",
   "appearance": "Apparence",
-  "themeSystem": "Comme le système",
+  "themeSystem": "Auto",
   "themeLight": "Clair",
   "themeDark": "Sombre",
   "language": "Langue",
@@ -238,7 +260,7 @@
   "languageItalian": "Italiano",
   "languagePortuguese": "Português",
   "myData": "Mes données",
-  "dataExplanation": "Tout est enregistré sur ce téléphone, sans compte ni serveur. L'export est le seul moyen de garder une copie de votre bibliothèque ou de la transférer sur un autre appareil.",
+  "dataExplanation": "Tout reste sur ce téléphone. Exportez votre bibliothèque pour en garder une copie ou la transférer.",
   "exportLibrary": "Exporter ma bibliothèque",
   "exportSubtitle": "Enregistre un fichier JSON",
   "importBackup": "Importer une sauvegarde",
@@ -379,6 +401,7 @@
   "cardKickerReading": "EN COURS DE LECTURE",
   "cardKickerRead": "LECTURE TERMINÉE",
   "cardKickerToRead": "DANS MA PILE",
+  "cardKickerAbandoned": "LECTURE ABANDONNÉE",
   "cardPage": "page {page}",
   "@cardPage": {
     "placeholders": {
@@ -407,7 +430,7 @@
   "imageNotReady": "Impossible de préparer l'image.",
   "welcomeTitle": "Bienvenue",
   "welcomeChooseLanguage": "Choisissez votre langue",
-  "welcomeHint": "Vous pourrez la changer à tout moment dans les réglages.",
+  "welcomeHint": "Vous pourrez la changer à tout moment dans l'onglet Plus.",
   "continueButton": "Continuer",
   "errorNetwork": "Pas de connexion. Vérifiez votre réseau et réessayez.",
   "errorTimeout": "La recherche met trop de temps à répondre.",
@@ -457,8 +480,26 @@
     }
   },
   "aboutRateTitle": "Vous aimez Mon marque-page ?",
-  "aboutRateBody": "Une note sur Google Play aide d'autres lecteurs à découvrir l'application. Merci !",
-  "aboutRateButton": "Noter sur Google Play",
+  "aboutRateBody": "Une note sur {store, select, apple{l'App Store} other{Google Play}} aide d'autres lecteurs à découvrir l'application. Merci !",
+  "@aboutRateBody": {
+    "description": "Invitation à noter ; store vaut apple (App Store) ou google (Google Play).",
+    "placeholders": {
+      "store": {
+        "type": "String",
+        "example": "google"
+      }
+    }
+  },
+  "aboutRateButton": "Noter sur {store, select, apple{l'App Store} other{Google Play}}",
+  "@aboutRateButton": {
+    "description": "Bouton pour noter ; store vaut apple ou google.",
+    "placeholders": {
+      "store": {
+        "type": "String",
+        "example": "google"
+      }
+    }
+  },
   "aboutWebsite": "Site web",
   "aboutPrivacy": "Politique de confidentialité",
   "aboutLinkFailed": "Impossible d'ouvrir le lien.",
@@ -467,5 +508,152 @@
   "scanHint": "Visez le code-barres au dos du livre.",
   "scanNotIsbn": "Ce code-barres n'est pas celui d'un livre (ISBN).",
   "widgetEmptyTitle": "Aucun livre en cours",
-  "widgetEmptyHint": "Touchez pour en commencer un."
+  "widgetEmptyHint": "Touchez pour en commencer un.",
+  "settingsYearReviews": "Mes bilans",
+  "settingsYearReviewsSubtitle": "Votre année de lecture, en images",
+  "yearReviewsEmptyTitle": "Pas encore de bilan",
+  "yearReviewsEmptyMessage": "Le bilan d'une année apparaît ici une fois l'année terminée, si elle compte au moins un livre lu.",
+  "yearReviewsSummary": "{books, plural, =1{1 livre} other{{books} livres}} · {pages} pages",
+  "@yearReviewsSummary": {
+    "placeholders": {
+      "books": {
+        "type": "int"
+      },
+      "pages": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "yearReviewsNew": "Nouveau",
+  "yearReviewAnnounceTitle": "Votre année {year} en lecture",
+  "@yearReviewAnnounceTitle": {
+    "placeholders": {
+      "year": {
+        "type": "String"
+      }
+    }
+  },
+  "yearReviewAnnounceBody": "Votre bilan est prêt : vos livres, vos pages, votre coup de cœur… Il vous attend tout le mois de janvier dans l'onglet Bilan.",
+  "yearReviewAnnounceOpen": "Voir mon bilan",
+  "yearReviewAnnounceLater": "Plus tard",
+  "yearReviewTitle": "Bilan {year}",
+  "@yearReviewTitle": {
+    "placeholders": {
+      "year": {
+        "type": "String"
+      }
+    }
+  },
+  "yearReviewShare": "Partager",
+  "yearReviewSave": "Enregistrer",
+  "yearReviewSaved": "Image enregistrée dans la galerie",
+  "yearReviewUpdate": "Mettre à jour",
+  "yearReviewUpdated": "Bilan mis à jour",
+  "yearReviewNone": "Aucun livre terminé en {year}.",
+  "@yearReviewNone": {
+    "placeholders": {
+      "year": {
+        "type": "String"
+      }
+    }
+  },
+  "yearReviewExportFailed": "Impossible de préparer l'image.",
+  "yrIntroKicker": "MON ANNÉE EN LECTURE",
+  "yrBooksCount": "{count, plural, =1{livre terminé} other{livres terminés}}",
+  "@yrBooksCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "yrPages": "{pages} pages tournées",
+  "@yrPages": {
+    "placeholders": {
+      "pages": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "yrMonthKicker": "MON MOIS LE PLUS LU",
+  "yrMonthBooks": "{count, plural, =1{1 livre terminé en {month}} other{{count} livres terminés en {month}}}",
+  "@yrMonthBooks": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "month": {
+        "type": "String"
+      }
+    }
+  },
+  "yrFavoriteKicker": "MON COUP DE CŒUR",
+  "yrAuthorKicker": "MON AUTEUR DE L'ANNÉE",
+  "yrAuthorBooks": "{count, plural, =1{1 livre lu} other{{count} livres lus}}",
+  "@yrAuthorBooks": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "yrLongestKicker": "MON PLUS GROS LIVRE",
+  "yrLongestPages": "{pages} pages",
+  "@yrLongestPages": {
+    "placeholders": {
+      "pages": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "yrAverageDays": "{days, plural, =1{En moyenne, 1 jour pour finir un livre} other{En moyenne, {days} jours pour finir un livre}}",
+  "@yrAverageDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "yrOutroKicker": "MON ANNÉE {year}",
+  "@yrOutroKicker": {
+    "placeholders": {
+      "year": {
+        "type": "String"
+      }
+    }
+  },
+  "yrOutroBooks": "Livres",
+  "yrOutroPages": "Pages",
+  "yrOutroFavorite": "Coup de cœur",
+  "yrOutroAuthor": "Auteur",
+  "yearReviewMovedTitle": "Votre bilan {year} a déménagé",
+  "yearReviewMovedBody": "Janvier est fini, l'onglet Bilan aussi. Votre bilan {year} vous attend maintenant dans l'onglet Plus, rubrique Mes bilans, avec ceux des autres années.",
+  "yearReviewMovedOpen": "Voir mon bilan",
+  "yearReviewMovedOk": "Compris",
+  "@yearReviewMovedTitle": {
+    "placeholders": {
+      "year": {
+        "type": "String"
+      }
+    }
+  },
+  "@yearReviewMovedBody": {
+    "placeholders": {
+      "year": {
+        "type": "String"
+      }
+    }
+  },
+  "errorVideoFailed": "Impossible de créer la vidéo.",
+  "yearReviewVideo": "Créer la vidéo",
+  "yearReviewVideoPreparing": "Création de la vidéo…",
+  "yearReviewVideoReadyTitle": "Votre vidéo est prête",
+  "yearReviewVideoReadyBody": "18 secondes en musique, au format story.",
+  "yearReviewVideoSaved": "Vidéo enregistrée dans la galerie",
+  "sectionMyYear": "Mon année",
+  "sectionDisplay": "Affichage",
+  "sectionHelp": "Aide et contact"
 }

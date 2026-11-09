@@ -1,6 +1,6 @@
 # MyBookmark — Mon marque-page
 
-Application de suivi de lecture pour Android (et bientôt iPhone), publiée par
+Application de suivi de lecture pour Android, publiée par
 libergot sous le nom **MyBookmark** en anglais et **Mon marque-page** en
 français.
 
@@ -96,7 +96,6 @@ Les versions sont compilées et envoyées automatiquement par GitHub Actions :
 | `main` | Google Play, production |
 
 - Android : [docs/PUBLICATION_PLAY_STORE.md](docs/PUBLICATION_PLAY_STORE.md)
-- iOS (Codemagic, TestFlight) : [docs/PUBLICATION_APP_STORE.md](docs/PUBLICATION_APP_STORE.md)
 - Icônes : `python3 tool/generate_icons.py` les régénère depuis
   `branding/logo-source.jpg`.
 - Captures et vidéo de présentation : `tool/screenshots/`.

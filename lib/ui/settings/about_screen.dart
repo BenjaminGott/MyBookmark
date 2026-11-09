@@ -95,21 +95,22 @@ class AboutScreen extends ConsumerWidget {
                 ],
               ),
             ),
-            _Section(
-              title: l10n.aboutRateTitle,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(l10n.aboutRateBody),
-                  const SizedBox(height: 12),
-                  OutlinedButton.icon(
-                    onPressed: () => FeedbackActions.rate(context, ref),
-                    icon: const Icon(Icons.star_outline),
-                    label: Text(l10n.aboutRateButton),
-                  ),
-                ],
+            if (AppLinks.canRate)
+              _Section(
+                title: l10n.aboutRateTitle,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(l10n.aboutRateBody(AppLinks.store)),
+                    const SizedBox(height: 12),
+                    OutlinedButton.icon(
+                      onPressed: () => FeedbackActions.rate(context, ref),
+                      icon: const Icon(Icons.star_outline),
+                      label: Text(l10n.aboutRateButton(AppLinks.store)),
+                    ),
+                  ],
+                ),
               ),
-            ),
             const Divider(height: 32),
             ListTile(
               contentPadding: EdgeInsets.zero,

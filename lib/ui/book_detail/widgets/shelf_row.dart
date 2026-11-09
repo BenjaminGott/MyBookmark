@@ -23,8 +23,23 @@ class ShelfRow extends ConsumerWidget {
         for (final shelf in Shelf.values)
           ButtonSegment<Shelf>(
             value: shelf,
-            icon: Icon(shelf.icon),
-            label: Text(shelf.label(context.l10n)),
+            tooltip: shelf.label(context.l10n),
+            // Quatre étagères sur la largeur d'un téléphone : l'icône au-dessus
+            // du nom, et le nom réduit plutôt que coupé (« Abgebrochen »).
+            label: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 6),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Icon(shelf.icon, size: 20),
+                  const SizedBox(height: 4),
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(shelf.label(context.l10n), maxLines: 1),
+                  ),
+                ],
+              ),
+            ),
           ),
       ],
       selected: <Shelf>{item.shelf},

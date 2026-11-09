@@ -193,7 +193,7 @@ abstract class AppLocalizations {
   /// No description provided for @navSettings.
   ///
   /// In fr, this message translates to:
-  /// **'Réglages'**
+  /// **'Plus'**
   String get navSettings;
 
   /// No description provided for @percent.
@@ -231,6 +231,12 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Lu'**
   String get shelfRead;
+
+  /// No description provided for @shelfAbandoned.
+  ///
+  /// In fr, this message translates to:
+  /// **'Abandonné'**
+  String get shelfAbandoned;
 
   /// No description provided for @shelfAdded.
   ///
@@ -304,6 +310,30 @@ abstract class AppLocalizations {
   /// **'Trier'**
   String get sortTooltip;
 
+  /// No description provided for @librarySearchHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rechercher un titre, un auteur'**
+  String get librarySearchHint;
+
+  /// No description provided for @librarySearchClear.
+  ///
+  /// In fr, this message translates to:
+  /// **'Effacer la recherche'**
+  String get librarySearchClear;
+
+  /// No description provided for @librarySearchNoResultTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun livre trouvé'**
+  String get librarySearchNoResultTitle;
+
+  /// Recherche sans résultat dans la bibliothèque.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rien ne correspond à « {query} » dans cette étagère.'**
+  String librarySearchNoResultMessage(String query);
+
   /// No description provided for @sortTitle.
   ///
   /// In fr, this message translates to:
@@ -333,6 +363,12 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Lu · pas encore noté'**
   String get readNotRated;
+
+  /// Sous un livre abandonné, dans la bibliothèque.
+  ///
+  /// In fr, this message translates to:
+  /// **'Abandonné à la page {page}'**
+  String abandonedAtPage(int page);
 
   /// No description provided for @toReadWithPages.
   ///
@@ -661,7 +697,7 @@ abstract class AppLocalizations {
   /// No description provided for @themeSystem.
   ///
   /// In fr, this message translates to:
-  /// **'Comme le système'**
+  /// **'Auto'**
   String get themeSystem;
 
   /// No description provided for @themeLight.
@@ -733,7 +769,7 @@ abstract class AppLocalizations {
   /// No description provided for @dataExplanation.
   ///
   /// In fr, this message translates to:
-  /// **'Tout est enregistré sur ce téléphone, sans compte ni serveur. L\'export est le seul moyen de garder une copie de votre bibliothèque ou de la transférer sur un autre appareil.'**
+  /// **'Tout reste sur ce téléphone. Exportez votre bibliothèque pour en garder une copie ou la transférer.'**
   String get dataExplanation;
 
   /// No description provided for @exportLibrary.
@@ -1114,6 +1150,12 @@ abstract class AppLocalizations {
   /// **'DANS MA PILE'**
   String get cardKickerToRead;
 
+  /// No description provided for @cardKickerAbandoned.
+  ///
+  /// In fr, this message translates to:
+  /// **'LECTURE ABANDONNÉE'**
+  String get cardKickerAbandoned;
+
   /// No description provided for @cardPage.
   ///
   /// In fr, this message translates to:
@@ -1183,7 +1225,7 @@ abstract class AppLocalizations {
   /// No description provided for @welcomeHint.
   ///
   /// In fr, this message translates to:
-  /// **'Vous pourrez la changer à tout moment dans les réglages.'**
+  /// **'Vous pourrez la changer à tout moment dans l\'onglet Plus.'**
   String get welcomeHint;
 
   /// No description provided for @continueButton.
@@ -1438,17 +1480,17 @@ abstract class AppLocalizations {
   /// **'Vous aimez Mon marque-page ?'**
   String get aboutRateTitle;
 
-  /// No description provided for @aboutRateBody.
+  /// Invitation à noter ; store vaut apple (App Store) ou google (Google Play).
   ///
   /// In fr, this message translates to:
-  /// **'Une note sur Google Play aide d\'autres lecteurs à découvrir l\'application. Merci !'**
-  String get aboutRateBody;
+  /// **'Une note sur {store, select, apple{l\'App Store} other{Google Play}} aide d\'autres lecteurs à découvrir l\'application. Merci !'**
+  String aboutRateBody(String store);
 
-  /// No description provided for @aboutRateButton.
+  /// Bouton pour noter ; store vaut apple ou google.
   ///
   /// In fr, this message translates to:
-  /// **'Noter sur Google Play'**
-  String get aboutRateButton;
+  /// **'Noter sur {store, select, apple{l\'App Store} other{Google Play}}'**
+  String aboutRateButton(String store);
 
   /// No description provided for @aboutWebsite.
   ///
@@ -1503,6 +1545,288 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Touchez pour en commencer un.'**
   String get widgetEmptyHint;
+
+  /// No description provided for @settingsYearReviews.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mes bilans'**
+  String get settingsYearReviews;
+
+  /// No description provided for @settingsYearReviewsSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Votre année de lecture, en images'**
+  String get settingsYearReviewsSubtitle;
+
+  /// No description provided for @yearReviewsEmptyTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pas encore de bilan'**
+  String get yearReviewsEmptyTitle;
+
+  /// No description provided for @yearReviewsEmptyMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le bilan d\'une année apparaît ici une fois l\'année terminée, si elle compte au moins un livre lu.'**
+  String get yearReviewsEmptyMessage;
+
+  /// No description provided for @yearReviewsSummary.
+  ///
+  /// In fr, this message translates to:
+  /// **'{books, plural, =1{1 livre} other{{books} livres}} · {pages} pages'**
+  String yearReviewsSummary(int books, int pages);
+
+  /// No description provided for @yearReviewsNew.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nouveau'**
+  String get yearReviewsNew;
+
+  /// No description provided for @yearReviewAnnounceTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Votre année {year} en lecture'**
+  String yearReviewAnnounceTitle(String year);
+
+  /// No description provided for @yearReviewAnnounceBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'Votre bilan est prêt : vos livres, vos pages, votre coup de cœur… Il vous attend tout le mois de janvier dans l\'onglet Bilan.'**
+  String get yearReviewAnnounceBody;
+
+  /// No description provided for @yearReviewAnnounceOpen.
+  ///
+  /// In fr, this message translates to:
+  /// **'Voir mon bilan'**
+  String get yearReviewAnnounceOpen;
+
+  /// No description provided for @yearReviewAnnounceLater.
+  ///
+  /// In fr, this message translates to:
+  /// **'Plus tard'**
+  String get yearReviewAnnounceLater;
+
+  /// No description provided for @yearReviewTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Bilan {year}'**
+  String yearReviewTitle(String year);
+
+  /// No description provided for @yearReviewShare.
+  ///
+  /// In fr, this message translates to:
+  /// **'Partager'**
+  String get yearReviewShare;
+
+  /// No description provided for @yearReviewSave.
+  ///
+  /// In fr, this message translates to:
+  /// **'Enregistrer'**
+  String get yearReviewSave;
+
+  /// No description provided for @yearReviewSaved.
+  ///
+  /// In fr, this message translates to:
+  /// **'Image enregistrée dans la galerie'**
+  String get yearReviewSaved;
+
+  /// No description provided for @yearReviewUpdate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mettre à jour'**
+  String get yearReviewUpdate;
+
+  /// No description provided for @yearReviewUpdated.
+  ///
+  /// In fr, this message translates to:
+  /// **'Bilan mis à jour'**
+  String get yearReviewUpdated;
+
+  /// No description provided for @yearReviewNone.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun livre terminé en {year}.'**
+  String yearReviewNone(String year);
+
+  /// No description provided for @yearReviewExportFailed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Impossible de préparer l\'image.'**
+  String get yearReviewExportFailed;
+
+  /// No description provided for @yrIntroKicker.
+  ///
+  /// In fr, this message translates to:
+  /// **'MON ANNÉE EN LECTURE'**
+  String get yrIntroKicker;
+
+  /// No description provided for @yrBooksCount.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count, plural, =1{livre terminé} other{livres terminés}}'**
+  String yrBooksCount(int count);
+
+  /// No description provided for @yrPages.
+  ///
+  /// In fr, this message translates to:
+  /// **'{pages} pages tournées'**
+  String yrPages(int pages);
+
+  /// No description provided for @yrMonthKicker.
+  ///
+  /// In fr, this message translates to:
+  /// **'MON MOIS LE PLUS LU'**
+  String get yrMonthKicker;
+
+  /// No description provided for @yrMonthBooks.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count, plural, =1{1 livre terminé en {month}} other{{count} livres terminés en {month}}}'**
+  String yrMonthBooks(int count, String month);
+
+  /// No description provided for @yrFavoriteKicker.
+  ///
+  /// In fr, this message translates to:
+  /// **'MON COUP DE CŒUR'**
+  String get yrFavoriteKicker;
+
+  /// No description provided for @yrAuthorKicker.
+  ///
+  /// In fr, this message translates to:
+  /// **'MON AUTEUR DE L\'ANNÉE'**
+  String get yrAuthorKicker;
+
+  /// No description provided for @yrAuthorBooks.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count, plural, =1{1 livre lu} other{{count} livres lus}}'**
+  String yrAuthorBooks(int count);
+
+  /// No description provided for @yrLongestKicker.
+  ///
+  /// In fr, this message translates to:
+  /// **'MON PLUS GROS LIVRE'**
+  String get yrLongestKicker;
+
+  /// No description provided for @yrLongestPages.
+  ///
+  /// In fr, this message translates to:
+  /// **'{pages} pages'**
+  String yrLongestPages(int pages);
+
+  /// No description provided for @yrAverageDays.
+  ///
+  /// In fr, this message translates to:
+  /// **'{days, plural, =1{En moyenne, 1 jour pour finir un livre} other{En moyenne, {days} jours pour finir un livre}}'**
+  String yrAverageDays(int days);
+
+  /// No description provided for @yrOutroKicker.
+  ///
+  /// In fr, this message translates to:
+  /// **'MON ANNÉE {year}'**
+  String yrOutroKicker(String year);
+
+  /// No description provided for @yrOutroBooks.
+  ///
+  /// In fr, this message translates to:
+  /// **'Livres'**
+  String get yrOutroBooks;
+
+  /// No description provided for @yrOutroPages.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pages'**
+  String get yrOutroPages;
+
+  /// No description provided for @yrOutroFavorite.
+  ///
+  /// In fr, this message translates to:
+  /// **'Coup de cœur'**
+  String get yrOutroFavorite;
+
+  /// No description provided for @yrOutroAuthor.
+  ///
+  /// In fr, this message translates to:
+  /// **'Auteur'**
+  String get yrOutroAuthor;
+
+  /// No description provided for @yearReviewMovedTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Votre bilan {year} a déménagé'**
+  String yearReviewMovedTitle(String year);
+
+  /// No description provided for @yearReviewMovedBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'Janvier est fini, l\'onglet Bilan aussi. Votre bilan {year} vous attend maintenant dans l\'onglet Plus, rubrique Mes bilans, avec ceux des autres années.'**
+  String yearReviewMovedBody(String year);
+
+  /// No description provided for @yearReviewMovedOpen.
+  ///
+  /// In fr, this message translates to:
+  /// **'Voir mon bilan'**
+  String get yearReviewMovedOpen;
+
+  /// No description provided for @yearReviewMovedOk.
+  ///
+  /// In fr, this message translates to:
+  /// **'Compris'**
+  String get yearReviewMovedOk;
+
+  /// No description provided for @errorVideoFailed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Impossible de créer la vidéo.'**
+  String get errorVideoFailed;
+
+  /// No description provided for @yearReviewVideo.
+  ///
+  /// In fr, this message translates to:
+  /// **'Créer la vidéo'**
+  String get yearReviewVideo;
+
+  /// No description provided for @yearReviewVideoPreparing.
+  ///
+  /// In fr, this message translates to:
+  /// **'Création de la vidéo…'**
+  String get yearReviewVideoPreparing;
+
+  /// No description provided for @yearReviewVideoReadyTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Votre vidéo est prête'**
+  String get yearReviewVideoReadyTitle;
+
+  /// No description provided for @yearReviewVideoReadyBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'18 secondes en musique, au format story.'**
+  String get yearReviewVideoReadyBody;
+
+  /// No description provided for @yearReviewVideoSaved.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vidéo enregistrée dans la galerie'**
+  String get yearReviewVideoSaved;
+
+  /// No description provided for @sectionMyYear.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mon année'**
+  String get sectionMyYear;
+
+  /// No description provided for @sectionDisplay.
+  ///
+  /// In fr, this message translates to:
+  /// **'Affichage'**
+  String get sectionDisplay;
+
+  /// No description provided for @sectionHelp.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aide et contact'**
+  String get sectionHelp;
 }
 
 class _AppLocalizationsDelegate

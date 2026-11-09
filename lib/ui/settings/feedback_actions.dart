@@ -1,3 +1,5 @@
+import 'dart:io' show Platform;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -27,9 +29,16 @@ class FeedbackActions {
     }
   }
 
-  /// L'application Play Store si elle est là, sinon la fiche dans le
-  /// navigateur.
+  /// Sur iPhone, la page d'avis de l'App Store. Sur Android, l'application
+  /// Play Store si elle est là, sinon la fiche dans le navigateur.
   static Future<void> rate(BuildContext context, WidgetRef ref) async {
+    final appStore = AppLinks.appStoreReview;
+    if (Platform.isIOS) {
+      if (appStore != null) {
+        await open(context, ref, appStore);
+      }
+      return;
+    }
     if (await ref.read(externalLinksProvider).open(AppLinks.playStoreApp)) {
       return;
     }
