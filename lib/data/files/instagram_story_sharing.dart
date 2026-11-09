@@ -8,9 +8,9 @@ import '../../domain/repositories/story_sharing.dart';
 
 /// Partage en story Instagram.
 ///
-/// Le partage est fait côté natif : sur Android par l'intent `ADD_TO_STORY` de
-/// Meta (`MainActivity`, avec un `FileProvider`), sur iOS par le
-/// presse-papiers et le lien `instagram-stories://` (`AppDelegate.swift`).
+/// Le partage est fait côté natif, sur Android, par l'intent `ADD_TO_STORY` de
+/// Meta (`MainActivity`, avec un `FileProvider`). Sur une autre plateforme,
+/// le canal ne répond pas et le bouton n'apparaît pas.
 class InstagramStorySharing implements StorySharing {
   const InstagramStorySharing();
 
