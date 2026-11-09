@@ -49,3 +49,18 @@ final StreamProvider<List<LibraryItem>> currentLibraryProvider =
   final query = ref.watch(libraryQueryProvider);
   return ref.watch(bookRepositoryProvider).watchLibrary(query);
 });
+
+/// Le texte tapé dans la recherche de « Ma bibliothèque ».
+class LibrarySearchController extends Notifier<String> {
+  @override
+  String build() => '';
+
+  void update(String text) => state = text;
+
+  void clear() => state = '';
+}
+
+final NotifierProvider<LibrarySearchController, String> librarySearchProvider =
+    NotifierProvider<LibrarySearchController, String>(
+  LibrarySearchController.new,
+);

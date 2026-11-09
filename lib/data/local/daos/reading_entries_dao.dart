@@ -73,7 +73,8 @@ class ReadingEntriesDao extends DatabaseAccessor<AppDatabase>
       switch (shelf) {
         case Shelf.toRead:
           break;
-        case Shelf.reading:
+        // Un livre abandonné a été commencé ; la page atteinte est gardée.
+        case Shelf.reading || Shelf.abandoned:
           if (entry.startedAt == null) {
             startedAt = Value<DateTime?>(timestamp);
           }

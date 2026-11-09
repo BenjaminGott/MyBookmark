@@ -6,6 +6,7 @@ import '../../core/theme/app_theme.dart';
 import '../../domain/models/library_item.dart';
 import '../../domain/models/library_query.dart';
 import '../../domain/models/shelf.dart';
+import '../../domain/services/library_search.dart';
 import '../book_form/book_form_screen.dart';
 import '../l10n/l10n.dart';
 import '../shelf_labels.dart';
@@ -29,6 +30,7 @@ class LibraryScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final query = ref.watch(libraryQueryProvider);
     final library = ref.watch(currentLibraryProvider);
+    final search = ref.watch(librarySearchProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -72,9 +74,30 @@ class LibraryScreen extends ConsumerWidget {
                 ? error
                 : const StorageException(AppErrorReason.libraryReadFailed),
           ),
-          data: (items) => items.isEmpty
-              ? _EmptyLibrary(query: query, onOpenSearch: onOpenSearch)
-              : _LibraryList(items: items, onOpenBook: onOpenBook),
+          data: (items) {
+            if (items.isEmpty) {
+              return _EmptyLibrary(query: query, onOpenSearch: onOpenSearch);
+            }
+            // La recherche se fait ici, sur le téléphone : taper ne relance
+            // aucune requête en base.
+            final visible = const LibrarySearch().filter(items, search);
+            return Column(
+              children: <Widget>[
+                const _LibrarySearchField(),
+                Expanded(
+                  child: visible.isEmpty
+                      ? EmptyState(
+                          icon: Icons.search_off,
+                          title: context.l10n.librarySearchNoResultTitle,
+                          message: context.l10n.librarySearchNoResultMessage(
+                            search.trim(),
+                          ),
+                        )
+                      : _LibraryList(items: visible, onOpenBook: onOpenBook),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
@@ -161,6 +184,64 @@ class _SortButton extends ConsumerWidget {
   }
 }
 
+/// Le champ de recherche au-dessus de la liste.
+class _LibrarySearchField extends ConsumerStatefulWidget {
+  const _LibrarySearchField();
+
+  @override
+  ConsumerState<_LibrarySearchField> createState() =>
+      _LibrarySearchFieldState();
+}
+
+class _LibrarySearchFieldState extends ConsumerState<_LibrarySearchField> {
+  // Repart du texte déjà cherché : le champ disparaît sur une étagère vide et
+  // revient avec la recherche en cours.
+  late final TextEditingController _controller = TextEditingController(
+    text: ref.read(librarySearchProvider),
+  );
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final hasText = ref.watch(librarySearchProvider).isNotEmpty;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+      child: TextField(
+        controller: _controller,
+        onChanged: ref.read(librarySearchProvider.notifier).update,
+        textInputAction: TextInputAction.search,
+        decoration: InputDecoration(
+          hintText: l10n.librarySearchHint,
+          prefixIcon: const Icon(Icons.search),
+          suffixIcon: hasText
+              ? IconButton(
+                  icon: const Icon(Icons.close),
+                  tooltip: l10n.librarySearchClear,
+                  onPressed: () {
+                    _controller.clear();
+                    ref.read(librarySearchProvider.notifier).clear();
+                  },
+                )
+              : null,
+          filled: true,
+          isDense: true,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(28),
+            borderSide: BorderSide.none,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _LibraryList extends StatelessWidget {
   const _LibraryList({required this.items, required this.onOpenBook});
 
@@ -174,6 +255,8 @@ class _LibraryList extends StatelessWidget {
       // ne cache jamais la note ni la progression.
       padding: const EdgeInsets.only(bottom: 96),
       itemCount: items.length,
+      // Faire défiler la liste referme le clavier de la recherche.
+      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
       separatorBuilder: (context, index) => const Divider(height: 1),
       itemBuilder: (context, index) {
         final item = items[index];
@@ -228,6 +311,12 @@ class _LibraryTile extends StatelessWidget {
               book.hasKnownPageCount
                   ? context.l10n.toReadWithPages(book.pageCount!)
                   : context.l10n.shelfToRead,
+              style: theme.textTheme.labelSmall,
+            ),
+            Shelf.abandoned => Text(
+              item.currentEntry.currentPage > 0
+                  ? context.l10n.abandonedAtPage(item.currentEntry.currentPage)
+                  : context.l10n.shelfAbandoned,
               style: theme.textTheme.labelSmall,
             ),
           },

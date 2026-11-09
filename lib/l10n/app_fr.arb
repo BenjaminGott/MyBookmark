@@ -35,6 +35,7 @@
   "shelfToRead": "À lire",
   "shelfReading": "En cours",
   "shelfRead": "Lu",
+  "shelfAbandoned": "Abandonné",
   "shelfAdded": "Ajouté à « {shelf} »",
   "@shelfAdded": {
     "placeholders": {
@@ -91,11 +92,32 @@
   "addBookManuallyTooltip": "Ajouter un livre que la recherche ne trouve pas",
   "filterAll": "Toutes",
   "sortTooltip": "Trier",
+  "librarySearchHint": "Rechercher un titre, un auteur",
+  "librarySearchClear": "Effacer la recherche",
+  "librarySearchNoResultTitle": "Aucun livre trouvé",
+  "librarySearchNoResultMessage": "Rien ne correspond à « {query} » dans cette étagère.",
+  "@librarySearchNoResultMessage": {
+    "description": "Recherche sans résultat dans la bibliothèque.",
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
   "sortTitle": "Titre",
   "sortAuthor": "Auteur",
   "sortAddedAt": "Date d'ajout",
   "sortRating": "Note",
   "readNotRated": "Lu · pas encore noté",
+  "abandonedAtPage": "Abandonné à la page {page}",
+  "@abandonedAtPage": {
+    "description": "Sous un livre abandonné, dans la bibliothèque.",
+    "placeholders": {
+      "page": {
+        "type": "int"
+      }
+    }
+  },
   "toReadWithPages": "{count, plural, =1{À lire · 1 page} other{À lire · {count} pages}}",
   "@toReadWithPages": {
     "placeholders": {
@@ -379,6 +401,7 @@
   "cardKickerReading": "EN COURS DE LECTURE",
   "cardKickerRead": "LECTURE TERMINÉE",
   "cardKickerToRead": "DANS MA PILE",
+  "cardKickerAbandoned": "LECTURE ABANDONNÉE",
   "cardPage": "page {page}",
   "@cardPage": {
     "placeholders": {
@@ -461,14 +484,20 @@
   "@aboutRateBody": {
     "description": "Invitation à noter ; store vaut apple (App Store) ou google (Google Play).",
     "placeholders": {
-      "store": {"type": "String", "example": "google"}
+      "store": {
+        "type": "String",
+        "example": "google"
+      }
     }
   },
   "aboutRateButton": "Noter sur {store, select, apple{l'App Store} other{Google Play}}",
   "@aboutRateButton": {
     "description": "Bouton pour noter ; store vaut apple ou google.",
     "placeholders": {
-      "store": {"type": "String", "example": "google"}
+      "store": {
+        "type": "String",
+        "example": "google"
+      }
     }
   },
   "aboutWebsite": "Site web",

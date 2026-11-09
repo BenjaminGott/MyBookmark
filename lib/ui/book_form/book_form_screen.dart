@@ -249,7 +249,7 @@ class _BookFormScreenState extends ConsumerState<BookFormScreen> {
                     width: double.infinity,
                     child: SegmentedButton<Shelf>(
                       segments: <ButtonSegment<Shelf>>[
-                        for (final shelf in Shelf.values)
+                        for (final shelf in Shelf.forNewBook)
                           ButtonSegment<Shelf>(
                             value: shelf,
                             // L'icône au-dessus du nom, comme un onglet : le

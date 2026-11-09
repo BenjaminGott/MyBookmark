@@ -44,10 +44,18 @@ void main() {
       expect(books[2].createdAt, DateTime(2026, 9, 22));
     });
 
-    test('garde une étagère inconnue comme étiquette', () {
-      expect(books.first.readings.single.shelf, Shelf.toRead);
-      expect(books.first.tags, <String>['did-not-finish']);
+    test('range « did-not-finish » dans « Abandonné », sans étiquette', () {
+      expect(books.first.readings.single.shelf, Shelf.abandoned);
+      expect(books.first.tags, isEmpty);
       expect(books[1].tags, isEmpty);
+    });
+
+    test('garde une étagère exclusive inconnue comme étiquette', () {
+      final book = GoodreadsCsv.decode(
+        _export.replaceAll('did-not-finish', 'on-hold'),
+      ).books.first;
+      expect(book.readings.single.shelf, Shelf.toRead);
+      expect(book.tags, <String>['on-hold']);
     });
 
     test('nettoie l\'ISBN et en tire la couverture Open Library', () {

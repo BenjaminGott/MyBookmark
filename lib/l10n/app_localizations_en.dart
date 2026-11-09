@@ -82,6 +82,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get shelfRead => 'Read';
 
   @override
+  String get shelfAbandoned => 'Abandoned';
+
+  @override
   String shelfAdded(String shelf) {
     return 'Added to “$shelf”';
   }
@@ -134,6 +137,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sortTooltip => 'Sort';
 
   @override
+  String get librarySearchHint => 'Search a title, an author';
+
+  @override
+  String get librarySearchClear => 'Clear search';
+
+  @override
+  String get librarySearchNoResultTitle => 'No book found';
+
+  @override
+  String librarySearchNoResultMessage(String query) {
+    return 'Nothing matches “$query” on this shelf.';
+  }
+
+  @override
   String get sortTitle => 'Title';
 
   @override
@@ -147,6 +164,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get readNotRated => 'Read · not rated yet';
+
+  @override
+  String abandonedAtPage(int page) {
+    return 'Abandoned at page $page';
+  }
 
   @override
   String toReadWithPages(int count) {
@@ -643,6 +665,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get cardKickerToRead => 'ON MY PILE';
+
+  @override
+  String get cardKickerAbandoned => 'DID NOT FINISH';
 
   @override
   String cardPage(int page) {

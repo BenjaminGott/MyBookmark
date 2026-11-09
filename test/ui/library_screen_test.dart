@@ -178,4 +178,53 @@ void main() {
 
     expect(tester.widget<StarRating>(find.byType(StarRating)).rating, 4);
   });
+
+  libraryTest('cherche un titre ou un auteur, sans tenir compte des accents',
+      (tester) async {
+    await db.booksDao.addBook(
+      title: 'Les Misérables',
+      author: 'Victor Hugo',
+      shelf: Shelf.toRead,
+    );
+    await db.booksDao.addBook(title: 'Dune', shelf: Shelf.toRead);
+
+    await pumpLibrary(tester);
+    await tester.enterText(find.byType(TextField), 'miserables');
+    await settle(tester);
+
+    expect(find.text('Les Misérables'), findsOne);
+    expect(find.text('Dune'), findsNothing);
+
+    await tester.enterText(find.byType(TextField), 'tolkien');
+    await settle(tester);
+    expect(find.text('Aucun livre trouvé'), findsOne);
+
+    // La croix efface la recherche et rend toute la liste.
+    await tester.tap(find.byTooltip('Effacer la recherche'));
+    await settle(tester);
+    expect(find.text('Les Misérables'), findsOne);
+    expect(find.text('Dune'), findsOne);
+  });
+
+  libraryTest('range un livre abandonné à part, avec sa page', (tester) async {
+    final bookId = await db.booksDao.addBook(
+      title: 'Ulysse',
+      pageCount: 900,
+      shelf: Shelf.reading,
+    );
+    final entry = await db.readingEntriesDao.findCurrentEntry(bookId);
+    await db.readingEntriesDao
+        .updateCurrentPage(entryId: entry!.id, page: 120);
+    await db.readingEntriesDao
+        .moveToShelf(entryId: entry.id, shelf: Shelf.abandoned);
+    await db.booksDao.addBook(title: 'Dune', shelf: Shelf.toRead);
+
+    await pumpLibrary(tester);
+    expect(find.text('Abandonné à la page 120'), findsOne);
+
+    await tester.tap(find.widgetWithText(FilterChip, 'Abandonné'));
+    await settle(tester);
+    expect(find.text('Ulysse'), findsOne);
+    expect(find.text('Dune'), findsNothing);
+  });
 }

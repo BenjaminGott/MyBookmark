@@ -232,6 +232,12 @@ abstract class AppLocalizations {
   /// **'Lu'**
   String get shelfRead;
 
+  /// No description provided for @shelfAbandoned.
+  ///
+  /// In fr, this message translates to:
+  /// **'Abandonné'**
+  String get shelfAbandoned;
+
   /// No description provided for @shelfAdded.
   ///
   /// In fr, this message translates to:
@@ -304,6 +310,30 @@ abstract class AppLocalizations {
   /// **'Trier'**
   String get sortTooltip;
 
+  /// No description provided for @librarySearchHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rechercher un titre, un auteur'**
+  String get librarySearchHint;
+
+  /// No description provided for @librarySearchClear.
+  ///
+  /// In fr, this message translates to:
+  /// **'Effacer la recherche'**
+  String get librarySearchClear;
+
+  /// No description provided for @librarySearchNoResultTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun livre trouvé'**
+  String get librarySearchNoResultTitle;
+
+  /// Recherche sans résultat dans la bibliothèque.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rien ne correspond à « {query} » dans cette étagère.'**
+  String librarySearchNoResultMessage(String query);
+
   /// No description provided for @sortTitle.
   ///
   /// In fr, this message translates to:
@@ -333,6 +363,12 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Lu · pas encore noté'**
   String get readNotRated;
+
+  /// Sous un livre abandonné, dans la bibliothèque.
+  ///
+  /// In fr, this message translates to:
+  /// **'Abandonné à la page {page}'**
+  String abandonedAtPage(int page);
 
   /// No description provided for @toReadWithPages.
   ///
@@ -1113,6 +1149,12 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'DANS MA PILE'**
   String get cardKickerToRead;
+
+  /// No description provided for @cardKickerAbandoned.
+  ///
+  /// In fr, this message translates to:
+  /// **'LECTURE ABANDONNÉE'**
+  String get cardKickerAbandoned;
 
   /// No description provided for @cardPage.
   ///

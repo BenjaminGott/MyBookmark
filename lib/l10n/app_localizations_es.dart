@@ -82,6 +82,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get shelfRead => 'Leído';
 
   @override
+  String get shelfAbandoned => 'Abandonado';
+
+  @override
   String shelfAdded(String shelf) {
     return 'Añadido a «$shelf»';
   }
@@ -135,6 +138,20 @@ class AppLocalizationsEs extends AppLocalizations {
   String get sortTooltip => 'Ordenar';
 
   @override
+  String get librarySearchHint => 'Buscar un título, un autor';
+
+  @override
+  String get librarySearchClear => 'Borrar la búsqueda';
+
+  @override
+  String get librarySearchNoResultTitle => 'Ningún libro encontrado';
+
+  @override
+  String librarySearchNoResultMessage(String query) {
+    return 'Nada coincide con «$query» en esta estantería.';
+  }
+
+  @override
   String get sortTitle => 'Título';
 
   @override
@@ -148,6 +165,11 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get readNotRated => 'Leído · sin valorar';
+
+  @override
+  String abandonedAtPage(int page) {
+    return 'Abandonado en la página $page';
+  }
 
   @override
   String toReadWithPages(int count) {
@@ -647,6 +669,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get cardKickerToRead => 'EN MI PILA';
+
+  @override
+  String get cardKickerAbandoned => 'LECTURA ABANDONADA';
 
   @override
   String cardPage(int page) {

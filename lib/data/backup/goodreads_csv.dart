@@ -53,8 +53,8 @@ class GoodreadsCsv {
       final isbn = _isbn(cell(row, 'ISBN13')) ?? _isbn(cell(row, 'ISBN'));
 
       // Les étagères personnalisées deviennent des étiquettes. Une étagère
-      // exclusive inconnue (« did-not-finish »…) aussi : le livre va dans
-      // « À lire », mais l'information n'est pas perdue.
+      // exclusive inconnue aussi : le livre va dans « À lire », mais
+      // l'information n'est pas perdue.
       final tags = <String>{
         ...?cell(row, 'Bookshelves')
             ?.split(',')
@@ -86,7 +86,9 @@ class GoodreadsCsv {
               isCurrent: true,
               rating: rating == null || rating > 5 ? null : rating,
               review: _plainText(cell(row, 'My Review')),
-              startedAt: shelf == Shelf.reading ? dateRead : null,
+              startedAt: shelf == Shelf.reading || shelf == Shelf.abandoned
+                  ? dateRead
+                  : null,
               finishedAt: shelf == Shelf.read ? dateRead : null,
               createdAt: dateAdded,
             ),
@@ -102,12 +104,24 @@ class GoodreadsCsv {
     'read',
     'currently-reading',
     'to-read',
+    'did-not-finish',
+    'dnf',
+    'abandoned',
+    'abandonne',
+    'abandonné',
   };
 
   static Shelf? _shelfOf(String exclusive) => switch (exclusive) {
     'read' => Shelf.read,
     'currently-reading' => Shelf.reading,
     'to-read' => Shelf.toRead,
+    // Goodreads n'a pas d'étagère « abandonné » officielle : chacun crée la
+    // sienne, le plus souvent sous l'un de ces noms.
+    'did-not-finish' ||
+    'dnf' ||
+    'abandoned' ||
+    'abandonne' ||
+    'abandonné' => Shelf.abandoned,
     _ => null,
   };
 

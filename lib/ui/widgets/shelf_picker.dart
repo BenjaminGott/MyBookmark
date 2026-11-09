@@ -29,7 +29,7 @@ Future<Shelf?> showShelfPicker(
               overflow: TextOverflow.ellipsis,
             ),
           ),
-          for (final shelf in Shelf.values)
+          for (final shelf in Shelf.forNewBook)
             ListTile(
               leading: Icon(shelf.icon),
               title: Text(shelf.label(context.l10n)),
