@@ -51,7 +51,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get navSearch => 'Suchen';
 
   @override
-  String get navSettings => 'Einstellungen';
+  String get navSettings => 'Mehr';
 
   @override
   String percent(int percent) {
@@ -377,7 +377,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get appearance => 'Darstellung';
 
   @override
-  String get themeSystem => 'Wie das System';
+  String get themeSystem => 'Auto';
 
   @override
   String get themeLight => 'Hell';
@@ -414,7 +414,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get dataExplanation =>
-      'Alles wird auf diesem Telefon gespeichert, ohne Konto und ohne Server. Der Export ist die einzige Möglichkeit, eine Kopie deiner Bibliothek aufzubewahren oder sie auf ein anderes Gerät zu übertragen.';
+      'Alles bleibt auf diesem Telefon. Exportiere deine Bibliothek, um eine Kopie zu behalten oder sie auf ein anderes Gerät zu übertragen.';
 
   @override
   String get exportLibrary => 'Meine Bibliothek exportieren';
@@ -713,8 +713,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get welcomeChooseLanguage => 'Wähle deine Sprache';
 
   @override
-  String get welcomeHint =>
-      'Du kannst sie jederzeit in den Einstellungen ändern.';
+  String get welcomeHint => 'Du kannst sie jederzeit im Tab Mehr ändern.';
 
   @override
   String get continueButton => 'Weiter';
@@ -1081,7 +1080,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String yearReviewMovedBody(String year) {
-    return 'Der Januar ist vorbei, und mit ihm der Tab Rückblick. Dein Rückblick $year ist jetzt unter Einstellungen, Meine Jahresrückblicke, zusammen mit den anderen Jahren.';
+    return 'Der Januar ist vorbei, und mit ihm der Tab Rückblick. Dein Rückblick $year ist jetzt im Tab Mehr unter Meine Jahresrückblicke, zusammen mit den anderen Jahren.';
   }
 
   @override
@@ -1108,4 +1107,13 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get yearReviewVideoSaved => 'Video in der Galerie gespeichert';
+
+  @override
+  String get sectionMyYear => 'Mein Jahr';
+
+  @override
+  String get sectionDisplay => 'Anzeige';
+
+  @override
+  String get sectionHelp => 'Hilfe & Kontakt';
 }

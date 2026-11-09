@@ -14,7 +14,7 @@
   "errorTitle": "Ça n'a pas marché",
   "navLibrary": "Bibliothèque",
   "navSearch": "Chercher",
-  "navSettings": "Réglages",
+  "navSettings": "Plus",
   "percent": "{percent} %",
   "@percent": {
     "placeholders": {
@@ -248,7 +248,7 @@
   "saveReview": "Enregistrer l'avis",
   "reviewSaved": "Avis enregistré",
   "appearance": "Apparence",
-  "themeSystem": "Comme le système",
+  "themeSystem": "Auto",
   "themeLight": "Clair",
   "themeDark": "Sombre",
   "language": "Langue",
@@ -260,7 +260,7 @@
   "languageItalian": "Italiano",
   "languagePortuguese": "Português",
   "myData": "Mes données",
-  "dataExplanation": "Tout est enregistré sur ce téléphone, sans compte ni serveur. L'export est le seul moyen de garder une copie de votre bibliothèque ou de la transférer sur un autre appareil.",
+  "dataExplanation": "Tout reste sur ce téléphone. Exportez votre bibliothèque pour en garder une copie ou la transférer.",
   "exportLibrary": "Exporter ma bibliothèque",
   "exportSubtitle": "Enregistre un fichier JSON",
   "importBackup": "Importer une sauvegarde",
@@ -430,7 +430,7 @@
   "imageNotReady": "Impossible de préparer l'image.",
   "welcomeTitle": "Bienvenue",
   "welcomeChooseLanguage": "Choisissez votre langue",
-  "welcomeHint": "Vous pourrez la changer à tout moment dans les réglages.",
+  "welcomeHint": "Vous pourrez la changer à tout moment dans l'onglet Plus.",
   "continueButton": "Continuer",
   "errorNetwork": "Pas de connexion. Vérifiez votre réseau et réessayez.",
   "errorTimeout": "La recherche met trop de temps à répondre.",
@@ -630,7 +630,7 @@
   "yrOutroFavorite": "Coup de cœur",
   "yrOutroAuthor": "Auteur",
   "yearReviewMovedTitle": "Votre bilan {year} a déménagé",
-  "yearReviewMovedBody": "Janvier est fini, l'onglet Bilan aussi. Votre bilan {year} vous attend maintenant dans Réglages, Mes bilans, avec ceux des autres années.",
+  "yearReviewMovedBody": "Janvier est fini, l'onglet Bilan aussi. Votre bilan {year} vous attend maintenant dans l'onglet Plus, rubrique Mes bilans, avec ceux des autres années.",
   "yearReviewMovedOpen": "Voir mon bilan",
   "yearReviewMovedOk": "Compris",
   "@yearReviewMovedTitle": {
@@ -652,5 +652,8 @@
   "yearReviewVideoPreparing": "Création de la vidéo…",
   "yearReviewVideoReadyTitle": "Votre vidéo est prête",
   "yearReviewVideoReadyBody": "18 secondes en musique, au format story.",
-  "yearReviewVideoSaved": "Vidéo enregistrée dans la galerie"
+  "yearReviewVideoSaved": "Vidéo enregistrée dans la galerie",
+  "sectionMyYear": "Mon année",
+  "sectionDisplay": "Affichage",
+  "sectionHelp": "Aide et contact"
 }

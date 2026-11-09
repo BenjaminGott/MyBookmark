@@ -51,7 +51,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get navSearch => 'Buscar';
 
   @override
-  String get navSettings => 'Ajustes';
+  String get navSettings => 'Más';
 
   @override
   String percent(int percent) {
@@ -375,7 +375,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get appearance => 'Apariencia';
 
   @override
-  String get themeSystem => 'Como el sistema';
+  String get themeSystem => 'Auto';
 
   @override
   String get themeLight => 'Claro';
@@ -412,7 +412,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get dataExplanation =>
-      'Todo se guarda en este teléfono, sin cuenta ni servidor. Exportar es la única forma de conservar una copia de tu biblioteca o de pasarla a otro dispositivo.';
+      'Todo se queda en este teléfono. Exporta tu biblioteca para guardar una copia o pasarla a otro dispositivo.';
 
   @override
   String get exportLibrary => 'Exportar mi biblioteca';
@@ -711,7 +711,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get welcomeChooseLanguage => 'Elige tu idioma';
 
   @override
-  String get welcomeHint => 'Puedes cambiarlo cuando quieras en los ajustes.';
+  String get welcomeHint =>
+      'Puedes cambiarlo cuando quieras en la pestaña Más.';
 
   @override
   String get continueButton => 'Continuar';
@@ -1075,7 +1076,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String yearReviewMovedBody(String year) {
-    return 'Enero ha terminado, y la pestaña Resumen también. Tu resumen $year está ahora en Ajustes, Mis resúmenes, junto a los de otros años.';
+    return 'Enero ha terminado, y la pestaña Resumen también. Tu resumen $year está ahora en la pestaña Más, en Mis resúmenes, junto a los de otros años.';
   }
 
   @override
@@ -1102,4 +1103,13 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get yearReviewVideoSaved => 'Vídeo guardado en la galería';
+
+  @override
+  String get sectionMyYear => 'Mi año';
+
+  @override
+  String get sectionDisplay => 'Pantalla';
+
+  @override
+  String get sectionHelp => 'Ayuda y contacto';
 }

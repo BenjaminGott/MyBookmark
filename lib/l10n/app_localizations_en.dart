@@ -51,7 +51,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get navSearch => 'Search';
 
   @override
-  String get navSettings => 'Settings';
+  String get navSettings => 'More';
 
   @override
   String percent(int percent) {
@@ -372,7 +372,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appearance => 'Appearance';
 
   @override
-  String get themeSystem => 'System default';
+  String get themeSystem => 'Auto';
 
   @override
   String get themeLight => 'Light';
@@ -409,7 +409,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dataExplanation =>
-      'Everything is stored on this phone, with no account or server. Exporting is the only way to keep a copy of your library or move it to another device.';
+      'Everything stays on this phone. Export your library to keep a copy or move it to another device.';
 
   @override
   String get exportLibrary => 'Export my library';
@@ -707,7 +707,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get welcomeChooseLanguage => 'Choose your language';
 
   @override
-  String get welcomeHint => 'You can change it anytime in Settings.';
+  String get welcomeHint => 'You can change it anytime in the More tab.';
 
   @override
   String get continueButton => 'Continue';
@@ -1063,7 +1063,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String yearReviewMovedBody(String year) {
-    return 'January is over, and so is the Review tab. Your $year review now lives in Settings, My reviews, along with your other years.';
+    return 'January is over, and so is the Review tab. Your $year review now lives in the More tab, under My reviews, along with your other years.';
   }
 
   @override
@@ -1090,4 +1090,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get yearReviewVideoSaved => 'Video saved to your gallery';
+
+  @override
+  String get sectionMyYear => 'My year';
+
+  @override
+  String get sectionDisplay => 'Display';
+
+  @override
+  String get sectionHelp => 'Help & contact';
 }

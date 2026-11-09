@@ -51,7 +51,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get navSearch => 'Chercher';
 
   @override
-  String get navSettings => 'Réglages';
+  String get navSettings => 'Plus';
 
   @override
   String percent(int percent) {
@@ -377,7 +377,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get appearance => 'Apparence';
 
   @override
-  String get themeSystem => 'Comme le système';
+  String get themeSystem => 'Auto';
 
   @override
   String get themeLight => 'Clair';
@@ -414,7 +414,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get dataExplanation =>
-      'Tout est enregistré sur ce téléphone, sans compte ni serveur. L\'export est le seul moyen de garder une copie de votre bibliothèque ou de la transférer sur un autre appareil.';
+      'Tout reste sur ce téléphone. Exportez votre bibliothèque pour en garder une copie ou la transférer.';
 
   @override
   String get exportLibrary => 'Exporter ma bibliothèque';
@@ -716,7 +716,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get welcomeHint =>
-      'Vous pourrez la changer à tout moment dans les réglages.';
+      'Vous pourrez la changer à tout moment dans l\'onglet Plus.';
 
   @override
   String get continueButton => 'Continuer';
@@ -1080,7 +1080,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String yearReviewMovedBody(String year) {
-    return 'Janvier est fini, l\'onglet Bilan aussi. Votre bilan $year vous attend maintenant dans Réglages, Mes bilans, avec ceux des autres années.';
+    return 'Janvier est fini, l\'onglet Bilan aussi. Votre bilan $year vous attend maintenant dans l\'onglet Plus, rubrique Mes bilans, avec ceux des autres années.';
   }
 
   @override
@@ -1107,4 +1107,13 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get yearReviewVideoSaved => 'Vidéo enregistrée dans la galerie';
+
+  @override
+  String get sectionMyYear => 'Mon année';
+
+  @override
+  String get sectionDisplay => 'Affichage';
+
+  @override
+  String get sectionHelp => 'Aide et contact';
 }

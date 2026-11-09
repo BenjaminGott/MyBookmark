@@ -17,7 +17,8 @@ import java.nio.ByteBuffer
  * Assemble la vidéo du bilan annuel : les pages du bilan, déjà dessinées par
  * Flutter en PNG, deviennent une vidéo H.264 avec la musique, en MP4.
  *
- * Chaque page avance d'un léger zoom, et se fond dans la suivante. Le dessin
+ * Chaque page avance d'un léger zoom, puis la suivante la pousse depuis la
+ * droite, comme dans une story. Le dessin
  * se fait sur la surface d'entrée de l'encodeur matériel du téléphone : pas
  * de bibliothèque vidéo à embarquer.
  */
@@ -110,29 +111,39 @@ class YearReviewVideoEncoder(
         return scaled
     }
 
-    /** L'image à l'instant [timeMillis] : la page en cours, puis la suivante en fondu. */
+    /**
+     * L'image à l'instant [timeMillis] : la page en cours, poussée vers la
+     * gauche par la suivante pendant la transition.
+     */
     private fun drawFrame(canvas: Canvas, slides: List<Bitmap>, timeMillis: Long, paint: Paint) {
         canvas.drawColor(Color.BLACK)
         val index = (timeMillis / slideMillis).toInt().coerceAtMost(slides.size - 1)
         val local = timeMillis - index * slideMillis
-        drawSlide(canvas, slides[index], local.toFloat() / slideMillis, 255, paint)
-
-        val fadeStart = slideMillis - TRANSITION_MILLIS
-        if (local > fadeStart && index + 1 < slides.size) {
-            val fade = (local - fadeStart).toFloat() / TRANSITION_MILLIS
-            drawSlide(canvas, slides[index + 1], 0f, (fade * 255).toInt(), paint)
+        val pushStart = slideMillis - TRANSITION_MILLIS
+        // Départ vif, arrivée en douceur.
+        val push = if (local > pushStart && index + 1 < slides.size) {
+            val t = (local - pushStart).toFloat() / TRANSITION_MILLIS
+            1f - (1f - t) * (1f - t) * (1f - t)
+        } else {
+            0f
+        }
+        drawSlide(canvas, slides[index], local.toFloat() / slideMillis, -push * width, paint)
+        if (push > 0f) {
+            drawSlide(canvas, slides[index + 1], 0f, (1f - push) * width, paint)
         }
     }
 
-    /** Une page, agrandie de [ZOOM] au fil de [progress] (de 0 à 1). */
-    private fun drawSlide(canvas: Canvas, slide: Bitmap, progress: Float, alpha: Int, paint: Paint) {
+    /** Une page décalée de [shiftX], agrandie de [ZOOM] au fil de [progress] (de 0 à 1). */
+    private fun drawSlide(canvas: Canvas, slide: Bitmap, progress: Float, shiftX: Float, paint: Paint) {
         val scale = 1f + ZOOM * progress.coerceIn(0f, 1f)
         val w = width * scale
         val h = height * scale
-        val left = (width - w) / 2
+        val left = (width - w) / 2 + shiftX
         val top = (height - h) / 2
-        paint.alpha = alpha
+        canvas.save()
+        canvas.clipRect(shiftX, 0f, shiftX + width, height.toFloat())
         canvas.drawBitmap(slide, null, RectF(left, top, left + w, top + h), paint)
+        canvas.restore()
     }
 
     private fun prepareAudio() {

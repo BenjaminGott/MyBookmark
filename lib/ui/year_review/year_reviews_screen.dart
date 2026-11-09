@@ -8,7 +8,7 @@ import '../widgets/status_views.dart';
 import 'year_review_providers.dart';
 import 'year_review_screen.dart';
 
-/// Réglages → Mes bilans : un bilan par année terminée.
+/// Plus → Mes bilans : un bilan par année terminée.
 class YearReviewsScreen extends ConsumerWidget {
   const YearReviewsScreen({super.key});
 

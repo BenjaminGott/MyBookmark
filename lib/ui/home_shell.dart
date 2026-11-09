@@ -83,7 +83,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
     return showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        icon: Icon(january ? Icons.insights : Icons.settings_outlined),
+        icon: Icon(january ? Icons.insights : Icons.more_horiz),
         title: Text(
           january
               ? l10n.yearReviewAnnounceTitle('$year')
@@ -171,8 +171,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
                       label: Text(l10n.yearReviewTitle('$reviewYear')),
                     ),
                   NavigationRailDestination(
-                    icon: const Icon(Icons.settings_outlined),
-                    selectedIcon: const Icon(Icons.settings),
+                    icon: const Icon(Icons.more_horiz),
                     label: Text(l10n.navSettings),
                   ),
                 ],
@@ -207,8 +206,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
               label: l10n.yearReviewTitle('$reviewYear'),
             ),
           NavigationDestination(
-            icon: const Icon(Icons.settings_outlined),
-            selectedIcon: const Icon(Icons.settings),
+            icon: const Icon(Icons.more_horiz),
             label: l10n.navSettings,
           ),
         ],

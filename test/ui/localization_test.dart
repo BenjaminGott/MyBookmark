@@ -62,7 +62,7 @@ void main() {
       );
       expect(
         lookupAppLocalizations(const Locale('de')).navSettings,
-        'Einstellungen',
+        'Mehr',
       );
       expect(
         lookupAppLocalizations(const Locale('it')).shelfToRead,

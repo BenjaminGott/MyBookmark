@@ -51,7 +51,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get navSearch => 'Buscar';
 
   @override
-  String get navSettings => 'Ajustes';
+  String get navSettings => 'Mais';
 
   @override
   String percent(int percent) {
@@ -375,7 +375,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get appearance => 'Aparência';
 
   @override
-  String get themeSystem => 'Igual ao sistema';
+  String get themeSystem => 'Auto';
 
   @override
   String get themeLight => 'Claro';
@@ -412,7 +412,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get dataExplanation =>
-      'Tudo fica salvo neste telefone, sem conta nem servidor. Exportar é a única forma de guardar uma cópia da sua biblioteca ou de levá-la para outro aparelho.';
+      'Tudo fica neste telefone. Exporte sua biblioteca para guardar uma cópia ou levá-la para outro aparelho.';
 
   @override
   String get exportLibrary => 'Exportar minha biblioteca';
@@ -711,7 +711,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get welcomeChooseLanguage => 'Escolha seu idioma';
 
   @override
-  String get welcomeHint => 'Você pode mudá-lo quando quiser nos ajustes.';
+  String get welcomeHint => 'Você pode mudá-lo quando quiser na aba Mais.';
 
   @override
   String get continueButton => 'Continuar';
@@ -1073,7 +1073,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String yearReviewMovedBody(String year) {
-    return 'Janeiro acabou, e a aba Resumo também. Seu resumo $year agora está em Configurações, Meus resumos, junto com os de outros anos.';
+    return 'Janeiro acabou, e a aba Resumo também. Seu resumo $year agora está na aba Mais, em Meus resumos, junto com os de outros anos.';
   }
 
   @override
@@ -1100,4 +1100,13 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get yearReviewVideoSaved => 'Vídeo salvo na galeria';
+
+  @override
+  String get sectionMyYear => 'Meu ano';
+
+  @override
+  String get sectionDisplay => 'Exibição';
+
+  @override
+  String get sectionHelp => 'Ajuda e contato';
 }

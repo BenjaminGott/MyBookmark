@@ -193,7 +193,7 @@ abstract class AppLocalizations {
   /// No description provided for @navSettings.
   ///
   /// In fr, this message translates to:
-  /// **'Réglages'**
+  /// **'Plus'**
   String get navSettings;
 
   /// No description provided for @percent.
@@ -697,7 +697,7 @@ abstract class AppLocalizations {
   /// No description provided for @themeSystem.
   ///
   /// In fr, this message translates to:
-  /// **'Comme le système'**
+  /// **'Auto'**
   String get themeSystem;
 
   /// No description provided for @themeLight.
@@ -769,7 +769,7 @@ abstract class AppLocalizations {
   /// No description provided for @dataExplanation.
   ///
   /// In fr, this message translates to:
-  /// **'Tout est enregistré sur ce téléphone, sans compte ni serveur. L\'export est le seul moyen de garder une copie de votre bibliothèque ou de la transférer sur un autre appareil.'**
+  /// **'Tout reste sur ce téléphone. Exportez votre bibliothèque pour en garder une copie ou la transférer.'**
   String get dataExplanation;
 
   /// No description provided for @exportLibrary.
@@ -1225,7 +1225,7 @@ abstract class AppLocalizations {
   /// No description provided for @welcomeHint.
   ///
   /// In fr, this message translates to:
-  /// **'Vous pourrez la changer à tout moment dans les réglages.'**
+  /// **'Vous pourrez la changer à tout moment dans l\'onglet Plus.'**
   String get welcomeHint;
 
   /// No description provided for @continueButton.
@@ -1759,7 +1759,7 @@ abstract class AppLocalizations {
   /// No description provided for @yearReviewMovedBody.
   ///
   /// In fr, this message translates to:
-  /// **'Janvier est fini, l\'onglet Bilan aussi. Votre bilan {year} vous attend maintenant dans Réglages, Mes bilans, avec ceux des autres années.'**
+  /// **'Janvier est fini, l\'onglet Bilan aussi. Votre bilan {year} vous attend maintenant dans l\'onglet Plus, rubrique Mes bilans, avec ceux des autres années.'**
   String yearReviewMovedBody(String year);
 
   /// No description provided for @yearReviewMovedOpen.
@@ -1809,6 +1809,24 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Vidéo enregistrée dans la galerie'**
   String get yearReviewVideoSaved;
+
+  /// No description provided for @sectionMyYear.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mon année'**
+  String get sectionMyYear;
+
+  /// No description provided for @sectionDisplay.
+  ///
+  /// In fr, this message translates to:
+  /// **'Affichage'**
+  String get sectionDisplay;
+
+  /// No description provided for @sectionHelp.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aide et contact'**
+  String get sectionHelp;
 }
 
 class _AppLocalizationsDelegate

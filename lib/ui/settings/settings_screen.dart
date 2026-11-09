@@ -15,7 +15,8 @@ import 'about_screen.dart';
 import 'backup_controller.dart';
 import 'feedback_actions.dart';
 
-/// Réglages : apparence, langue, et sauvegarde de la bibliothèque.
+/// L'onglet « Plus » : le bilan de l'année, les données, l'affichage, et
+/// l'aide. Tout ce qui n'est ni la bibliothèque ni la recherche.
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
@@ -31,42 +32,23 @@ class SettingsScreen extends ConsumerWidget {
       body: ReadableWidth(
         child: ListView(
           children: <Widget>[
-            _SectionTitle(l10n.appearance),
-            RadioGroup<AppThemeMode>(
-              groupValue: theme,
-              onChanged: (mode) {
-                if (mode != null) {
-                  ref.read(themeModeProvider.notifier).select(mode);
-                }
-              },
-              child: Column(
-                children: <Widget>[
-                  RadioListTile<AppThemeMode>(
-                    value: AppThemeMode.system,
-                    title: Text(l10n.themeSystem),
+            // Mon année : le bilan d'abord, c'est ce qu'on vient chercher.
+            _SectionTitle(l10n.sectionMyYear),
+            Card(
+              margin: const EdgeInsets.symmetric(horizontal: 16),
+              child: ListTile(
+                leading: const Icon(Icons.insights_outlined),
+                title: Text(l10n.settingsYearReviews),
+                subtitle: Text(l10n.settingsYearReviewsSubtitle),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => const YearReviewsScreen(),
                   ),
-                  RadioListTile<AppThemeMode>(
-                    value: AppThemeMode.light,
-                    title: Text(l10n.themeLight),
-                  ),
-                  RadioListTile<AppThemeMode>(
-                    value: AppThemeMode.dark,
-                    title: Text(l10n.themeDark),
-                  ),
-                ],
+                ),
               ),
             ),
-            const Divider(),
-            _SectionTitle(l10n.language),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-              child: LanguageDropdown(
-                languages: AppLanguage.values,
-                value: language,
-                onChanged: (value) =>
-                    ref.read(languageProvider.notifier).select(value),
-              ),
-            ),
+            const SizedBox(height: 8),
             const Divider(),
             _SectionTitle(l10n.myData),
             Padding(
@@ -101,18 +83,49 @@ class SettingsScreen extends ConsumerWidget {
                 child: LinearProgressIndicator(),
               ),
             const Divider(),
-            ListTile(
-              leading: const Icon(Icons.insights_outlined),
-              title: Text(l10n.settingsYearReviews),
-              subtitle: Text(l10n.settingsYearReviewsSubtitle),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () => Navigator.of(context).push(
-                MaterialPageRoute<void>(
-                  builder: (_) => const YearReviewsScreen(),
+            // Affichage : le thème sur une ligne, la langue juste dessous.
+            _SectionTitle(l10n.sectionDisplay),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
+              child: SizedBox(
+                width: double.infinity,
+                child: SegmentedButton<AppThemeMode>(
+                  segments: <ButtonSegment<AppThemeMode>>[
+                    ButtonSegment<AppThemeMode>(
+                      value: AppThemeMode.system,
+                      icon: const Icon(Icons.brightness_auto_outlined),
+                      label: Text(l10n.themeSystem),
+                    ),
+                    ButtonSegment<AppThemeMode>(
+                      value: AppThemeMode.light,
+                      icon: const Icon(Icons.light_mode_outlined),
+                      label: Text(l10n.themeLight),
+                    ),
+                    ButtonSegment<AppThemeMode>(
+                      value: AppThemeMode.dark,
+                      icon: const Icon(Icons.dark_mode_outlined),
+                      label: Text(l10n.themeDark),
+                    ),
+                  ],
+                  selected: <AppThemeMode>{theme},
+                  showSelectedIcon: false,
+                  onSelectionChanged: (selection) => ref
+                      .read(themeModeProvider.notifier)
+                      .select(selection.first),
                 ),
               ),
             ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
+              child: LanguageDropdown(
+                languages: AppLanguage.values,
+                value: language,
+                onChanged: (value) =>
+                    ref.read(languageProvider.notifier).select(value),
+              ),
+            ),
             const Divider(),
+            _SectionTitle(l10n.sectionHelp),
             ListTile(
               leading: const Icon(Icons.mail_outline),
               title: Text(l10n.aboutFeedbackButton),
@@ -135,6 +148,7 @@ class SettingsScreen extends ConsumerWidget {
                 MaterialPageRoute<void>(builder: (_) => const AboutScreen()),
               ),
             ),
+            SizedBox(height: 16 + MediaQuery.paddingOf(context).bottom),
           ],
         ),
       ),
