@@ -897,4 +897,172 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get widgetEmptyHint => 'Toque para começar um.';
+
+  @override
+  String get settingsYearReviews => 'Meus resumos';
+
+  @override
+  String get settingsYearReviewsSubtitle => 'Seu ano de leitura, em imagens';
+
+  @override
+  String get yearReviewsEmptyTitle => 'Ainda não há resumo';
+
+  @override
+  String get yearReviewsEmptyMessage =>
+      'O resumo de um ano aparece aqui quando o ano termina, se você terminou pelo menos um livro.';
+
+  @override
+  String yearReviewsSummary(int books, int pages) {
+    final intl.NumberFormat pagesNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String pagesString = pagesNumberFormat.format(pages);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      books,
+      locale: localeName,
+      other: '$books livros',
+      one: '1 livro',
+    );
+    return '$_temp0 · $pagesString páginas';
+  }
+
+  @override
+  String get yearReviewsNew => 'Novo';
+
+  @override
+  String yearReviewAnnounceTitle(String year) {
+    return 'Seu $year de leitura';
+  }
+
+  @override
+  String get yearReviewAnnounceBody =>
+      'Seu resumo está pronto: seus livros, suas páginas, seu favorito… Você também o encontra em Configurações, Meus resumos.';
+
+  @override
+  String get yearReviewAnnounceOpen => 'Ver meu resumo';
+
+  @override
+  String get yearReviewAnnounceLater => 'Mais tarde';
+
+  @override
+  String yearReviewTitle(String year) {
+    return 'Resumo $year';
+  }
+
+  @override
+  String get yearReviewShare => 'Compartilhar';
+
+  @override
+  String get yearReviewSave => 'Salvar';
+
+  @override
+  String get yearReviewSaved => 'Imagem salva na galeria';
+
+  @override
+  String get yearReviewUpdate => 'Atualizar';
+
+  @override
+  String get yearReviewUpdated => 'Resumo atualizado';
+
+  @override
+  String yearReviewNone(String year) {
+    return 'Nenhum livro terminado em $year.';
+  }
+
+  @override
+  String get yearReviewExportFailed => 'Não foi possível preparar a imagem.';
+
+  @override
+  String get yrIntroKicker => 'MEU ANO DE LEITURA';
+
+  @override
+  String yrBooksCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'livros terminados',
+      one: 'livro terminado',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String yrPages(int pages) {
+    final intl.NumberFormat pagesNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String pagesString = pagesNumberFormat.format(pages);
+
+    return '$pagesString páginas lidas';
+  }
+
+  @override
+  String get yrMonthKicker => 'MEU MÊS MAIS LIDO';
+
+  @override
+  String yrMonthBooks(int count, String month) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count livros terminados em $month',
+      one: '1 livro terminado em $month',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get yrFavoriteKicker => 'MEU FAVORITO';
+
+  @override
+  String get yrAuthorKicker => 'MEU AUTOR DO ANO';
+
+  @override
+  String yrAuthorBooks(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count livros lidos',
+      one: '1 livro lido',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get yrLongestKicker => 'MEU LIVRO MAIS LONGO';
+
+  @override
+  String yrLongestPages(int pages) {
+    final intl.NumberFormat pagesNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String pagesString = pagesNumberFormat.format(pages);
+
+    return '$pagesString páginas';
+  }
+
+  @override
+  String yrAverageDays(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: 'Em média, $days dias para terminar um livro',
+      one: 'Em média, 1 dia para terminar um livro',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String yrOutroKicker(String year) {
+    return 'MEU $year';
+  }
+
+  @override
+  String get yrOutroBooks => 'Livros';
+
+  @override
+  String get yrOutroPages => 'Páginas';
+
+  @override
+  String get yrOutroFavorite => 'Favorito';
+
+  @override
+  String get yrOutroAuthor => 'Autor';
 }

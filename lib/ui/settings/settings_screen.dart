@@ -10,6 +10,7 @@ import '../l10n/l10n.dart';
 import '../l10n/language_dropdown.dart';
 import '../providers/settings_providers.dart';
 import '../widgets/readable_width.dart';
+import '../year_review/year_reviews_screen.dart';
 import 'about_screen.dart';
 import 'backup_controller.dart';
 import 'feedback_actions.dart';
@@ -99,6 +100,18 @@ class SettingsScreen extends ConsumerWidget {
                 padding: EdgeInsets.symmetric(horizontal: 16),
                 child: LinearProgressIndicator(),
               ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.auto_awesome_outlined),
+              title: Text(l10n.settingsYearReviews),
+              subtitle: Text(l10n.settingsYearReviewsSubtitle),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => const YearReviewsScreen(),
+                ),
+              ),
+            ),
             const Divider(),
             ListTile(
               leading: const Icon(Icons.mail_outline),

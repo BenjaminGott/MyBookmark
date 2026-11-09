@@ -508,5 +508,125 @@
   "scanHint": "Visez le code-barres au dos du livre.",
   "scanNotIsbn": "Ce code-barres n'est pas celui d'un livre (ISBN).",
   "widgetEmptyTitle": "Aucun livre en cours",
-  "widgetEmptyHint": "Touchez pour en commencer un."
+  "widgetEmptyHint": "Touchez pour en commencer un.",
+  "settingsYearReviews": "Mes bilans",
+  "settingsYearReviewsSubtitle": "Votre année de lecture, en images",
+  "yearReviewsEmptyTitle": "Pas encore de bilan",
+  "yearReviewsEmptyMessage": "Le bilan d'une année apparaît ici une fois l'année terminée, si elle compte au moins un livre lu.",
+  "yearReviewsSummary": "{books, plural, =1{1 livre} other{{books} livres}} · {pages} pages",
+  "@yearReviewsSummary": {
+    "placeholders": {
+      "books": {
+        "type": "int"
+      },
+      "pages": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "yearReviewsNew": "Nouveau",
+  "yearReviewAnnounceTitle": "Votre année {year} en lecture",
+  "@yearReviewAnnounceTitle": {
+    "placeholders": {
+      "year": {
+        "type": "String"
+      }
+    }
+  },
+  "yearReviewAnnounceBody": "Votre bilan est prêt : vos livres, vos pages, votre coup de cœur… Vous le retrouverez dans Réglages, Mes bilans.",
+  "yearReviewAnnounceOpen": "Voir mon bilan",
+  "yearReviewAnnounceLater": "Plus tard",
+  "yearReviewTitle": "Bilan {year}",
+  "@yearReviewTitle": {
+    "placeholders": {
+      "year": {
+        "type": "String"
+      }
+    }
+  },
+  "yearReviewShare": "Partager",
+  "yearReviewSave": "Enregistrer",
+  "yearReviewSaved": "Image enregistrée dans la galerie",
+  "yearReviewUpdate": "Mettre à jour",
+  "yearReviewUpdated": "Bilan mis à jour",
+  "yearReviewNone": "Aucun livre terminé en {year}.",
+  "@yearReviewNone": {
+    "placeholders": {
+      "year": {
+        "type": "String"
+      }
+    }
+  },
+  "yearReviewExportFailed": "Impossible de préparer l'image.",
+  "yrIntroKicker": "MON ANNÉE EN LECTURE",
+  "yrBooksCount": "{count, plural, =1{livre terminé} other{livres terminés}}",
+  "@yrBooksCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "yrPages": "{pages} pages tournées",
+  "@yrPages": {
+    "placeholders": {
+      "pages": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "yrMonthKicker": "MON MOIS LE PLUS LU",
+  "yrMonthBooks": "{count, plural, =1{1 livre terminé en {month}} other{{count} livres terminés en {month}}}",
+  "@yrMonthBooks": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "month": {
+        "type": "String"
+      }
+    }
+  },
+  "yrFavoriteKicker": "MON COUP DE CŒUR",
+  "yrAuthorKicker": "MON AUTEUR DE L'ANNÉE",
+  "yrAuthorBooks": "{count, plural, =1{1 livre lu} other{{count} livres lus}}",
+  "@yrAuthorBooks": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "yrLongestKicker": "MON PLUS GROS LIVRE",
+  "yrLongestPages": "{pages} pages",
+  "@yrLongestPages": {
+    "placeholders": {
+      "pages": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "yrAverageDays": "{days, plural, =1{En moyenne, 1 jour pour finir un livre} other{En moyenne, {days} jours pour finir un livre}}",
+  "@yrAverageDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "yrOutroKicker": "MON ANNÉE {year}",
+  "@yrOutroKicker": {
+    "placeholders": {
+      "year": {
+        "type": "String"
+      }
+    }
+  },
+  "yrOutroBooks": "Livres",
+  "yrOutroPages": "Pages",
+  "yrOutroFavorite": "Coup de cœur",
+  "yrOutroAuthor": "Auteur"
 }

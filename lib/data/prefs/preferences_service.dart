@@ -15,6 +15,7 @@ class PreferencesService {
   static const String _languageKey = 'language';
   static const String _goalPrefix = 'reading_goal_';
   static const String _reviewKey = 'review_asked_at';
+  static const String _yearReviewPrefix = 'year_review_';
 
   /// Nul quand les préférences n'ont pas pu être chargées.
   final SharedPreferences? _preferences;
@@ -78,4 +79,19 @@ class PreferencesService {
   Future<void> setReviewAskedAt(DateTime when) async {
     await _preferences?.setInt(_reviewKey, when.millisecondsSinceEpoch);
   }
+
+  /// Le bilan figé d'une année, en JSON, ou `null` s'il n'a pas été créé.
+  String? yearReviewJson(int year) =>
+      _preferences?.getString('$_yearReviewPrefix$year');
+
+  Future<void> setYearReviewJson(int year, String json) async {
+    await _preferences?.setString('$_yearReviewPrefix$year', json);
+  }
+
+  /// Les années qui ont un bilan enregistré.
+  Set<int> get savedYearReviews => <int>{
+        for (final key in _preferences?.getKeys() ?? const <String>{})
+          if (key.startsWith(_yearReviewPrefix))
+            ?int.tryParse(key.substring(_yearReviewPrefix.length)),
+      };
 }
