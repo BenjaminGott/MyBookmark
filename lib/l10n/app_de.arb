@@ -277,5 +277,11 @@
   "yearReviewMovedTitle": "Dein Rückblick {year} ist umgezogen",
   "yearReviewMovedBody": "Der Januar ist vorbei, und mit ihm der Tab Rückblick. Dein Rückblick {year} ist jetzt unter Einstellungen, Meine Jahresrückblicke, zusammen mit den anderen Jahren.",
   "yearReviewMovedOpen": "Rückblick ansehen",
-  "yearReviewMovedOk": "Verstanden"
+  "yearReviewMovedOk": "Verstanden",
+  "errorVideoFailed": "Das Video konnte nicht erstellt werden.",
+  "yearReviewVideo": "Video erstellen",
+  "yearReviewVideoPreparing": "Video wird erstellt…",
+  "yearReviewVideoReadyTitle": "Dein Video ist fertig",
+  "yearReviewVideoReadyBody": "18 Sekunden mit Musik, im Story-Format.",
+  "yearReviewVideoSaved": "Video in der Galerie gespeichert"
 }

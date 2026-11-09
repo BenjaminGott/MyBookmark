@@ -277,5 +277,11 @@
   "yearReviewMovedTitle": "Tu resumen {year} se ha mudado",
   "yearReviewMovedBody": "Enero ha terminado, y la pestaña Resumen también. Tu resumen {year} está ahora en Ajustes, Mis resúmenes, junto a los de otros años.",
   "yearReviewMovedOpen": "Ver mi resumen",
-  "yearReviewMovedOk": "Entendido"
+  "yearReviewMovedOk": "Entendido",
+  "errorVideoFailed": "No se pudo crear el vídeo.",
+  "yearReviewVideo": "Crear el vídeo",
+  "yearReviewVideoPreparing": "Creando el vídeo…",
+  "yearReviewVideoReadyTitle": "Tu vídeo está listo",
+  "yearReviewVideoReadyBody": "18 segundos con música, en formato historia.",
+  "yearReviewVideoSaved": "Vídeo guardado en la galería"
 }

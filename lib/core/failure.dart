@@ -30,6 +30,7 @@ enum AppErrorReason {
   photoAccess,
   notEnoughSpace,
   imageSaveFailed,
+  videoFailed,
 }
 
 /// Les échecs que l'application sait nommer, et donc expliquer à l'utilisateur.

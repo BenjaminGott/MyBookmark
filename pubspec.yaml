@@ -80,3 +80,5 @@ flutter:
   # Le logo de l'en-tête, produit par tool/generate_icons.py.
   assets:
     - assets/logo.png
+    # Musique originale de la vidéo du bilan (tool/screenshots/music.py).
+    - assets/audio/year_review.m4a

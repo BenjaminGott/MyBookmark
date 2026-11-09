@@ -1083,4 +1083,23 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get yearReviewMovedOk => 'Entendido';
+
+  @override
+  String get errorVideoFailed => 'No se pudo crear el vídeo.';
+
+  @override
+  String get yearReviewVideo => 'Crear el vídeo';
+
+  @override
+  String get yearReviewVideoPreparing => 'Creando el vídeo…';
+
+  @override
+  String get yearReviewVideoReadyTitle => 'Tu vídeo está listo';
+
+  @override
+  String get yearReviewVideoReadyBody =>
+      '18 segundos con música, en formato historia.';
+
+  @override
+  String get yearReviewVideoSaved => 'Vídeo guardado en la galería';
 }

@@ -102,7 +102,7 @@ class SettingsScreen extends ConsumerWidget {
               ),
             const Divider(),
             ListTile(
-              leading: const Icon(Icons.auto_awesome_outlined),
+              leading: const Icon(Icons.insights_outlined),
               title: Text(l10n.settingsYearReviews),
               subtitle: Text(l10n.settingsYearReviewsSubtitle),
               trailing: const Icon(Icons.chevron_right),

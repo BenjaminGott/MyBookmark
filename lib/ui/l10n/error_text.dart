@@ -30,5 +30,6 @@ extension AppExceptionText on AppException {
     AppErrorReason.photoAccess => l10n.errorPhotoAccess,
     AppErrorReason.notEnoughSpace => l10n.errorNotEnoughSpace,
     AppErrorReason.imageSaveFailed => l10n.errorImageSaveFailed,
+    AppErrorReason.videoFailed => l10n.errorVideoFailed,
   };
 }

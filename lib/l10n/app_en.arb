@@ -277,5 +277,11 @@
   "yearReviewMovedTitle": "Your {year} review has moved",
   "yearReviewMovedBody": "January is over, and so is the Review tab. Your {year} review now lives in Settings, My reviews, along with your other years.",
   "yearReviewMovedOpen": "See my review",
-  "yearReviewMovedOk": "Got it"
+  "yearReviewMovedOk": "Got it",
+  "errorVideoFailed": "Couldn't create the video.",
+  "yearReviewVideo": "Create the video",
+  "yearReviewVideoPreparing": "Creating the video…",
+  "yearReviewVideoReadyTitle": "Your video is ready",
+  "yearReviewVideoReadyBody": "18 seconds with music, in story format.",
+  "yearReviewVideoSaved": "Video saved to your gallery"
 }

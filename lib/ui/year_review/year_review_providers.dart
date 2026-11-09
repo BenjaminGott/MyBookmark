@@ -1,8 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../data/files/android_year_review_video.dart';
 import '../../data/year_review/local_year_review_repository.dart';
 import '../../domain/models/year_review.dart';
 import '../../domain/repositories/year_review_repository.dart';
+import '../../domain/repositories/year_review_video.dart';
 import '../../domain/services/year_review_builder.dart';
 import '../../domain/services/year_review_season.dart';
 import '../providers/database_providers.dart';
@@ -15,6 +17,9 @@ final Provider<YearReviewRepository> yearReviewRepositoryProvider =
         preferences: ref.watch(preferencesServiceProvider),
       );
     });
+
+final Provider<YearReviewVideo> yearReviewVideoProvider =
+    Provider<YearReviewVideo>((ref) => AndroidYearReviewVideo());
 
 /// L'heure qu'il est. Remplacée dans les tests pour se placer en janvier.
 final Provider<DateTime Function()> clockProvider =

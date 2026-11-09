@@ -1,11 +1,15 @@
-import 'dart:typed_data';
+import 'dart:async';
+import 'dart:io';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../../core/failure.dart';
+import '../../core/theme/app_theme.dart';
 import '../../domain/models/year_review.dart';
 import '../l10n/error_text.dart';
 import '../l10n/l10n.dart';
@@ -16,7 +20,8 @@ import 'year_review_slides.dart';
 
 /// Un bilan annuel, page après page, comme une story : toucher à droite
 /// avance, toucher à gauche recule. Chaque page se partage ou s'enregistre en
-/// image 1080 × 1920.
+/// image 1080 × 1920, et le bilan entier devient une vidéo de 18 secondes en
+/// musique.
 class YearReviewScreen extends ConsumerStatefulWidget {
   const YearReviewScreen({required this.year, super.key});
 
@@ -34,6 +39,14 @@ class _YearReviewScreenState extends ConsumerState<YearReviewScreen> {
 
   /// L'export se fait à trois fois la taille de dessin : 1080 × 1920.
   static const double _captureRatio = 3;
+
+  /// Les pages de la vidéo, à deux fois la taille de dessin : 720 × 1280,
+  /// net sur un téléphone et rapide à encoder.
+  static const double _videoRatio = 2;
+
+  /// La durée de la vidéo, celle de la musique : chaque page en a sa part.
+  static const Duration _videoLength = Duration(seconds: 18);
+  static const String _music = 'assets/audio/year_review.m4a';
 
   @override
   void dispose() {
@@ -54,14 +67,14 @@ class _YearReviewScreenState extends ConsumerState<YearReviewScreen> {
     }
   }
 
-  Future<Uint8List?> _capture() async {
+  Future<Uint8List?> _capture({double ratio = _captureRatio}) async {
     final boundary =
         _keyFor(_index).currentContext?.findRenderObject()
             as RenderRepaintBoundary?;
     if (boundary == null) {
       return null;
     }
-    final image = await boundary.toImage(pixelRatio: _captureRatio);
+    final image = await boundary.toImage(pixelRatio: ratio);
     try {
       final data = await image.toByteData(format: ui.ImageByteFormat.png);
       return data?.buffer.asUint8List();
@@ -101,6 +114,135 @@ class _YearReviewScreenState extends ConsumerState<YearReviewScreen> {
       if (mounted) {
         setState(() => _busy = false);
       }
+    }
+  }
+
+  /// Fait défiler les pages pour les photographier une à une, puis confie
+  /// l'assemblage à Android. Une fenêtre suit l'avancement.
+  Future<void> _createVideo(int slideCount) async {
+    final l10n = context.l10n;
+    final messenger = ScaffoldMessenger.of(context);
+    final video = ref.read(yearReviewVideoProvider);
+    final progress = ValueNotifier<double>(0);
+    final startPage = _index;
+    setState(() => _busy = true);
+
+    unawaited(
+      showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => PopScope(
+          canPop: false,
+          child: AlertDialog(
+            title: Text(l10n.yearReviewVideoPreparing),
+            content: ValueListenableBuilder<double>(
+              valueListenable: progress,
+              builder: (context, value, _) =>
+                  LinearProgressIndicator(value: value),
+            ),
+          ),
+        ),
+      ),
+    );
+    final navigator = Navigator.of(context);
+
+    String? output;
+    try {
+      final folder = Directory(
+        '${(await getTemporaryDirectory()).path}/year_review_video',
+      );
+      if (folder.existsSync()) {
+        folder.deleteSync(recursive: true);
+      }
+      folder.createSync(recursive: true);
+
+      final frames = <String>[];
+      for (var page = 0; page < slideCount; page++) {
+        _pages.jumpToPage(page);
+        // Deux images : la page se construit, puis ses couvertures s'affichent.
+        await WidgetsBinding.instance.endOfFrame;
+        await WidgetsBinding.instance.endOfFrame;
+        final bytes = await _capture(ratio: _videoRatio);
+        if (bytes == null) {
+          throw const FileAccessException(AppErrorReason.videoFailed);
+        }
+        final frame = File('${folder.path}/page-$page.png');
+        await frame.writeAsBytes(bytes, flush: true);
+        frames.add(frame.path);
+        progress.value = 0.3 * (page + 1) / slideCount;
+      }
+
+      final music = File('${folder.path}/music.m4a');
+      final data = await rootBundle.load(_music);
+      await music.writeAsBytes(data.buffer.asUint8List(), flush: true);
+
+      output = '${folder.path}/mybookmark-${widget.year}.mp4';
+      await video.encode(
+        frames: frames,
+        width: (yearReviewSlideSize.width * _videoRatio).round(),
+        height: (yearReviewSlideSize.height * _videoRatio).round(),
+        slide: _videoLength ~/ slideCount,
+        outputPath: output,
+        audioPath: music.path,
+        onProgress: (value) => progress.value = 0.3 + 0.7 * value,
+      );
+    } on AppException catch (error) {
+      output = null;
+      messenger.showSnackBar(SnackBar(content: Text(error.describe(l10n))));
+    } on FileSystemException {
+      output = null;
+      messenger.showSnackBar(SnackBar(content: Text(l10n.errorVideoFailed)));
+    } finally {
+      navigator.pop();
+      progress.dispose();
+      if (mounted) {
+        _pages.jumpToPage(startPage);
+        setState(() => _busy = false);
+      }
+    }
+
+    if (output != null && mounted) {
+      await _offerVideo(output);
+    }
+  }
+
+  /// La vidéo est prête : l'enregistrer ou la partager.
+  Future<void> _offerVideo(String path) async {
+    final l10n = context.l10n;
+    final messenger = ScaffoldMessenger.of(context);
+    final video = ref.read(yearReviewVideoProvider);
+    final share = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        icon: const Icon(Icons.movie_outlined),
+        title: Text(l10n.yearReviewVideoReadyTitle),
+        content: Text(l10n.yearReviewVideoReadyBody),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(l10n.yearReviewSave),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(l10n.yearReviewShare),
+          ),
+        ],
+      ),
+    );
+    if (share == null) {
+      return;
+    }
+    try {
+      if (share) {
+        await video.share(path);
+      } else {
+        await video.saveToGallery(path);
+        messenger.showSnackBar(
+          SnackBar(content: Text(l10n.yearReviewVideoSaved)),
+        );
+      }
+    } on AppException catch (error) {
+      messenger.showSnackBar(SnackBar(content: Text(error.describe(l10n))));
     }
   }
 
@@ -211,8 +353,24 @@ class _YearReviewScreenState extends ConsumerState<YearReviewScreen> {
               ),
             ),
           ),
+          if (ref.watch(yearReviewVideoProvider).isSupported)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+              child: SizedBox(
+                width: double.infinity,
+                child: FilledButton.icon(
+                  style: FilledButton.styleFrom(
+                    backgroundColor: AppTheme.yellow,
+                    foregroundColor: Colors.black,
+                  ),
+                  onPressed: _busy ? null : () => _createVideo(slides.length),
+                  icon: const Icon(Icons.movie_outlined),
+                  label: Text(l10n.yearReviewVideo),
+                ),
+              ),
+            ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
             child: Row(
               children: <Widget>[
                 Expanded(
@@ -228,7 +386,11 @@ class _YearReviewScreenState extends ConsumerState<YearReviewScreen> {
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: FilledButton.icon(
+                  child: OutlinedButton.icon(
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      side: const BorderSide(color: Colors.white54),
+                    ),
                     onPressed: _busy ? null : () => _export(share: true),
                     icon: const Icon(Icons.share_outlined),
                     label: Text(l10n.yearReviewShare),

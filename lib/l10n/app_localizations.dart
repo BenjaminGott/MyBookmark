@@ -1773,6 +1773,42 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Compris'**
   String get yearReviewMovedOk;
+
+  /// No description provided for @errorVideoFailed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Impossible de créer la vidéo.'**
+  String get errorVideoFailed;
+
+  /// No description provided for @yearReviewVideo.
+  ///
+  /// In fr, this message translates to:
+  /// **'Créer la vidéo'**
+  String get yearReviewVideo;
+
+  /// No description provided for @yearReviewVideoPreparing.
+  ///
+  /// In fr, this message translates to:
+  /// **'Création de la vidéo…'**
+  String get yearReviewVideoPreparing;
+
+  /// No description provided for @yearReviewVideoReadyTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Votre vidéo est prête'**
+  String get yearReviewVideoReadyTitle;
+
+  /// No description provided for @yearReviewVideoReadyBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'18 secondes en musique, au format story.'**
+  String get yearReviewVideoReadyBody;
+
+  /// No description provided for @yearReviewVideoSaved.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vidéo enregistrée dans la galerie'**
+  String get yearReviewVideoSaved;
 }
 
 class _AppLocalizationsDelegate

@@ -646,5 +646,11 @@
         "type": "String"
       }
     }
-  }
+  },
+  "errorVideoFailed": "Impossible de créer la vidéo.",
+  "yearReviewVideo": "Créer la vidéo",
+  "yearReviewVideoPreparing": "Création de la vidéo…",
+  "yearReviewVideoReadyTitle": "Votre vidéo est prête",
+  "yearReviewVideoReadyBody": "18 secondes en musique, au format story.",
+  "yearReviewVideoSaved": "Vidéo enregistrée dans la galerie"
 }

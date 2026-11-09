@@ -277,5 +277,11 @@
   "yearReviewMovedTitle": "Il tuo bilancio {year} si è spostato",
   "yearReviewMovedBody": "Gennaio è finito, e anche la scheda Bilancio. Il tuo bilancio {year} ora si trova in Impostazioni, I miei bilanci, insieme a quelli degli altri anni.",
   "yearReviewMovedOpen": "Vedi il mio bilancio",
-  "yearReviewMovedOk": "Ho capito"
+  "yearReviewMovedOk": "Ho capito",
+  "errorVideoFailed": "Impossibile creare il video.",
+  "yearReviewVideo": "Crea il video",
+  "yearReviewVideoPreparing": "Creazione del video…",
+  "yearReviewVideoReadyTitle": "Il tuo video è pronto",
+  "yearReviewVideoReadyBody": "18 secondi con musica, in formato storia.",
+  "yearReviewVideoSaved": "Video salvato nella galleria"
 }
