@@ -37,7 +37,7 @@ class SettingsScreen extends ConsumerWidget {
             Card(
               margin: const EdgeInsets.symmetric(horizontal: 16),
               child: ListTile(
-                leading: const Icon(Icons.insights_outlined),
+                leading: const Icon(Icons.bar_chart_outlined),
                 title: Text(l10n.settingsYearReviews),
                 subtitle: Text(l10n.settingsYearReviewsSubtitle),
                 trailing: const Icon(Icons.chevron_right),

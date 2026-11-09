@@ -29,7 +29,7 @@ class YearReviewsScreen extends ConsumerWidget {
           ),
           data: (years) => years.isEmpty
               ? EmptyState(
-                  icon: Icons.insights_outlined,
+                  icon: Icons.bar_chart_outlined,
                   title: l10n.yearReviewsEmptyTitle,
                   message: l10n.yearReviewsEmptyMessage,
                 )
@@ -40,7 +40,7 @@ class YearReviewsScreen extends ConsumerWidget {
                   children: <Widget>[
                     for (final summary in years)
                       ListTile(
-                        leading: const Icon(Icons.insights_outlined),
+                        leading: const Icon(Icons.bar_chart_outlined),
                         title: Text(l10n.yearReviewTitle('${summary.year}')),
                         subtitle: summary.review == null
                             ? Text(l10n.yearReviewsNew)
