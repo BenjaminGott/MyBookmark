@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../domain/services/year_review_season.dart';
 import 'book_detail/book_detail_screen.dart';
 import 'l10n/l10n.dart';
 import 'library/library_screen.dart';
@@ -21,24 +22,26 @@ class HomeShell extends ConsumerStatefulWidget {
 class _HomeShellState extends ConsumerState<HomeShell> {
   int _index = 0;
 
+  /// En janvier, l'année dont le bilan a son onglet.
+  int? _reviewTabYear;
+
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _announceYearReview());
+    WidgetsBinding.instance.addPostFrameCallback((_) => _yearReviewSeason());
   }
 
-  /// En janvier, crée le bilan de l'année qui vient de finir et le propose.
-  ///
-  /// Le bilan est créé avant d'être annoncé : la fenêtre ne revient donc pas
-  /// au lancement suivant, même si l'utilisateur répond « Plus tard ».
-  Future<void> _announceYearReview() async {
-    final int? year;
+  /// Le bilan de l'année écoulée, selon le mois : son onglet tout janvier,
+  /// et une fenêtre aux deux premiers lancements de janvier puis de février.
+  Future<void> _yearReviewSeason() async {
+    final YearReviewSeasonState? season;
     try {
-      year = await ref.read(yearToAnnounceProvider.future);
-      if (year == null) {
+      season = await ref.read(yearReviewSeasonProvider.future);
+      if (season == null) {
         return;
       }
-      await ref.read(yearReviewProvider(year).future);
+      // Le bilan est créé (et figé) avant d'être montré.
+      await ref.read(yearReviewProvider(season.year).future);
     } on Object {
       // Le bilan est un plus : un souci de lecture ne gêne pas le lancement.
       return;
@@ -46,33 +49,71 @@ class _HomeShellState extends ConsumerState<HomeShell> {
     if (!mounted) {
       return;
     }
-    final l10n = context.l10n;
-    final open = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        icon: const Icon(Icons.auto_awesome),
-        title: Text(l10n.yearReviewAnnounceTitle('$year')),
-        content: Text(l10n.yearReviewAnnounceBody),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text(l10n.yearReviewAnnounceLater),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: Text(l10n.yearReviewAnnounceOpen),
-          ),
-        ],
-      ),
-    );
-    if (open == true && mounted) {
+    if (season.tab) {
+      setState(() => _reviewTabYear = season!.year);
+    }
+    final notice = season.notice;
+    if (notice == null) {
+      return;
+    }
+    await ref
+        .read(yearReviewRepositoryProvider)
+        .markNoticeShown(notice, season.year);
+    if (!mounted) {
+      return;
+    }
+    final open = await _showNotice(notice, season.year);
+    if (open != true || !mounted) {
+      return;
+    }
+    if (notice == YearReviewNotice.january) {
+      setState(() => _index = _reviewTabIndex);
+    } else {
       await Navigator.of(context).push(
         MaterialPageRoute<void>(
-          builder: (context) => YearReviewScreen(year: year!),
+          builder: (context) => YearReviewScreen(year: season!.year),
         ),
       );
     }
   }
+
+  Future<bool?> _showNotice(YearReviewNotice notice, int year) {
+    final l10n = context.l10n;
+    final january = notice == YearReviewNotice.january;
+    return showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        icon: Icon(january ? Icons.auto_awesome : Icons.settings_outlined),
+        title: Text(
+          january
+              ? l10n.yearReviewAnnounceTitle('$year')
+              : l10n.yearReviewMovedTitle('$year'),
+        ),
+        content: Text(
+          january
+              ? l10n.yearReviewAnnounceBody
+              : l10n.yearReviewMovedBody('$year'),
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(
+              january ? l10n.yearReviewAnnounceLater : l10n.yearReviewMovedOk,
+            ),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(
+              january ? l10n.yearReviewAnnounceOpen : l10n.yearReviewMovedOpen,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// L'onglet du bilan se glisse avant les réglages.
+  static const int _reviewTabIndex = 2;
 
   void _goToSearch() => setState(() => _index = 1);
 
@@ -87,6 +128,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final reviewYear = _reviewTabYear;
     // IndexedStack garde l'état des onglets : revenir à la recherche
     // retrouve la saisie et les résultats.
     final pages = IndexedStack(
@@ -94,6 +136,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
       children: <Widget>[
         LibraryScreen(onOpenSearch: _goToSearch, onOpenBook: _openBook),
         const SearchScreen(),
+        if (reviewYear != null) YearReviewScreen(year: reviewYear),
         const SettingsScreen(),
       ],
     );
@@ -121,6 +164,12 @@ class _HomeShellState extends ConsumerState<HomeShell> {
                     icon: const Icon(Icons.search),
                     label: Text(l10n.navSearch),
                   ),
+                  if (reviewYear != null)
+                    NavigationRailDestination(
+                      icon: const Icon(Icons.auto_awesome_outlined),
+                      selectedIcon: const Icon(Icons.auto_awesome),
+                      label: Text(l10n.yearReviewTitle('$reviewYear')),
+                    ),
                   NavigationRailDestination(
                     icon: const Icon(Icons.settings_outlined),
                     selectedIcon: const Icon(Icons.settings),
@@ -151,6 +200,12 @@ class _HomeShellState extends ConsumerState<HomeShell> {
             icon: const Icon(Icons.search),
             label: l10n.navSearch,
           ),
+          if (reviewYear != null)
+            NavigationDestination(
+              icon: const Icon(Icons.auto_awesome_outlined),
+              selectedIcon: const Icon(Icons.auto_awesome),
+              label: l10n.yearReviewTitle('$reviewYear'),
+            ),
           NavigationDestination(
             icon: const Icon(Icons.settings_outlined),
             selectedIcon: const Icon(Icons.settings),

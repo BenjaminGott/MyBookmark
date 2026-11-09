@@ -936,7 +936,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get yearReviewAnnounceBody =>
-      'Seu resumo está pronto: seus livros, suas páginas, seu favorito… Você também o encontra em Configurações, Meus resumos.';
+      'Seu resumo está pronto: seus livros, suas páginas, seu favorito… Ele espera por você todo o mês de janeiro na aba Resumo.';
 
   @override
   String get yearReviewAnnounceOpen => 'Ver meu resumo';
@@ -1065,4 +1065,20 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get yrOutroAuthor => 'Autor';
+
+  @override
+  String yearReviewMovedTitle(String year) {
+    return 'Seu resumo $year mudou de lugar';
+  }
+
+  @override
+  String yearReviewMovedBody(String year) {
+    return 'Janeiro acabou, e a aba Resumo também. Seu resumo $year agora está em Configurações, Meus resumos, junto com os de outros anos.';
+  }
+
+  @override
+  String get yearReviewMovedOpen => 'Ver meu resumo';
+
+  @override
+  String get yearReviewMovedOk => 'Entendi';
 }

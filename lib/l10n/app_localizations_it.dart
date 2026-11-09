@@ -939,7 +939,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get yearReviewAnnounceBody =>
-      'Il tuo bilancio è pronto: i tuoi libri, le tue pagine, il tuo preferito… Lo ritrovi anche in Impostazioni, I miei bilanci.';
+      'Il tuo bilancio è pronto: i tuoi libri, le tue pagine, il tuo preferito… Ti aspetta per tutto gennaio nella scheda Bilancio.';
 
   @override
   String get yearReviewAnnounceOpen => 'Vedi il mio bilancio';
@@ -1068,4 +1068,20 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get yrOutroAuthor => 'Autore';
+
+  @override
+  String yearReviewMovedTitle(String year) {
+    return 'Il tuo bilancio $year si è spostato';
+  }
+
+  @override
+  String yearReviewMovedBody(String year) {
+    return 'Gennaio è finito, e anche la scheda Bilancio. Il tuo bilancio $year ora si trova in Impostazioni, I miei bilanci, insieme a quelli degli altri anni.';
+  }
+
+  @override
+  String get yearReviewMovedOpen => 'Vedi il mio bilancio';
+
+  @override
+  String get yearReviewMovedOk => 'Ho capito';
 }

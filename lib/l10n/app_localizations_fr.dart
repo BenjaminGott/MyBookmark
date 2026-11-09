@@ -943,7 +943,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get yearReviewAnnounceBody =>
-      'Votre bilan est prêt : vos livres, vos pages, votre coup de cœur… Vous le retrouverez dans Réglages, Mes bilans.';
+      'Votre bilan est prêt : vos livres, vos pages, votre coup de cœur… Il vous attend tout le mois de janvier dans l\'onglet Bilan.';
 
   @override
   String get yearReviewAnnounceOpen => 'Voir mon bilan';
@@ -1072,4 +1072,20 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get yrOutroAuthor => 'Auteur';
+
+  @override
+  String yearReviewMovedTitle(String year) {
+    return 'Votre bilan $year a déménagé';
+  }
+
+  @override
+  String yearReviewMovedBody(String year) {
+    return 'Janvier est fini, l\'onglet Bilan aussi. Votre bilan $year vous attend maintenant dans Réglages, Mes bilans, avec ceux des autres années.';
+  }
+
+  @override
+  String get yearReviewMovedOpen => 'Voir mon bilan';
+
+  @override
+  String get yearReviewMovedOk => 'Compris';
 }

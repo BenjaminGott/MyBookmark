@@ -3,6 +3,7 @@ import 'package:biblivre/domain/models/reading_entry.dart';
 import 'package:biblivre/domain/models/shelf.dart';
 import 'package:biblivre/domain/models/year_review.dart';
 import 'package:biblivre/domain/repositories/year_review_repository.dart';
+import 'package:biblivre/domain/services/year_review_season.dart';
 import 'package:biblivre/l10n/app_localizations.dart';
 import 'package:biblivre/ui/year_review/year_review_providers.dart';
 import 'package:biblivre/ui/year_review/year_review_screen.dart';
@@ -29,6 +30,12 @@ class _FakeRepository implements YearReviewRepository {
 
   @override
   Set<int> savedYears() => saved.keys.toSet();
+
+  @override
+  int noticeCount(YearReviewNotice notice, int year) => 0;
+
+  @override
+  Future<void> markNoticeShown(YearReviewNotice notice, int year) async {}
 }
 
 FinishedReading _reading(

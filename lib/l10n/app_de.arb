@@ -247,7 +247,7 @@
   "yearReviewsSummary": "{books, plural, =1{1 Buch} other{{books} Bücher}} · {pages} Seiten",
   "yearReviewsNew": "Neu",
   "yearReviewAnnounceTitle": "Dein Lesejahr {year}",
-  "yearReviewAnnounceBody": "Dein Rückblick ist fertig: deine Bücher, deine Seiten, dein Lieblingsbuch… Du findest ihn auch unter Einstellungen, Meine Jahresrückblicke.",
+  "yearReviewAnnounceBody": "Dein Rückblick ist fertig: deine Bücher, deine Seiten, dein Lieblingsbuch… Den ganzen Januar findest du ihn im Tab Rückblick.",
   "yearReviewAnnounceOpen": "Rückblick ansehen",
   "yearReviewAnnounceLater": "Später",
   "yearReviewTitle": "Rückblick {year}",
@@ -273,5 +273,9 @@
   "yrOutroBooks": "Bücher",
   "yrOutroPages": "Seiten",
   "yrOutroFavorite": "Lieblingsbuch",
-  "yrOutroAuthor": "Autor"
+  "yrOutroAuthor": "Autor",
+  "yearReviewMovedTitle": "Dein Rückblick {year} ist umgezogen",
+  "yearReviewMovedBody": "Der Januar ist vorbei, und mit ihm der Tab Rückblick. Dein Rückblick {year} ist jetzt unter Einstellungen, Meine Jahresrückblicke, zusammen mit den anderen Jahren.",
+  "yearReviewMovedOpen": "Rückblick ansehen",
+  "yearReviewMovedOk": "Verstanden"
 }

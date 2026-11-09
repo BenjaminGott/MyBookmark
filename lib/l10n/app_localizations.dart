@@ -1591,7 +1591,7 @@ abstract class AppLocalizations {
   /// No description provided for @yearReviewAnnounceBody.
   ///
   /// In fr, this message translates to:
-  /// **'Votre bilan est prêt : vos livres, vos pages, votre coup de cœur… Vous le retrouverez dans Réglages, Mes bilans.'**
+  /// **'Votre bilan est prêt : vos livres, vos pages, votre coup de cœur… Il vous attend tout le mois de janvier dans l\'onglet Bilan.'**
   String get yearReviewAnnounceBody;
 
   /// No description provided for @yearReviewAnnounceOpen.
@@ -1749,6 +1749,30 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Auteur'**
   String get yrOutroAuthor;
+
+  /// No description provided for @yearReviewMovedTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Votre bilan {year} a déménagé'**
+  String yearReviewMovedTitle(String year);
+
+  /// No description provided for @yearReviewMovedBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'Janvier est fini, l\'onglet Bilan aussi. Votre bilan {year} vous attend maintenant dans Réglages, Mes bilans, avec ceux des autres années.'**
+  String yearReviewMovedBody(String year);
+
+  /// No description provided for @yearReviewMovedOpen.
+  ///
+  /// In fr, this message translates to:
+  /// **'Voir mon bilan'**
+  String get yearReviewMovedOpen;
+
+  /// No description provided for @yearReviewMovedOk.
+  ///
+  /// In fr, this message translates to:
+  /// **'Compris'**
+  String get yearReviewMovedOk;
 }
 
 class _AppLocalizationsDelegate

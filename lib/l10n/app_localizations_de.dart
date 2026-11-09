@@ -944,7 +944,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get yearReviewAnnounceBody =>
-      'Dein Rückblick ist fertig: deine Bücher, deine Seiten, dein Lieblingsbuch… Du findest ihn auch unter Einstellungen, Meine Jahresrückblicke.';
+      'Dein Rückblick ist fertig: deine Bücher, deine Seiten, dein Lieblingsbuch… Den ganzen Januar findest du ihn im Tab Rückblick.';
 
   @override
   String get yearReviewAnnounceOpen => 'Rückblick ansehen';
@@ -1073,4 +1073,20 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get yrOutroAuthor => 'Autor';
+
+  @override
+  String yearReviewMovedTitle(String year) {
+    return 'Dein Rückblick $year ist umgezogen';
+  }
+
+  @override
+  String yearReviewMovedBody(String year) {
+    return 'Der Januar ist vorbei, und mit ihm der Tab Rückblick. Dein Rückblick $year ist jetzt unter Einstellungen, Meine Jahresrückblicke, zusammen mit den anderen Jahren.';
+  }
+
+  @override
+  String get yearReviewMovedOpen => 'Rückblick ansehen';
+
+  @override
+  String get yearReviewMovedOk => 'Verstanden';
 }

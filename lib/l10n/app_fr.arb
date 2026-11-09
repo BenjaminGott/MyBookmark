@@ -534,7 +534,7 @@
       }
     }
   },
-  "yearReviewAnnounceBody": "Votre bilan est prêt : vos livres, vos pages, votre coup de cœur… Vous le retrouverez dans Réglages, Mes bilans.",
+  "yearReviewAnnounceBody": "Votre bilan est prêt : vos livres, vos pages, votre coup de cœur… Il vous attend tout le mois de janvier dans l'onglet Bilan.",
   "yearReviewAnnounceOpen": "Voir mon bilan",
   "yearReviewAnnounceLater": "Plus tard",
   "yearReviewTitle": "Bilan {year}",
@@ -628,5 +628,23 @@
   "yrOutroBooks": "Livres",
   "yrOutroPages": "Pages",
   "yrOutroFavorite": "Coup de cœur",
-  "yrOutroAuthor": "Auteur"
+  "yrOutroAuthor": "Auteur",
+  "yearReviewMovedTitle": "Votre bilan {year} a déménagé",
+  "yearReviewMovedBody": "Janvier est fini, l'onglet Bilan aussi. Votre bilan {year} vous attend maintenant dans Réglages, Mes bilans, avec ceux des autres années.",
+  "yearReviewMovedOpen": "Voir mon bilan",
+  "yearReviewMovedOk": "Compris",
+  "@yearReviewMovedTitle": {
+    "placeholders": {
+      "year": {
+        "type": "String"
+      }
+    }
+  },
+  "@yearReviewMovedBody": {
+    "placeholders": {
+      "year": {
+        "type": "String"
+      }
+    }
+  }
 }

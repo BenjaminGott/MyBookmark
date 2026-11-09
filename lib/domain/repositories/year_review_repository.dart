@@ -1,4 +1,5 @@
 import '../models/year_review.dart';
+import '../services/year_review_season.dart';
 
 /// Les bilans annuels : la matière pour les calculer, et les bilans figés.
 abstract class YearReviewRepository {
@@ -13,4 +14,9 @@ abstract class YearReviewRepository {
 
   /// Les années qui ont un bilan enregistré.
   Set<int> savedYears();
+
+  /// Combien de fois [notice] a été montrée pour le bilan de [year].
+  int noticeCount(YearReviewNotice notice, int year);
+
+  Future<void> markNoticeShown(YearReviewNotice notice, int year);
 }

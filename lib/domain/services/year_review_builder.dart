@@ -114,25 +114,6 @@ class YearReviewBuilder {
     );
   }
 
-  /// Faut-il afficher l'annonce du bilan de l'an dernier ?
-  ///
-  /// En janvier seulement, si le bilan n'existe pas encore et qu'au moins un
-  /// livre a été terminé l'an dernier. Renvoie l'année concernée.
-  int? yearToAnnounce({
-    required DateTime now,
-    required List<FinishedReading> readings,
-    required Set<int> savedYears,
-  }) {
-    if (now.month != DateTime.january) {
-      return null;
-    }
-    final lastYear = now.year - 1;
-    if (savedYears.contains(lastYear)) {
-      return null;
-    }
-    return yearsWithReadings(readings).contains(lastYear) ? lastYear : null;
-  }
-
   static bool _isFinished(FinishedReading reading) =>
       reading.entry.shelf == Shelf.read && reading.entry.finishedAt != null;
 }

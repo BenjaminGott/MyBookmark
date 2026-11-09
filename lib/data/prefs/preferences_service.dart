@@ -16,6 +16,7 @@ class PreferencesService {
   static const String _goalPrefix = 'reading_goal_';
   static const String _reviewKey = 'review_asked_at';
   static const String _yearReviewPrefix = 'year_review_';
+  static const String _noticePrefix = 'year_review_notice_';
 
   /// Nul quand les préférences n'ont pas pu être chargées.
   final SharedPreferences? _preferences;
@@ -86,6 +87,19 @@ class PreferencesService {
 
   Future<void> setYearReviewJson(int year, String json) async {
     await _preferences?.setString('$_yearReviewPrefix$year', json);
+  }
+
+  /// Combien de fois la fenêtre [season] (« january », « february ») du
+  /// bilan de [year] a été montrée.
+  int yearReviewNoticeCount(String season, int year) =>
+      _preferences?.getInt('$_noticePrefix${season}_$year') ?? 0;
+
+  Future<void> setYearReviewNoticeCount(
+    String season,
+    int year,
+    int count,
+  ) async {
+    await _preferences?.setInt('$_noticePrefix${season}_$year', count);
   }
 
   /// Les années qui ont un bilan enregistré.

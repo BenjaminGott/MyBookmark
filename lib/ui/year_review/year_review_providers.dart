@@ -4,6 +4,7 @@ import '../../data/year_review/local_year_review_repository.dart';
 import '../../domain/models/year_review.dart';
 import '../../domain/repositories/year_review_repository.dart';
 import '../../domain/services/year_review_builder.dart';
+import '../../domain/services/year_review_season.dart';
 import '../providers/database_providers.dart';
 import '../providers/settings_providers.dart';
 
@@ -91,16 +92,16 @@ Future<YearReview?> _buildAndSave(
   return review;
 }
 
-/// L'année dont il faut annoncer le bilan à l'ouverture de l'app : en
-/// janvier, celle qui vient de finir, si elle a des lectures et pas encore de
-/// bilan. `null` le reste du temps.
-final FutureProvider<int?> yearToAnnounceProvider = FutureProvider<int?>((
-  ref,
-) async {
-  final repository = ref.watch(yearReviewRepositoryProvider);
-  return const YearReviewBuilder().yearToAnnounce(
-    now: ref.watch(clockProvider)(),
-    readings: await repository.finishedReadings(),
-    savedYears: repository.savedYears(),
-  );
-});
+/// Ce que l'app montre du bilan de l'an dernier à ce lancement : l'onglet
+/// en janvier, et la fenêtre de janvier ou de février tant qu'elle n'a pas
+/// été vue deux fois. `null` le reste de l'année.
+final FutureProvider<YearReviewSeasonState?> yearReviewSeasonProvider =
+    FutureProvider<YearReviewSeasonState?>((ref) async {
+      final repository = ref.watch(yearReviewRepositoryProvider);
+      return const YearReviewSeason().at(
+        now: ref.watch(clockProvider)(),
+        readings: await repository.finishedReadings(),
+        savedYears: repository.savedYears(),
+        shownCount: repository.noticeCount,
+      );
+    });

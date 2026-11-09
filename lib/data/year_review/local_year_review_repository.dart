@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import '../../domain/models/year_review.dart';
 import '../../domain/repositories/year_review_repository.dart';
+import '../../domain/services/year_review_season.dart';
 import '../local/app_database.dart';
 import '../prefs/preferences_service.dart';
 
@@ -42,4 +43,16 @@ class LocalYearReviewRepository implements YearReviewRepository {
 
   @override
   Set<int> savedYears() => preferences.savedYearReviews;
+
+  @override
+  int noticeCount(YearReviewNotice notice, int year) =>
+      preferences.yearReviewNoticeCount(notice.name, year);
+
+  @override
+  Future<void> markNoticeShown(YearReviewNotice notice, int year) =>
+      preferences.setYearReviewNoticeCount(
+        notice.name,
+        year,
+        noticeCount(notice, year) + 1,
+      );
 }

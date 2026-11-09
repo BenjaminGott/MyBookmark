@@ -247,7 +247,7 @@
   "yearReviewsSummary": "{books, plural, =1{1 libro} other{{books} libri}} · {pages} pagine",
   "yearReviewsNew": "Nuovo",
   "yearReviewAnnounceTitle": "Il tuo {year} di lettura",
-  "yearReviewAnnounceBody": "Il tuo bilancio è pronto: i tuoi libri, le tue pagine, il tuo preferito… Lo ritrovi anche in Impostazioni, I miei bilanci.",
+  "yearReviewAnnounceBody": "Il tuo bilancio è pronto: i tuoi libri, le tue pagine, il tuo preferito… Ti aspetta per tutto gennaio nella scheda Bilancio.",
   "yearReviewAnnounceOpen": "Vedi il mio bilancio",
   "yearReviewAnnounceLater": "Più tardi",
   "yearReviewTitle": "Bilancio {year}",
@@ -273,5 +273,9 @@
   "yrOutroBooks": "Libri",
   "yrOutroPages": "Pagine",
   "yrOutroFavorite": "Preferito",
-  "yrOutroAuthor": "Autore"
+  "yrOutroAuthor": "Autore",
+  "yearReviewMovedTitle": "Il tuo bilancio {year} si è spostato",
+  "yearReviewMovedBody": "Gennaio è finito, e anche la scheda Bilancio. Il tuo bilancio {year} ora si trova in Impostazioni, I miei bilanci, insieme a quelli degli altri anni.",
+  "yearReviewMovedOpen": "Vedi il mio bilancio",
+  "yearReviewMovedOk": "Ho capito"
 }

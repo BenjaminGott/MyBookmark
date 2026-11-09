@@ -926,7 +926,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get yearReviewAnnounceBody =>
-      'Your review is ready: your books, your pages, your favorite… You\'ll find it again in Settings, My reviews.';
+      'Your review is ready: your books, your pages, your favorite… It\'s waiting for you all January in the Review tab.';
 
   @override
   String get yearReviewAnnounceOpen => 'See my review';
@@ -1055,4 +1055,20 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get yrOutroAuthor => 'Author';
+
+  @override
+  String yearReviewMovedTitle(String year) {
+    return 'Your $year review has moved';
+  }
+
+  @override
+  String yearReviewMovedBody(String year) {
+    return 'January is over, and so is the Review tab. Your $year review now lives in Settings, My reviews, along with your other years.';
+  }
+
+  @override
+  String get yearReviewMovedOpen => 'See my review';
+
+  @override
+  String get yearReviewMovedOk => 'Got it';
 }

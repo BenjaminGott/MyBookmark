@@ -247,7 +247,7 @@
   "yearReviewsSummary": "{books, plural, =1{1 livro} other{{books} livros}} · {pages} páginas",
   "yearReviewsNew": "Novo",
   "yearReviewAnnounceTitle": "Seu {year} de leitura",
-  "yearReviewAnnounceBody": "Seu resumo está pronto: seus livros, suas páginas, seu favorito… Você também o encontra em Configurações, Meus resumos.",
+  "yearReviewAnnounceBody": "Seu resumo está pronto: seus livros, suas páginas, seu favorito… Ele espera por você todo o mês de janeiro na aba Resumo.",
   "yearReviewAnnounceOpen": "Ver meu resumo",
   "yearReviewAnnounceLater": "Mais tarde",
   "yearReviewTitle": "Resumo {year}",
@@ -273,5 +273,9 @@
   "yrOutroBooks": "Livros",
   "yrOutroPages": "Páginas",
   "yrOutroFavorite": "Favorito",
-  "yrOutroAuthor": "Autor"
+  "yrOutroAuthor": "Autor",
+  "yearReviewMovedTitle": "Seu resumo {year} mudou de lugar",
+  "yearReviewMovedBody": "Janeiro acabou, e a aba Resumo também. Seu resumo {year} agora está em Configurações, Meus resumos, junto com os de outros anos.",
+  "yearReviewMovedOpen": "Ver meu resumo",
+  "yearReviewMovedOk": "Entendi"
 }
